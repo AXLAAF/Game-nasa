@@ -10,7 +10,8 @@ func run(scene_tree: SceneTree) -> void:
 		_dir = OS.get_environment("SHOTS_DIR")
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(_dir))
 	for phase: StringName in Tutorial.ORDER:
-		Profile.tutorial_seen.append(String(phase))
+		if not Profile.tutorial_seen.has(String(phase)):
+			Profile.tutorial_seen.append(String(phase))
 	tree.root.add_child(load("res://game/main.tscn").instantiate())
 	await _wait(1.0)
 	await _shot("1_hangar")

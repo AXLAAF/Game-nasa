@@ -180,10 +180,10 @@ func _draw_view() -> void:
 	var o := _origin()
 	_view.draw_rect(Rect2(Vector2.ZERO, _view.size), Color(0, 0, 0, 0.75))
 	_view.draw_rect(Rect2(o, AREA), Color(0.02, 0.04, 0.09))
-	_view.draw_rect(Rect2(o, AREA), Ui.CYAN, false, 2.0)
+	_view.draw_rect(Rect2(o, AREA), Ui.INFO, false, 2.0)
 	var font := Ui.mono()
 	var title := {&"asteroids": "CAMPO DE ASTEROIDES  W/A/S/D", &"drill": "PERFORACION  ESPACIO en la zona verde", &"dock": "ACOPLE  W/S alinear, D avanzar, A frenar"}
-	_view.draw_string(font, o + Vector2(0, -12), str(title.get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.GOLD)
+	_view.draw_string(font, o + Vector2(0, -12), str(title.get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.IVORY)
 	match mode:
 		&"asteroids":
 			_draw_asteroids(o, font)
@@ -192,7 +192,7 @@ func _draw_view() -> void:
 		&"dock":
 			_draw_dock(o, font)
 	if _done:
-		_view.draw_string(font, o + Vector2(0, AREA.y + 34), _msg, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Ui.TEXT)
+		_view.draw_string(font, o + Vector2(0, AREA.y + 34), _msg, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Ui.IVORY)
 
 
 func _draw_asteroids(o: Vector2, font: Font) -> void:
@@ -209,9 +209,9 @@ func _draw_asteroids(o: Vector2, font: Font) -> void:
 			_view.draw_colored_polygon(pts, Color(0.45, 0.4, 0.38))
 	var ship := o + _ship
 	if _invuln <= 0.0 or int(_time * 12.0) % 2 == 0:
-		_view.draw_colored_polygon(PackedVector2Array([ship + Vector2(16, 0), ship + Vector2(-10, -9), ship + Vector2(-10, 9)]), Ui.CYAN)
+		_view.draw_colored_polygon(PackedVector2Array([ship + Vector2(16, 0), ship + Vector2(-10, -9), ship + Vector2(-10, 9)]), Ui.INFO)
 		_view.draw_circle(ship + Vector2(-14, 0), 4.0 + randf() * 3.0, Color(2.5, 1.2, 0.3))
-	_view.draw_string(font, o + Vector2(12, 24), "Casco %s   Tiempo %d" % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.TEXT)
+	_view.draw_string(font, o + Vector2(12, 24), "Casco %s   Tiempo %d" % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.IVORY)
 
 
 func _draw_drill(o: Vector2, font: Font) -> void:
@@ -220,16 +220,16 @@ func _draw_drill(o: Vector2, font: Font) -> void:
 	_view.draw_rect(Rect2(bar.position.x + bar.size.x * _zone.x, bar.position.y, bar.size.x * (_zone.y - _zone.x), bar.size.y), Color(0.2, 0.9 + _flash, 0.4))
 	var x := bar.position.x + bar.size.x * _needle
 	_view.draw_line(Vector2(x, bar.position.y - 20), Vector2(x, bar.end.y + 20), Color(2.0, 1.8, 1.0), 4.0)
-	_view.draw_string(font, o + Vector2(60, 60), "Ronda %d/3   Limpias %d" % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.TEXT)
+	_view.draw_string(font, o + Vector2(60, 60), "Ronda %d/3   Limpias %d" % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.IVORY)
 
 
 func _draw_dock(o: Vector2, font: Font) -> void:
 	var port := o + Vector2(AREA.x - 60, AREA.y * 0.5)
 	_view.draw_rect(Rect2(port + Vector2(0, -60), Vector2(60, 120)), Color(0.4, 0.42, 0.5))
-	_view.draw_rect(Rect2(port + Vector2(-8, -16), Vector2(8, 32)), Ui.GREEN)
+	_view.draw_rect(Rect2(port + Vector2(-8, -16), Vector2(8, 32)), Ui.LAMP_GO)
 	_view.draw_dashed_line(Vector2(o.x, port.y), port, Color(0.4, 1, 0.55, 0.3), 2.0, 10.0)
 	var ship := o + _ship
 	_view.draw_rect(Rect2(ship + Vector2(-24, -10), Vector2(40, 20)), Color(0.8, 0.85, 0.9))
-	_view.draw_rect(Rect2(ship + Vector2(16, -5), Vector2(6, 10)), Ui.CYAN)
+	_view.draw_rect(Rect2(ship + Vector2(16, -5), Vector2(6, 10)), Ui.INFO)
 	var speed := _vel.length()
-	_view.draw_string(font, o + Vector2(12, 24), "Velocidad %d  (max 70)   Desvio %d" % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.RED if speed > 70 else Ui.TEXT)
+	_view.draw_string(font, o + Vector2(12, 24), "Velocidad %d  (max 70)   Desvio %d" % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.LAMP_WARNING if speed > 70 else Ui.IVORY)

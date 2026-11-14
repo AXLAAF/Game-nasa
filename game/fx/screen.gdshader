@@ -19,7 +19,7 @@ void fragment() {
 	uv.y += cos(uv.x * 50.0 + TIME * 5.0) * 0.002 * heat;
 	float glitch = step(0.985 - bad * 0.1 - damage * 0.05, hash(vec2(floor(uv.y * 90.0), floor(TIME * 12.0))));
 	uv.x += glitch * (hash(vec2(TIME, uv.y)) - 0.5) * 0.05 * (bad + damage);
-	float ab = 0.0012 + bad * 0.006 + damage * 0.012;
+	float ab = bad * 0.006 + damage * 0.012;
 	vec3 col;
 	col.r = textureLod(screen_tex, uv + vec2(ab, 0.0), 0.0).r;
 	col.g = textureLod(screen_tex, uv, 0.0).g;
@@ -27,8 +27,8 @@ void fragment() {
 	vec3 blur = textureLod(screen_tex, uv, 2.5 * bad).rgb;
 	col = mix(col, blur, bad * 0.6);
 	float scan = 0.95 + 0.05 * sin(SCREEN_UV.y * 1100.0);
-	col *= mix(1.0, scan, 0.4 + bad);
-	col += (hash(SCREEN_UV * vec2(TIME * 61.0 + 1.0, TIME * 37.0 + 1.0)) - 0.5) * (0.02 + bad * 0.25);
+	col *= mix(1.0, scan, bad);
+	col += (hash(SCREEN_UV * vec2(TIME * 61.0 + 1.0, TIME * 37.0 + 1.0)) - 0.5) * (0.008 + bad * 0.25);
 	vec2 d = SCREEN_UV - 0.5;
 	float vig = smoothstep(0.9, 0.2, length(d) * (1.0 + (1.0 - light) * 1.6));
 	col *= mix(1.0, vig, 0.3 + (1.0 - light) * 0.6);

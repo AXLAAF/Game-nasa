@@ -3,6 +3,7 @@ extends CanvasLayer
 
 ## Capitulos por fase. La primera visita los muestra; el hangar puede repetirlos todos.
 
+const CHAPTER := {&"hangar": "hangar", &"assembly": "ensamblaje", &"launch": "despegue", &"space": "espacio", &"descent": "descenso", &"debrief": "liquidación"}
 const ORDER: Array[StringName] = [&"hangar", &"assembly", &"launch", &"space", &"descent", &"debrief"]
 const STEPS: Dictionary = {
 	&"hangar": [
@@ -91,17 +92,18 @@ func _ready() -> void:
 	add_child(root)
 	_panel = PanelContainer.new()
 	_panel.custom_minimum_size = Vector2(680, 0)
-	_panel.add_theme_stylebox_override("panel", Ui.box(Ui.PANEL_LIGHT, Ui.CYAN, 2, 8))
 	root.add_child(_panel)
 	var panel := _panel
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 6)
+	col.add_theme_constant_override("separation", 10)
 	panel.add_child(col)
 	var head := HBoxContainer.new()
 	col.add_child(head)
 	_count = Label.new()
-	_count.add_theme_font_size_override("font_size", 13)
-	_count.add_theme_color_override("font_color", Ui.CYAN)
+	_count.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
+	_count.add_theme_font_override("font", Ui.legend_font())
+	_count.add_theme_color_override("font_color", Ui.IVORY_DIM)
+	_count.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	head.add_child(_count)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -112,15 +114,18 @@ func _ready() -> void:
 	head.add_child(skip)
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 22)
+	_title.add_theme_font_override("font", Ui.bold())
 	col.add_child(_title)
 	_body = Label.new()
 	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_body.custom_minimum_size = Vector2(640, 0)
-	_body.add_theme_font_size_override("font_size", 15)
-	_body.add_theme_color_override("font_color", Ui.TEXT)
+	_body.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
+	_body.add_theme_constant_override("line_spacing", 5)
+	_body.add_theme_color_override("font_color", Ui.IVORY)
 	col.add_child(_body)
 	_next = Button.new()
-	_next.custom_minimum_size = Vector2(0, 36)
+	_next.custom_minimum_size = Vector2(0, 44)
+	Ui.primary(_next)
 	_next.pressed.connect(_advance)
 	col.add_child(_next)
 	_paint()
@@ -151,8 +156,7 @@ func _collect() -> Array[Dictionary]:
 
 func _paint() -> void:
 	var page := _pages[_index]
-	var chapter := String(page.phase).to_upper()
-	_count.text = "TUTORIAL  %s   %d / %d" % [chapter, _index + 1, _pages.size()]
+	_count.text = ("Manual de vuelo: %s   %d / %d" % [CHAPTER[page.phase], _index + 1, _pages.size()]).to_upper()
 	_title.text = String(page.title)
 	_body.text = String(page.text)
 	_next.text = "Listo" if _index >= _pages.size() - 1 else "Siguiente"

@@ -30,12 +30,12 @@ static func streak_mult(streak: int) -> float:
 
 static func risk_color(chance: float) -> Color:
 	if chance >= 0.999:
-		return Color(0.55, 0.85, 1.0)
+		return Color("8fd6ce")
 	if chance >= 0.7:
-		return Color(0.4, 1.0, 0.55)
+		return Color("58c96b")
 	if chance >= 0.45:
-		return Color(1.0, 0.75, 0.25)
-	return Color(1.0, 0.3, 0.3)
+		return Color("ffb000")
+	return Color("f0503f")
 
 
 ## Fiabilidad estimada de la nave en un viaje: rango [peor, mejor] segun lo que se sabe.

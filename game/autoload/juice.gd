@@ -21,8 +21,9 @@ var _slow_scale: float = 1.0
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_noise.frequency = 2.5
+	# El filtro degrada la ventana (capa 5), no el tablero (capas 10+).
 	var layer := CanvasLayer.new()
-	layer.layer = 100
+	layer.layer = 5
 	add_child(layer)
 	_overlay = ColorRect.new()
 	_overlay.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -31,11 +32,14 @@ func _ready() -> void:
 	mat.shader = load("res://game/fx/screen.gdshader")
 	_overlay.material = mat
 	layer.add_child(_overlay)
+	var flash_layer := CanvasLayer.new()
+	flash_layer.layer = 100
+	add_child(flash_layer)
 	_flash = ColorRect.new()
 	_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_flash.color = Color(1, 1, 1, 0)
-	layer.add_child(_flash)
+	flash_layer.add_child(_flash)
 	_last_ticks = Time.get_ticks_msec()
 	Events.phase_changed.connect(func(_id: StringName) -> void: reset())
 
@@ -51,6 +55,8 @@ func reset() -> void:
 
 
 func shake(amount: float) -> void:
+	if Profile.reduced_motion:
+		return
 	trauma = minf(trauma + amount, 1.0)
 
 
@@ -69,6 +75,8 @@ func slowmo(scale: float, duration: float) -> void:
 
 
 func flash(color: Color, strength: float = 0.6) -> void:
+	if Profile.reduced_motion:
+		return
 	_flash.color = Color(color.r, color.g, color.b, strength)
 
 
@@ -88,13 +96,15 @@ func _process(_delta: float) -> void:
 			Engine.time_scale = _slow_scale
 		else:
 			Engine.time_scale = 1.0
+	var flying := FLIGHT_PHASES.has(Router.current)
 	var cam := get_viewport().get_camera_2d()
 	if cam != null:
 		var t := now / 1000.0 * 40.0
 		var power := trauma * trauma * 22.0
-		cam.offset = Vector2(_noise.get_noise_1d(t), _noise.get_noise_1d(t + 500.0)) * power
+		# En vuelo la consola tapa la franja inferior: el centro util de la ventana sube.
+		var bias := Vector2(0, Ui.CONSOLE_H * 0.5 / cam.zoom.y) if flying else Vector2.ZERO
+		cam.offset = bias + Vector2(_noise.get_noise_1d(t), _noise.get_noise_1d(t + 500.0)) * power
 	var mat := _overlay.material as ShaderMaterial
-	var flying := FLIGHT_PHASES.has(Router.current)
 	mat.set_shader_parameter("vision", Run.channel(&"vision") if flying else 1.0)
 	mat.set_shader_parameter("light", Run.channel(&"light") if flying else 1.0)
 	mat.set_shader_parameter("plasma", plasma)

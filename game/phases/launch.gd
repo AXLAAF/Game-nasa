@@ -75,18 +75,18 @@ func _build_hud() -> void:
 	var panel := Ui.panel(root)
 	Ui.place(panel, Rect2(12, 12, 260, 0))
 	var col := Ui.vbox(panel, 4)
-	Ui.label(col, "DESPEGUE  %s" % body.display_name.to_upper(), 16, Ui.CYAN)
+	Ui.label(col, "DESPEGUE  %s" % body.display_name.to_upper(), 16, Ui.INFO)
 	_info = Ui.label(col, "", 13)
-	for key: Array in [["orbit", "VELOCIDAD ORBITAL", Ui.GREEN], ["q", "PRESION DINAMICA (Q)", Ui.ORANGE], ["stress", "ESTRES ESTRUCTURAL", Ui.RED], ["throttle", "ACELERADOR", Ui.CYAN], ["fuel", "COMBUSTIBLE ETAPA", Ui.GOLD]]:
+	for key: Array in [["orbit", "VELOCIDAD ORBITAL", Ui.LAMP_GO], ["q", "PRESION DINAMICA (Q)", Ui.LAMP_CAUTION], ["stress", "ESTRES ESTRUCTURAL", Ui.LAMP_WARNING], ["throttle", "ACELERADOR", Ui.INFO], ["fuel", "COMBUSTIBLE ETAPA", Ui.IVORY]]:
 		var g := Gauge.new(key[1], key[2])
 		col.add_child(g)
 		_gauges[key[0]] = g
 	Ui.button(col, "Estado [C]", func() -> void: Ui.toggle_status(self))
-	Ui.label(col, "1-4 velocidad de tiempo", 12, Ui.DIM)
+	Ui.label(col, "1-4 velocidad de tiempo", 12, Ui.IVORY_DIM)
 	var ticker := Ticker.new()
 	Ui.place(ticker, Rect2(900, 12, 370, 300))
 	root.add_child(ticker)
-	_banner = Ui.label(root, "", 34, Ui.GOLD)
+	_banner = Ui.label(root, "", 34, Ui.IVORY)
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_banner.position.y = 80
@@ -99,7 +99,7 @@ func _build_hud() -> void:
 	_dial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dial.draw.connect(_draw_dial)
 	root.add_child(_dial)
-	var hint := Ui.label(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   ESPACIO ignicion / etapa   C estado   BACKSPACE abortar", 13, Ui.DIM)
+	var hint := Ui.label(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   ESPACIO ignicion / etapa   C estado   BACKSPACE abortar", 13, Ui.IVORY_DIM)
 	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	hint.position.y -= 28
 	hint.position.x -= 330
@@ -132,7 +132,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		Ui.toggle_status(self)
 	elif key >= KEY_1 and key <= KEY_4:
 		warp_i = key - KEY_1
-		Events.toast.emit("Tiempo %s" % ("x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])), Ui.CYAN)
+		Events.toast.emit("Tiempo %s" % ("x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])), Ui.INFO)
 	elif key == KEY_R and state == State.ASCENT and not lifted and stuck_time > 2.5:
 		_scrub()
 
@@ -141,12 +141,12 @@ func _ignite() -> void:
 	var timing := absf(countdown)
 	var failed: Array[ShipPart]
 	if timing <= 0.3:
-		_say("IGNICION PERFECTA", Ui.GREEN)
+		_say("IGNICION PERFECTA", Ui.LAMP_GO)
 		ignition_bonus = 1.05
 		failed = Run.roll_stress(0.3, [&"engine"], Run.ship.active_stage())
-		Juice.flash(Ui.GREEN, 0.3)
+		Juice.flash(Ui.LAMP_GO, 0.3)
 	else:
-		_say("ARRANQUE DURO" if countdown > 0.0 else "IGNICION TARDIA", Ui.ORANGE)
+		_say("ARRANQUE DURO" if countdown > 0.0 else "IGNICION TARDIA", Ui.LAMP_CAUTION)
 		stress += 0.25
 		failed = Run.roll_stress(0.9, [&"engine"], Run.ship.active_stage())
 		Juice.shake(0.5)
@@ -177,7 +177,7 @@ func _try_stage() -> void:
 			if ok:
 				_do_stage()
 			else:
-				Events.toast.emit("Desacoplador trabado: ESPACIO para reintentar", Ui.ORANGE))
+				Events.toast.emit("Desacoplador trabado: ESPACIO para reintentar", Ui.LAMP_CAUTION))
 
 
 func _do_stage() -> void:
@@ -190,7 +190,7 @@ func _do_stage() -> void:
 	Juice.shake(0.35)
 	_rebuild_exhausts()
 	_raise(Run.roll_stress(0.5, [&"engine"], Run.ship.active_stage()))
-	Events.toast.emit("Separacion de etapa", Ui.CYAN)
+	Events.toast.emit("Separacion de etapa", Ui.INFO)
 
 
 func _abort() -> void:
@@ -199,12 +199,12 @@ func _abort() -> void:
 			Run.destroy("Autodestruccion tras quedarse sin combustible.")
 			return
 		Synth.play(&"deny")
-		Events.toast.emit("Sin torre de escape funcional", Ui.RED)
+		Events.toast.emit("Sin torre de escape funcional", Ui.LAMP_WARNING)
 		return
 	Run.outcome = &"aborted"
 	Run.outcome_text = "Abortaste el despegue. La torre salvo la capsula."
 	Synth.play(&"boom", -6.0)
-	Fx.burst(self, Vector2.ZERO, Ui.ORANGE, 90, 500)
+	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 90, 500)
 	Juice.shake(0.8)
 	_finish(State.OVER)
 
@@ -301,14 +301,14 @@ func _fly(delta: float) -> void:
 		stress += (q - Q_SAFE) / Q_SAFE * delta * (0.85 if Profile.assist else 1.4)
 		if not _maxq_warned:
 			_maxq_warned = true
-			_say("MAX-Q  baja el acelerador", Ui.ORANGE)
+			_say("MAX-Q  baja el acelerador", Ui.LAMP_CAUTION)
 			Synth.play(&"beep")
 	else:
 		stress = maxf(stress - delta * 0.12, 0.0)
 	if stress >= 1.0:
 		stress = 0.45
 		overloads += 1
-		_say("SOBRECARGA ESTRUCTURAL", Ui.RED)
+		_say("SOBRECARGA ESTRUCTURAL", Ui.LAMP_WARNING)
 		Synth.play(&"alarm")
 		Juice.hit(0.8)
 		Juice.hitstop(0.12)
@@ -355,10 +355,10 @@ func _reach_orbit() -> void:
 	elif ratio > 0.3:
 		grade = "B"
 	Run.launch_grade = grade
-	_say("EN ORBITA  -  ascenso %s" % grade, Ui.GREEN)
+	_say("EN ORBITA  -  ascenso %s" % grade, Ui.LAMP_GO)
 	Synth.play(&"chime")
 	Juice.slowmo(0.35, 0.8)
-	Juice.flash(Ui.CYAN, 0.4)
+	Juice.flash(Ui.INFO, 0.4)
 	await get_tree().create_timer(1.6).timeout
 	_offer_bets()
 
@@ -392,7 +392,7 @@ func _bet(label: String, stake: int, kind: String, mult: float) -> ChoiceDef:
 func _explode() -> void:
 	Synth.play(&"boom")
 	Synth.engine_level = 0.0
-	Fx.burst(self, Vector2.ZERO, Ui.ORANGE, 160, 700, 1.4)
+	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 160, 700, 1.4)
 	Fx.burst(self, Vector2.ZERO, Color(0.5, 0.5, 0.5), 80, 300, 2.0)
 	Juice.hit(1.0)
 	Juice.hitstop(0.2)
@@ -524,7 +524,7 @@ func _update_hud() -> void:
 	if state == State.COUNTDOWN:
 		_banner.text = "T-%d   pulsa ESPACIO en T-0" % maxi(ceili(countdown), 0) if countdown > 0.3 else "AHORA"
 		_banner.modulate.a = 1.0
-		_banner.add_theme_color_override("font_color", Ui.GREEN if absf(countdown) <= 0.3 else Ui.GOLD)
+		_banner.add_theme_color_override("font_color", Ui.LAMP_GO if absf(countdown) <= 0.3 else Ui.IVORY)
 
 
 func _draw_dial() -> void:
@@ -534,12 +534,12 @@ func _draw_dial() -> void:
 	_dial.draw_arc(c, r, 0.0, TAU, 48, Color(0.3, 0.6, 0.8, 0.5), 2.0)
 	if state == State.COUNTDOWN:
 		var window := 0.3 / 4.0 * TAU
-		_dial.draw_arc(c, r - 6, -PI * 0.5 - window, -PI * 0.5 + window, 16, Ui.GREEN, 10.0)
+		_dial.draw_arc(c, r - 6, -PI * 0.5 - window, -PI * 0.5 + window, 16, Ui.LAMP_GO, 10.0)
 		var a := -PI * 0.5 - countdown / 4.0 * TAU
-		_dial.draw_line(c, c + Vector2(cos(a), sin(a)) * r, Ui.GOLD, 4.0)
+		_dial.draw_line(c, c + Vector2(cos(a), sin(a)) * r, Ui.IVORY, 4.0)
 		return
 	var target := deg_to_rad(target_pitch()) - PI * 0.5
 	_dial.draw_arc(c, r - 6, target - deg_to_rad(8), target + deg_to_rad(8), 12, Color(0.4, 1.0, 0.55, 0.7), 10.0)
 	var a2 := deg_to_rad(pitch) - PI * 0.5
-	_dial.draw_line(c, c + Vector2(cos(a2), sin(a2)) * r, Ui.GOLD, 4.0)
-	_dial.draw_string(Ui.mono(), c + Vector2(-40, r + 22), "CORREDOR", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ui.DIM)
+	_dial.draw_line(c, c + Vector2(cos(a2), sin(a2)) * r, Ui.IVORY, 4.0)
+	_dial.draw_string(Ui.mono(), c + Vector2(-40, r + 22), "CORREDOR", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ui.IVORY_DIM)

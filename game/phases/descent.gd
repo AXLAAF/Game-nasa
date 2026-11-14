@@ -87,7 +87,7 @@ func _ready() -> void:
 		if Run.channel(&"map") < 0.6 and not Profile.assist:
 			corridor += Vector2.ONE * Run.rng.randf_range(-2.0, 2.0)
 		gamma = edge - width * 0.5
-		_say("CORREDOR DE ENTRADA", Ui.CYAN)
+		_say("CORREDOR DE ENTRADA", Ui.INFO)
 
 
 func _hidden_hazard() -> void:
@@ -113,7 +113,7 @@ func _hidden_hazard() -> void:
 		&"heat":
 			hull_heat = 0.35
 			text = "CALOR EXTREMO: el casco ya viene caliente"
-	Events.toast.emit("PELIGRO OCULTO: " + text, Ui.RED)
+	Events.toast.emit("PELIGRO OCULTO: " + text, Ui.LAMP_WARNING)
 	Run.note("Peligro oculto: " + text)
 	Synth.play(&"alarm")
 
@@ -123,9 +123,9 @@ func _build_hud() -> void:
 	var panel := Ui.panel(root)
 	Ui.place(panel, Rect2(12, 12, 270, 0))
 	var col := Ui.vbox(panel, 4)
-	Ui.label(col, "DESCENSO  %s" % body.display_name.to_upper(), 16, Ui.CYAN)
+	Ui.label(col, "DESCENSO  %s" % body.display_name.to_upper(), 16, Ui.INFO)
 	_info = Ui.label(col, "", 13)
-	for key: Array in [["heat", "CALOR DEL CASCO", Ui.RED], ["shield", "ESCUDO ABLATIVO", Ui.ORANGE], ["g", "CARGA G", Ui.GOLD], ["burn", "FRENADO SUICIDA", Ui.GREEN], ["fuel", "COMBUSTIBLE", Ui.CYAN]]:
+	for key: Array in [["heat", "CALOR DEL CASCO", Ui.LAMP_WARNING], ["shield", "ESCUDO ABLATIVO", Ui.LAMP_CAUTION], ["g", "CARGA G", Ui.IVORY], ["burn", "FRENADO SUICIDA", Ui.LAMP_GO], ["fuel", "COMBUSTIBLE", Ui.INFO]]:
 		var g := Gauge.new(key[1], key[2])
 		col.add_child(g)
 		_gauges[key[0]] = g
@@ -133,13 +133,13 @@ func _build_hud() -> void:
 	var ticker := Ticker.new()
 	Ui.place(ticker, Rect2(900, 12, 370, 300))
 	root.add_child(ticker)
-	_banner = Ui.label(root, "", 32, Ui.GOLD)
+	_banner = Ui.label(root, "", 32, Ui.IVORY)
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	_banner.position.y = 80
 	_banner.add_theme_color_override("font_outline_color", Color.BLACK)
 	_banner.add_theme_constant_override("outline_size", 8)
-	_prompt = Ui.label(root, "", 15, Ui.DIM)
+	_prompt = Ui.label(root, "", 15, Ui.IVORY_DIM)
 	_prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
 	_prompt.position += Vector2(-420, -34)
 	_panel = Ui.panel(root)
@@ -218,11 +218,11 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_1, KEY_2, KEY_3, KEY_4:
 			var next := (event as InputEventKey).physical_keycode - KEY_1
 			if next >= 2 and (heat > 0.05 or agl() < 3000.0):
-				Events.toast.emit("Demasiado bajo o caliente para acelerar", Ui.ORANGE)
+				Events.toast.emit("Demasiado bajo o caliente para acelerar", Ui.LAMP_CAUTION)
 				warp_i = 1
 			else:
 				warp_i = next
-				Events.toast.emit("Tiempo %s" % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.CYAN)
+				Events.toast.emit("Tiempo %s" % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.INFO)
 
 
 func _commit() -> void:
@@ -233,9 +233,9 @@ func _commit() -> void:
 	state = State.ENTRY if body.atmosphere > 0.0 else State.FLIGHT
 	Synth.play(&"whoosh")
 	if body.atmosphere > 0.0:
-		_say("INTERFAZ DE ENTRADA  %.1f grados" % gamma, Ui.ORANGE)
+		_say("INTERFAZ DE ENTRADA  %.1f grados" % gamma, Ui.LAMP_CAUTION)
 	else:
-		_say("SIN ATMOSFERA: frena con el motor (T retro)", Ui.ORANGE)
+		_say("SIN ATMOSFERA: frena con el motor (T retro)", Ui.LAMP_CAUTION)
 
 
 func _stage() -> void:
@@ -245,7 +245,7 @@ func _stage() -> void:
 	Run.ship.drop_stage()
 	Synth.play(&"thud")
 	Juice.shake(0.3)
-	Events.toast.emit("Etapa separada", Ui.CYAN)
+	Events.toast.emit("Etapa separada", Ui.INFO)
 
 
 func _deploy_chute() -> void:
@@ -261,12 +261,12 @@ func _deploy_chute() -> void:
 	var limit := 450.0 if chute == 0 else 120.0
 	Synth.play(&"whoosh", 0.0, 1.3)
 	if chute == 1 and agl() > 6000.0:
-		Events.toast.emit("Demasiado alto para el principal", Ui.ORANGE)
+		Events.toast.emit("Demasiado alto para el principal", Ui.LAMP_CAUTION)
 		return
 	if speed > limit and Run.rng.randf() < clampf((speed - limit) / 250.0, 0.15, 0.95):
 		var torn := live[0]
 		torn.broken = true
-		_say("PARACAIDAS DESGARRADO", Ui.RED)
+		_say("PARACAIDAS DESGARRADO", Ui.LAMP_WARNING)
 		Juice.hit(0.6)
 		Run.lose_streak()
 		return
@@ -276,12 +276,12 @@ func _deploy_chute() -> void:
 	if chute == 2:
 		for part: ShipPart in live:
 			part.deployed = true
-	_say("FRENO DESPLEGADO" if chute == 1 else "PRINCIPAL DESPLEGADO", Ui.GREEN)
+	_say("FRENO DESPLEGADO" if chute == 1 else "PRINCIPAL DESPLEGADO", Ui.LAMP_GO)
 	for part: ShipPart in failed:
 		Card.malfunction(part, func(ok: bool) -> void:
 			if not ok:
 				chute = 0
-				Events.toast.emit("Paracaidas perdido", Ui.RED))
+				Events.toast.emit("Paracaidas perdido", Ui.LAMP_WARNING))
 
 
 func _eject() -> void:
@@ -292,8 +292,8 @@ func _eject() -> void:
 	throttle = 0.0
 	Synth.play(&"boom", -8.0)
 	Juice.hit(0.6)
-	Fx.burst(self, Vector2.ZERO, Ui.ORANGE, 70, 260)
-	_say("CAPSULA EYECTADA", Ui.ORANGE)
+	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 70, 260)
+	_say("CAPSULA EYECTADA", Ui.LAMP_CAUTION)
 	Run.note("Capsula eyectada en %s" % body.display_name)
 
 
@@ -334,7 +334,7 @@ func _fly(delta: float) -> void:
 		pitch = rad_to_deg(atan2(-vx, -vy))
 		if Vector2(vx, vy).length() < v_orb * 0.45 or agl() < 7000.0:
 			state = State.FLIGHT
-			_say("CONTROL MANUAL", Ui.CYAN)
+			_say("CONTROL MANUAL", Ui.INFO)
 	else:
 		lift = 0.0
 		if Input.is_physical_key_pressed(KEY_W): throttle = minf(throttle + delta * 1.2, 1.0)
@@ -378,7 +378,7 @@ func _fly(delta: float) -> void:
 		Juice.shake(delta * 2.0)
 		if _stress_clock > 0.8:
 			_stress_clock = 0.0
-			_say("SOBRECARGA %.1f G" % g_load, Ui.RED)
+			_say("SOBRECARGA %.1f G" % g_load, Ui.LAMP_WARNING)
 			Synth.play(&"alarm", -6.0)
 			_raise(Run.roll_stress((g_load - g_cap) / g_cap + 0.4))
 	Juice.shake(clampf(q / 30000.0, 0.0, 1.0) * delta * 1.5)
@@ -401,7 +401,7 @@ func _heat(speed: float, dt: float) -> void:
 		part.ablative -= absorbed * SHIELD_USE
 		load -= absorbed
 		if part.ablative <= 0.0:
-			Events.toast.emit("ESCUDO TERMICO AGOTADO", Ui.RED)
+			Events.toast.emit("ESCUDO TERMICO AGOTADO", Ui.LAMP_WARNING)
 	hull_heat = maxf(hull_heat + load * 0.6 * (1.0 - resist * 0.6) - dt * 0.012, 0.0)
 	if hull_heat > 1.0:
 		_stress_clock += dt
@@ -417,13 +417,13 @@ func _heat(speed: float, dt: float) -> void:
 			var victim: ShipPart = victims[Run.rng.randi_range(0, victims.size() - 1)]
 			if Run.admit(victim):
 				victim.broken = true
-				Events.toast.emit("%s se fundio" % victim.def.display_name, Ui.RED)
+				Events.toast.emit("%s se fundio" % victim.def.display_name, Ui.LAMP_WARNING)
 			Juice.hit(0.4)
 
 
 func _skip_out() -> void:
 	state = State.OVER
-	_say("REBOTE EN LA ATMOSFERA", Ui.ORANGE)
+	_say("REBOTE EN LA ATMOSFERA", Ui.LAMP_CAUTION)
 	Run.lose_streak()
 	Run.space_state.return_body = body.id
 	Run.space_state.return_boost = 1.12
@@ -466,16 +466,16 @@ func _touchdown() -> void:
 		var stress := impact / tol
 		for part: ShipPart in Run.roll_stress(stress, [], ship.parts_in_zone(&"bottom")):
 			part.broken = true
-			Events.toast.emit("%s cedio en el impacto" % part.def.display_name, Ui.RED)
+			Events.toast.emit("%s cedio en el impacto" % part.def.display_name, Ui.LAMP_WARNING)
 		if impact > tol:
 			for part: ShipPart in Run.roll_stress(stress * 0.6, [], ship.parts_in_zone(&"middle")):
 				part.broken = true
 	if on_pad and body == Run.target():
 		Run.apply({"credits": 200})
-		Events.toast.emit("Aterrizaje en plataforma: +$200", Ui.GOLD)
+		Events.toast.emit("Aterrizaje en plataforma: +$200", Ui.IVORY)
 	Run.landed_body = body.id
 	Run.grade = grade
-	_say("ATERRIZAJE %s" % grade, Ui.GREEN if grade in ["S", "A"] else Ui.GOLD)
+	_say("ATERRIZAJE %s" % grade, Ui.LAMP_GO if grade in ["S", "A"] else Ui.IVORY)
 	Synth.play(&"jackpot" if grade == "S" else &"chime")
 	if grade == "S":
 		Run.win_streak()
@@ -487,7 +487,7 @@ func _explode() -> void:
 	state = State.OVER
 	Synth.play(&"boom")
 	Synth.engine_level = 0.0
-	Fx.burst(self, Vector2.ZERO, Ui.ORANGE, 160, 700, 1.4)
+	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 160, 700, 1.4)
 	Juice.hit(1.0)
 	Juice.hitstop(0.2)
 	Juice.plasma = 0.0
@@ -502,7 +502,7 @@ func _show_surface() -> void:
 		child.queue_free()
 	_panel.visible = true
 	var col := Ui.vbox(_panel, 8)
-	Ui.label(col, "EN LA SUPERFICIE DE %s" % body.display_name.to_upper(), 18, Ui.CYAN)
+	Ui.label(col, "EN LA SUPERFICIE DE %s" % body.display_name.to_upper(), 18, Ui.INFO)
 	var at_target := body == Run.target()
 	if at_target:
 		var text := "Entregar %s" % Run.contract.cargo.to_lower()
@@ -529,7 +529,7 @@ func _deliver() -> void:
 	Run.outcome = &"partial" if ejected else &"delivered"
 	Run.outcome_text = "Entrega %s en %s. Aterrizaje %s." % ["parcial" if ejected else "completa", body.display_name, grade]
 	Synth.play(&"win")
-	Juice.flash(Ui.GOLD, 0.5)
+	Juice.flash(Ui.IVORY, 0.5)
 	Router.go(&"debrief")
 
 
@@ -565,7 +565,7 @@ func _repair() -> void:
 	Run.kits -= 1
 	Run.apply({"fix": true}, broken[0])
 	Synth.play(&"coin")
-	Events.toast.emit("%s reparada" % broken[0].def.display_name, Ui.GREEN)
+	Events.toast.emit("%s reparada" % broken[0].def.display_name, Ui.LAMP_GO)
 	_show_surface()
 
 
@@ -699,7 +699,7 @@ func _draw() -> void:
 		for p: float in [pad - PAD_EVERY, pad, pad + PAD_EVERY]:
 			var a := _to_screen(p - PAD_HALF, terrain(p))
 			var b := _to_screen(p + PAD_HALF, terrain(p))
-			draw_line(a, b, Ui.GREEN if body == Run.target() else Ui.GOLD, maxf(3.0, 1.0 * _scale))
+			draw_line(a, b, Ui.LAMP_GO if body == Run.target() else Ui.IVORY, maxf(3.0, 1.0 * _scale))
 			var blink := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 150.0)
 			draw_circle(a, 3.0, Color(2.0, 0.3, 0.2, blink))
 			draw_circle(b, 3.0, Color(2.0, 0.3, 0.2, blink))
@@ -717,7 +717,7 @@ func _draw() -> void:
 	if not landed and state != State.APPROACH and agl() < 2000.0:
 		var v := Vector2(vx, -vy)
 		if v.length() > 1.0:
-			draw_line(Vector2.ZERO, v.normalized() * minf(v.length(), 80.0), Color(Ui.GREEN, 0.7), 2.0)
+			draw_line(Vector2.ZERO, v.normalized() * minf(v.length(), 80.0), Color(Ui.LAMP_GO, 0.7), 2.0)
 
 
 func _draw_corridor(view: Vector2) -> void:
@@ -728,11 +728,11 @@ func _draw_corridor(view: Vector2) -> void:
 	draw_rect(Rect2(-view.x, horizon, view.x * 2.0, view.y), Color(body.color.r, body.color.g, body.color.b, 0.35))
 	draw_line(Vector2(-view.x, horizon), Vector2(view.x, horizon), Color(body.atmo_color, 0.9), 4.0)
 	for angle: float in [c.x, c.y]:
-		draw_line(origin, origin + Vector2.from_angle(deg_to_rad(-angle)) * length, Color(Ui.GREEN, 0.55), 2.0)
+		draw_line(origin, origin + Vector2.from_angle(deg_to_rad(-angle)) * length, Color(Ui.LAMP_GO, 0.55), 2.0)
 	var band := PackedVector2Array([origin, origin + Vector2.from_angle(deg_to_rad(-c.x)) * length, origin + Vector2.from_angle(deg_to_rad(-c.y)) * length])
 	draw_colored_polygon(band, Color(0.3, 1.0, 0.5, 0.16))
 	var inside := gamma >= c.x and gamma <= c.y
 	var aim := origin + Vector2.from_angle(deg_to_rad(-gamma)) * length
-	draw_line(origin, aim, Ui.GOLD if inside else Ui.RED, 3.0)
+	draw_line(origin, aim, Ui.IVORY if inside else Ui.LAMP_WARNING, 3.0)
 	draw_colored_polygon(PackedVector2Array([origin + Vector2(-7, 14), origin + Vector2(7, 14), origin + Vector2(0, -16)]), Color(0.95, 0.97, 1.0))
-	draw_string(Ui.mono(), origin + Vector2(length * 0.15, -36), "PLANO = REBOTE" if gamma > c.y else ("EMPINADO = CALOR" if gamma < c.x else "DENTRO DEL CORREDOR"), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.GOLD if inside else Ui.RED)
+	draw_string(Ui.mono(), origin + Vector2(length * 0.15, -36), "PLANO = REBOTE" if gamma > c.y else ("EMPINADO = CALOR" if gamma < c.x else "DENTRO DEL CORREDOR"), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.IVORY if inside else Ui.LAMP_WARNING)

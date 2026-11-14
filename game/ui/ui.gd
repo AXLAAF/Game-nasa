@@ -1,29 +1,60 @@
 class_name Ui
 extends RefCounted
 
-const BG := Color(0.02, 0.03, 0.07)
-const PANEL := Color(0.04, 0.07, 0.13, 0.94)
-const PANEL_LIGHT := Color(0.08, 0.12, 0.2, 0.96)
-const CYAN := Color(0.35, 0.9, 1.0)
-const ORANGE := Color(1.0, 0.6, 0.2)
-const RED := Color(1.0, 0.28, 0.25)
-const GREEN := Color(0.4, 1.0, 0.55)
-const GOLD := Color(1.0, 0.82, 0.3)
-const PURPLE := Color(0.75, 0.45, 1.0)
-const DIM := Color(0.55, 0.65, 0.75)
-const TEXT := Color(0.9, 0.94, 1.0)
-const RARITY: Array[Color] = [Color(0.6, 0.9, 1.0), Color(0.75, 0.45, 1.0), Color(1.0, 0.82, 0.3)]
-const RARITY_NAMES: Array[String] = ["Comun", "Rara", "Legendaria"]
+## Tablero de cabina de segunda mano: chapa esmaltada, ventanas de lectura oscuras,
+## teclas de baquelita y lamparas. Reglas en docs/DISENO-CABINA.md.
+## El texto largo vive en ventanas oscuras; sobre el esmalte solo leyendas en BAKELITE.
+
+const ENAMEL := Color("3e8f8a")
+const ENAMEL_LIGHT := Color("6fb5af")
+const ENAMEL_SHADE := Color("2c6b67")
+const BAKELITE := Color("16181a")
+const BAKELITE_RAISED := Color("24272a")
+const BAKELITE_EDGE := Color("3a3f44")
+const IVORY := Color("efe6cf")
+const IVORY_DIM := Color("a9a493")
+const INFO := Color("8fd6ce")
+const LAMP_GO := Color("58c96b")
+const LAMP_CAUTION := Color("ffb000")
+const LAMP_WARNING := Color("f0503f")
+const LAMP_OFF := Color("2a2d30")
+const MYSTERY := Color("b48cf2")
+const BG := Color("070a10")
+const RARITY: Array[Color] = [IVORY, MYSTERY, LAMP_CAUTION]
+const RARITY_NAMES: Array[String] = ["Común", "Rara", "Legendaria"]
+
+## Alto de la consola inferior de vuelo; Juice desplaza la camara la mitad.
+const CONSOLE_H := 132.0
+const SIZE_LEGEND := 13
+const SIZE_TEXT := 15
+const SIZE_HEAD := 18
+const SIZE_READOUT := 24
+const SIZE_HERO := 36
 
 static var _theme: Theme
-static var _mono: SystemFont
+static var _legend: FontVariation
 
 
+static func sans() -> Font:
+	return load("res://assets/fonts/B612-Regular.ttf")
+
+
+static func bold() -> Font:
+	return load("res://assets/fonts/B612-Bold.ttf")
+
+
+## Solo para cifras en ventanas de lectura.
 static func mono() -> Font:
-	if _mono == null:
-		_mono = SystemFont.new()
-		_mono.font_names = PackedStringArray(["Consolas", "Cascadia Mono", "JetBrains Mono", "DejaVu Sans Mono", "Courier New", "monospace"])
-	return _mono
+	return load("res://assets/fonts/B612Mono-Regular.ttf")
+
+
+## Leyenda grabada: negrita con un punto de espaciado. Unico uso de mayusculas.
+static func legend_font() -> Font:
+	if _legend == null:
+		_legend = FontVariation.new()
+		_legend.base_font = bold()
+		_legend.spacing_glyph = 1
+	return _legend
 
 
 static func box(bg: Color, border: Color, width: int = 1, radius: int = 4) -> StyleBoxFlat:
@@ -39,26 +70,149 @@ static func box(bg: Color, border: Color, width: int = 1, radius: int = 4) -> St
 	return style
 
 
+## Ventana oscura con bisel de esmalte: el panel por defecto.
+static func bezel(accent: Color = ENAMEL) -> StyleBoxFlat:
+	var style := box(BAKELITE, accent, 4, 6)
+	style.border_width_bottom = 7
+	style.set_content_margin_all(12)
+	style.shadow_color = Color(0, 0, 0, 0.45)
+	style.shadow_size = 6
+	style.shadow_offset = Vector2(0, 3)
+	return style
+
+
+## Chapa esmaltada lisa (consola, placas). Solo admite leyendas en BAKELITE.
+static func enamel() -> StyleBoxFlat:
+	var style := box(ENAMEL, ENAMEL_SHADE, 0, 3)
+	style.border_width_bottom = 4
+	style.set_content_margin_all(10)
+	return style
+
+
+## Hueco de lectura hundido en la chapa.
+static func well_box() -> StyleBoxFlat:
+	var style := box(BAKELITE, Color("0b0c0d"), 0, 3)
+	style.border_width_top = 3
+	style.content_margin_top = 5
+	return style
+
+
+static func _key(bg: Color, edge: Color, pressed: bool = false) -> StyleBoxFlat:
+	var style := box(bg, edge, 1, 4)
+	style.border_width_bottom = 1 if pressed else 4
+	style.content_margin_top = 10 if pressed else 7
+	style.content_margin_bottom = 7
+	style.content_margin_left = 14
+	style.content_margin_right = 14
+	return style
+
+
 static func theme() -> Theme:
 	if _theme != null:
 		return _theme
 	_theme = Theme.new()
-	_theme.default_font = mono()
-	_theme.default_font_size = 15
-	_theme.set_stylebox("normal", "Button", box(Color(0.07, 0.11, 0.19), Color(0.25, 0.55, 0.7)))
-	_theme.set_stylebox("hover", "Button", box(Color(0.12, 0.18, 0.3), ORANGE))
-	_theme.set_stylebox("pressed", "Button", box(Color(0.2, 0.12, 0.05), ORANGE, 2))
-	_theme.set_stylebox("disabled", "Button", box(Color(0.05, 0.06, 0.08), Color(0.2, 0.22, 0.25)))
-	_theme.set_stylebox("focus", "Button", StyleBoxEmpty.new())
-	_theme.set_color("font_color", "Button", TEXT)
-	_theme.set_color("font_hover_color", "Button", GOLD)
-	_theme.set_color("font_disabled_color", "Button", Color(0.4, 0.45, 0.5))
-	_theme.set_stylebox("panel", "PanelContainer", box(PANEL, Color(0.2, 0.4, 0.55), 1, 6))
-	_theme.set_stylebox("panel", "Panel", box(PANEL, Color(0.2, 0.4, 0.55), 1, 6))
-	_theme.set_color("font_color", "Label", TEXT)
-	_theme.set_stylebox("panel", "TooltipPanel", box(Color(0.03, 0.05, 0.1, 0.97), CYAN))
-	_theme.set_color("font_color", "TooltipLabel", TEXT)
+	_theme.default_font = sans()
+	_theme.default_font_size = SIZE_TEXT
+	_theme.set_stylebox("normal", "Button", _key(BAKELITE_RAISED, BAKELITE_EDGE))
+	_theme.set_stylebox("hover", "Button", _key(Color("30353a"), IVORY_DIM))
+	_theme.set_stylebox("pressed", "Button", _key(Color("101113"), IVORY_DIM, true))
+	_theme.set_stylebox("disabled", "Button", _key(Color("1b1d1f"), Color("26292c")))
+	var focus := box(Color.TRANSPARENT, IVORY, 2, 6)
+	focus.draw_center = false
+	focus.set_expand_margin_all(3)
+	_theme.set_stylebox("focus", "Button", focus)
+	_theme.set_color("font_color", "Button", IVORY)
+	_theme.set_color("font_hover_color", "Button", IVORY)
+	_theme.set_color("font_pressed_color", "Button", IVORY)
+	_theme.set_color("font_focus_color", "Button", IVORY)
+	_theme.set_color("font_disabled_color", "Button", Color("77756b"))
+	_theme.set_stylebox("panel", "PanelContainer", bezel())
+	_theme.set_stylebox("panel", "Panel", bezel())
+	_theme.set_color("font_color", "Label", IVORY)
+	_theme.set_color("default_color", "RichTextLabel", IVORY)
+	_theme.set_stylebox("panel", "TooltipPanel", box(BAKELITE, IVORY_DIM))
+	_theme.set_color("font_color", "TooltipLabel", IVORY)
+	var grabber := box(BAKELITE_EDGE, BAKELITE_EDGE, 0, 3)
+	grabber.set_content_margin_all(3)
+	_theme.set_stylebox("grabber", "VScrollBar", grabber)
+	_theme.set_stylebox("grabber_highlight", "VScrollBar", box(IVORY_DIM, IVORY_DIM, 0, 3))
+	_theme.set_stylebox("grabber_pressed", "VScrollBar", box(IVORY, IVORY, 0, 3))
+	_theme.set_stylebox("scroll", "VScrollBar", box(Color("0b0c0d"), BAKELITE, 0, 3))
 	return _theme
+
+
+## Tecla principal de la pantalla: marfil sobre baquelita. Una por pantalla.
+static func primary(b: Button) -> Button:
+	b.add_theme_stylebox_override("normal", _key(IVORY, IVORY_DIM))
+	b.add_theme_stylebox_override("hover", _key(Color("fff6dc"), IVORY_DIM))
+	b.add_theme_stylebox_override("pressed", _key(IVORY_DIM, IVORY_DIM, true))
+	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
+		b.add_theme_color_override(state, BAKELITE)
+	b.add_theme_font_override("font", bold())
+	return b
+
+
+## Leyenda grabada en mayusculas. on_enamel = sobre chapa (negro); si no, dentro de ventana.
+static func legend(parent: Node, text: String, on_enamel: bool = false) -> Label:
+	var l := label(parent, text.to_upper(), SIZE_LEGEND, BAKELITE if on_enamel else IVORY_DIM)
+	l.add_theme_font_override("font", legend_font())
+	return l
+
+
+## Placa esmaltada con leyenda: cabecera de un panel.
+static func plate(parent: Node, text: String) -> PanelContainer:
+	var p := PanelContainer.new()
+	var style := enamel()
+	style.set_content_margin_all(5)
+	style.content_margin_left = 10
+	p.add_theme_stylebox_override("panel", style)
+	parent.add_child(p)
+	legend(p, text, true)
+	return p
+
+
+static func well(parent: Node) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", well_box())
+	parent.add_child(p)
+	return p
+
+
+## Instrumento de lectura sobre chapa: leyenda, cifra en mono y unidad. Devuelve la cifra.
+static func readout(parent: Node, legend_text: String, unit: String = "", min_width: float = 110.0) -> Label:
+	var col := vbox(parent, 3)
+	legend(col, legend_text, true)
+	var w := well(col)
+	w.custom_minimum_size = Vector2(min_width, 0)
+	var row := hbox(w, 6)
+	var value := label(row, "", SIZE_READOUT, IVORY)
+	value.add_theme_font_override("font", mono())
+	value.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	if unit != "":
+		var u := label(row, unit, SIZE_LEGEND, IVORY_DIM)
+		u.size_flags_vertical = Control.SIZE_SHRINK_END
+	return value
+
+
+## Consola inferior de las fases de vuelo. Devuelve la fila donde van los instrumentos.
+static func console(root: Control) -> HBoxContainer:
+	var p := PanelContainer.new()
+	var style := enamel()
+	style.border_width_bottom = 0
+	style.border_width_top = 3
+	style.border_color = ENAMEL_LIGHT
+	style.set_corner_radius_all(0)
+	style.content_margin_left = 16
+	style.content_margin_right = 16
+	style.shadow_color = Color(0, 0, 0, 0.5)
+	style.shadow_size = 8
+	p.add_theme_stylebox_override("panel", style)
+	p.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+	p.offset_top = -CONSOLE_H
+	p.mouse_filter = Control.MOUSE_FILTER_STOP
+	root.add_child(p)
+	return hbox(p, 14)
 
 
 ## Capa de UI con un Control raiz a pantalla completa que hereda el tema.
@@ -74,7 +228,7 @@ static func root(parent: Node, layer_index: int = 10) -> Control:
 	return control
 
 
-static func label(parent: Node, text: String, size: int = 15, color: Color = TEXT) -> Label:
+static func label(parent: Node, text: String, size: int = 15, color: Color = IVORY) -> Label:
 	var l := Label.new()
 	l.text = text
 	l.add_theme_font_size_override("font_size", size)
@@ -121,17 +275,16 @@ static func place(control: Control, rect: Rect2) -> Control:
 	return control
 
 
-static var _board: StatusBoard
-
-
+## Despliega el detalle de la matriz de lamparas. Si la fase no tiene una, la crea arriba a la derecha.
 static func toggle_status(host: Node) -> void:
-	if _board != null and is_instance_valid(_board):
-		_board.queue_free()
-		_board = null
-		return
-	var board := StatusBoard.new()
-	_board = board
-	host.add_child(board)
+	if Annunciator.current == null or not is_instance_valid(Annunciator.current):
+		var holder := root(host, 30)
+		var board := Annunciator.new()
+		board.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		board.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+		board.position += Vector2(-12, 12)
+		holder.add_child(board)
+	Annunciator.toggle_detail()
 
 
 static func money(amount: int) -> String:

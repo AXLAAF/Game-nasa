@@ -3,23 +3,24 @@ extends VBoxContainer
 
 ## Lista de avisos que se desvanecen. Sin comunicaciones, el texto llega corrupto.
 
-const MAX_LINES := 7
+const MAX_LINES := 4
 const GLYPHS := "#%&@$*?!"
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_theme_constant_override("separation", 2)
+	add_theme_constant_override("separation", 4)
 	Events.toast.connect(push)
 
 
-func push(text: String, color: Color = Ui.TEXT) -> void:
+func push(text: String, color: Color = Ui.IVORY) -> void:
 	var line := Label.new()
 	line.text = _garble(text)
-	line.add_theme_font_size_override("font_size", 14)
+	line.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
 	line.add_theme_color_override("font_color", color)
-	line.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
-	line.add_theme_constant_override("outline_size", 4)
+	line.add_theme_stylebox_override("normal", Ui.box(Color(Ui.BAKELITE, 0.9), color, 0, 3))
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	line.custom_minimum_size = Vector2(360, 0)
 	add_child(line)
 	move_child(line, 0)
 	while get_child_count() > MAX_LINES:

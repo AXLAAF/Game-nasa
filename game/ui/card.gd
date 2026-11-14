@@ -73,7 +73,7 @@ func _ready() -> void:
 	_root = Ui.root(self, 50)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.55)
+	dim.color = Color(0, 0, 0, 0.65)
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(dim)
 	var center := CenterContainer.new()
@@ -81,7 +81,6 @@ func _ready() -> void:
 	_root.add_child(center)
 	_panel = PanelContainer.new()
 	_panel.custom_minimum_size = Vector2(600, 0)
-	_panel.add_theme_stylebox_override("panel", Ui.box(Ui.PANEL_LIGHT, _accent(), 2, 8))
 	center.add_child(_panel)
 	_body = Ui.vbox(_panel, 10)
 	_build()
@@ -97,31 +96,35 @@ func _ready() -> void:
 func _accent() -> Color:
 	match data.get("tone", &"info"):
 		&"malfunction":
-			return Ui.RED
+			return Ui.LAMP_WARNING
 		&"encounter":
 			return Ui.RARITY[clampi(int(data.get("rarity", 0)), 0, 2)]
 		&"bet":
-			return Ui.GOLD
-	return Ui.CYAN
+			return Ui.IVORY
+	return Ui.INFO
 
 
 func _build() -> void:
 	for child: Node in _body.get_children():
 		child.queue_free()
 	var header := Ui.hbox(_body)
-	var tag := "AVERIA" if data.get("tone") == &"malfunction" else ("APUESTA" if data.get("tone") == &"bet" else "ENCUENTRO")
+	var tag := "Avería" if data.get("tone") == &"malfunction" else ("Apuesta" if data.get("tone") == &"bet" else "Encuentro")
 	if data.get("tone") == &"encounter":
-		tag = "%s  -  %s" % [tag, Ui.RARITY_NAMES[clampi(int(data.get("rarity", 0)), 0, 2)].to_upper()]
+		tag = "%s: %s" % [tag, Ui.RARITY_NAMES[clampi(int(data.get("rarity", 0)), 0, 2)]]
 	if data.get("tone") == &"info":
-		tag = "AVISO"
-	Ui.label(header, tag, 13, _accent())
+		tag = "Aviso"
+	var lamp := Lamp.new(tag, Lamp.GO)
+	lamp.tint = _accent()
+	lamp.blink = data.get("tone") == &"malfunction"
+	lamp.custom_minimum_size = Vector2(200, 28)
+	header.add_child(lamp)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(spacer)
 	if Run.streak > 0:
-		Ui.label(header, "RACHA x%.2f" % Run.streak_mult(), 13, Ui.GOLD)
-	Ui.label(_body, str(data.get("title", "")), 26, Ui.TEXT)
-	var text := Ui.label(_body, str(data.get("text", "")), 15, Ui.DIM)
+		Ui.label(header, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY)
+	Ui.label(_body, str(data.get("title", "")), Ui.SIZE_READOUT, Ui.IVORY).add_theme_font_override("font", Ui.bold())
+	var text := Ui.label(_body, str(data.get("text", "")), Ui.SIZE_TEXT, Ui.IVORY)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	text.custom_minimum_size = Vector2(560, 0)
 	_choices_box = Ui.vbox(_body, 8)
@@ -131,7 +134,7 @@ func _build() -> void:
 	if choices.is_empty():
 		Ui.button(_choices_box, "Continuar", _close.bind(true))
 	elif not _scanned and _has_risk(choices):
-		var scan := Ui.button(_body, "Escanear probabilidades  (-15% bateria)", _scan)
+		var scan := Ui.button(_body, "Escanear probabilidades (gasta 15 % de batería)", _scan)
 		scan.disabled = Run.battery < 0.15 * Thermal.battery_capacity(Run.ship)
 
 
@@ -145,7 +148,7 @@ func _has_risk(choices: Array) -> bool:
 func _add_choice(choice: ChoiceDef, index: int) -> void:
 	var row := Ui.hbox(_choices_box, 10)
 	var b := Ui.button(row, choice.label, _choose.bind(index))
-	b.custom_minimum_size = Vector2(330, 40)
+	b.custom_minimum_size = Vector2(330, 44)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	var need := int(choice.cost.get("credits", 0))
 	var stake := int(choice.cost.get("stake", 0))
@@ -154,8 +157,8 @@ func _add_choice(choice: ChoiceDef, index: int) -> void:
 	if choice.cost.has("kits") and Run.kits < -int(choice.cost.kits):
 		b.disabled = true
 	var info := Ui.vbox(row, 0)
-	var odds_text := "MINIJUEGO" if choice.minigame != &"" else Odds.fog_text(choice.odds, _scanned)
-	var odds_color := Ui.CYAN if choice.minigame != &"" else Odds.risk_color(choice.odds if _scanned else 0.5 + (choice.odds - 0.5) * 0.4)
+	var odds_text := "Minijuego" if choice.minigame != &"" else Odds.fog_text(choice.odds, _scanned)
+	var odds_color := Ui.INFO if choice.minigame != &"" else Odds.risk_color(choice.odds if _scanned else 0.5 + (choice.odds - 0.5) * 0.4)
 	if choice.odds >= 1.0:
 		odds_color = Odds.risk_color(1.0)
 	Ui.label(info, odds_text, 15, odds_color)
@@ -163,10 +166,10 @@ func _add_choice(choice: ChoiceDef, index: int) -> void:
 	if not choice.cost.is_empty():
 		detail += "Costo: %s  " % Run.describe(choice.cost)
 	if not choice.win.is_empty():
-		detail += "Exito: %s  " % Run.describe(choice.win)
+		detail += "Éxito: %s  " % Run.describe(choice.win)
 	if not choice.lose.is_empty() and choice.odds < 1.0:
 		detail += "Fallo: %s" % Run.describe(choice.lose)
-	var d := Ui.label(info, detail, 12, Ui.DIM)
+	var d := Ui.label(info, detail, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.custom_minimum_size = Vector2(220, 0)
 
@@ -228,13 +231,15 @@ func _set_needle(value: float) -> void:
 func _draw_bar() -> void:
 	var w := _bar.size.x
 	var h := 26.0
-	_bar.draw_rect(Rect2(0, 10, w * _odds, h), Color(0.15, 0.6, 0.3))
-	_bar.draw_rect(Rect2(w * _odds, 10, w * (1.0 - _odds), h), Color(0.6, 0.15, 0.15))
-	_bar.draw_string(Ui.mono(), Vector2(8, 29), "EXITO", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1, 1, 1, 0.8))
-	_bar.draw_string(Ui.mono(), Vector2(w - 60, 29), "FALLO", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1, 1, 1, 0.8))
+	_bar.draw_rect(Rect2(0, 10, w, h), Ui.BAKELITE)
+	_bar.draw_rect(Rect2(0, 10, w * _odds, h).grow(-2), Ui.LAMP_GO)
+	_bar.draw_rect(Rect2(w * _odds, 10, w * (1.0 - _odds), h).grow(-2), Ui.LAMP_WARNING)
+	_bar.draw_string(Ui.legend_font(), Vector2(10, 28), "ÉXITO", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE)
+	_bar.draw_string(Ui.legend_font(), Vector2(0, 28), "FALLO", HORIZONTAL_ALIGNMENT_RIGHT, w - 10, Ui.SIZE_LEGEND, Ui.BAKELITE)
 	var x := w * _needle
-	_bar.draw_colored_polygon(PackedVector2Array([Vector2(x - 8, 0), Vector2(x + 8, 0), Vector2(x, 12)]), Ui.GOLD)
-	_bar.draw_line(Vector2(x, 10), Vector2(x, 10 + h), Color(2.0, 1.8, 1.0), 3.0)
+	_bar.draw_colored_polygon(PackedVector2Array([Vector2(x - 8, 0), Vector2(x + 8, 0), Vector2(x, 12)]), Ui.IVORY)
+	_bar.draw_line(Vector2(x, 8), Vector2(x, 12 + h), Ui.BAKELITE, 5.0)
+	_bar.draw_line(Vector2(x, 8), Vector2(x, 12 + h), Ui.IVORY, 3.0)
 
 
 func _resolve(choice: ChoiceDef, success: bool) -> void:
@@ -249,23 +254,23 @@ func _resolve(choice: ChoiceDef, success: bool) -> void:
 	Run.apply(effects, part)
 	if success:
 		Synth.play(&"win" if risky else &"beep")
-		Juice.flash(Ui.GREEN, 0.25 if risky else 0.0)
+		Juice.flash(Ui.LAMP_GO, 0.25 if risky else 0.0)
 	else:
 		Synth.play(&"lose")
-		Juice.flash(Ui.RED, 0.35)
+		Juice.flash(Ui.LAMP_WARNING, 0.35)
 		Juice.hit(0.4)
 	for child: Node in _choices_box.get_children():
 		child.queue_free()
 	var verdict := choice.win_text if success else choice.lose_text
 	if verdict == "":
 		verdict = "Salio bien." if success else "Salio mal."
-	Ui.label(_body, ("EXITO  " if success else "FALLO  ") + verdict, 20, Ui.GREEN if success else Ui.RED)
+	Ui.label(_body, ("Éxito. " if success else "Fallo. ") + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
 	var summary := Run.describe(effects)
 	if summary != "":
-		Ui.label(_body, summary, 14, Ui.GOLD)
+		Ui.label(_body, summary, Ui.SIZE_TEXT, Ui.IVORY)
 	if risky and success:
-		Ui.label(_body, "Racha x%.2f" % Run.streak_mult(), 14, Ui.GOLD)
-	var done := Ui.button(_body, "Continuar", _close.bind(success))
+		Ui.label(_body, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY)
+	var done := Ui.primary(Ui.button(_body, "Continuar", _close.bind(success)))
 	done.grab_focus()
 
 

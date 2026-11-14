@@ -27,12 +27,12 @@ func _ready() -> void:
 	panel.custom_minimum_size = Vector2(640, 0)
 	_col = Ui.vbox(panel, 8)
 	var good := Run.outcome == &"delivered" or Run.outcome == &"partial"
-	Ui.label(_col, _headline(), 30, Ui.GREEN if good else Ui.RED)
-	var why := Ui.label(_col, Run.outcome_text, 14, Ui.DIM)
+	Ui.label(_col, _headline(), 30, Ui.LAMP_GO if good else Ui.LAMP_WARNING)
+	var why := Ui.label(_col, Run.outcome_text, 14, Ui.IVORY_DIM)
 	why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	why.custom_minimum_size = Vector2(600, 0)
 	_list = Ui.vbox(_col, 2)
-	_total_label = Ui.label(_col, "", 34, Ui.GOLD)
+	_total_label = Ui.label(_col, "", 34, Ui.IVORY)
 	_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_play()
 
@@ -54,39 +54,39 @@ func _settle() -> void:
 		var base := contract.payout - contract.advance
 		if Run.outcome == &"partial":
 			base = int(base * 0.5)
-		_add("Pago del contrato", base, Ui.TEXT)
+		_add("Pago del contrato", base, Ui.IVORY)
 		if Profile.assist:
 			var cut := int(base * (1.0 - Run.assist_payout_mult()))
-			_add("Modo asistido  -15%", -cut, Ui.ORANGE)
+			_add("Modo asistido  -15%", -cut, Ui.LAMP_CAUTION)
 			base -= cut
 		var grade_mult: float = GRADE_MULT.get(Run.grade, 1.0)
 		if grade_mult != 1.0:
-			_add("Aterrizaje %s  x%.2f" % [Run.grade, grade_mult], int(base * (grade_mult - 1.0)), Ui.CYAN)
+			_add("Aterrizaje %s  x%.2f" % [Run.grade, grade_mult], int(base * (grade_mult - 1.0)), Ui.INFO)
 		var t: float = Run.space_state.get("t", 0.0)
 		if t <= contract.deadline:
-			_add("A tiempo  +15%", int(base * 0.15), Ui.GREEN)
+			_add("A tiempo  +15%", int(base * 0.15), Ui.LAMP_GO)
 		else:
-			_add("Fuera de plazo  -30%", -int(base * 0.3), Ui.RED)
+			_add("Fuera de plazo  -30%", -int(base * 0.3), Ui.LAMP_WARNING)
 		if Run.streak > 0:
-			_add("Racha x%.2f" % Run.streak_mult(), int(base * (Run.streak_mult() - 1.0)), Ui.GOLD)
+			_add("Racha x%.2f" % Run.streak_mult(), int(base * (Run.streak_mult() - 1.0)), Ui.IVORY)
 	elif contract != null:
-		_add("Adelanto ya cobrado", 0, Ui.DIM)
+		_add("Adelanto ya cobrado", 0, Ui.IVORY_DIM)
 	if Run.earnings != 0:
-		_add("Botin en ruta", Run.earnings, Ui.GOLD)
+		_add("Botin en ruta", Run.earnings, Ui.IVORY)
 	if Run.science > 0:
-		_add("Ciencia  %d x %d" % [Run.science, SCIENCE_VALUE], Run.science * SCIENCE_VALUE, Ui.PURPLE)
+		_add("Ciencia  %d x %d" % [Run.science, SCIENCE_VALUE], Run.science * SCIENCE_VALUE, Ui.MYSTERY)
 	for bet: Dictionary in Run.side_bets:
 		var won := _bet_won(str(bet.kind), delivered)
 		var prize := int(bet.stake * bet.mult) if won else 0
-		_add("Apuesta %s  (%d)" % [_bet_name(str(bet.kind)), int(bet.stake)], prize, Ui.GREEN if won else Ui.RED)
+		_add("Apuesta %s  (%d)" % [_bet_name(str(bet.kind)), int(bet.stake)], prize, Ui.LAMP_GO if won else Ui.LAMP_WARNING)
 	if not delivered and Run.insurance > 0:
 		var cover := int((Run.spent - Run.premium) * Profile.INSURANCE_COVER[Run.insurance])
-		_add("Seguro %s" % Profile.INSURANCE_NAMES[Run.insurance], cover, Ui.CYAN)
+		_add("Seguro %s" % Profile.INSURANCE_NAMES[Run.insurance], cover, Ui.INFO)
 	for part: ShipPart in Run.salvage:
 		part.reveal()
 		Profile.inventory.append(part.to_dict())
 	if not Run.salvage.is_empty():
-		_add("Chatarra al inventario  (%d)" % Run.salvage.size(), 0, Ui.DIM)
+		_add("Chatarra al inventario  (%d)" % Run.salvage.size(), 0, Ui.IVORY_DIM)
 	for line: Array in _lines:
 		_total += int(line[1])
 	Profile.credits += _total
@@ -96,7 +96,7 @@ func _settle() -> void:
 	if not delivered:
 		var lesson := Profile.learn_random(Run.rng)
 		if lesson != "":
-			_add("LECCION: " + str(Profile.LESSONS[lesson]), 0, Ui.GREEN)
+			_add("LECCION: " + str(Profile.LESSONS[lesson]), 0, Ui.LAMP_GO)
 	Profile.save_profile()
 
 
@@ -128,7 +128,7 @@ func _play() -> void:
 		var row := Ui.hbox(_list)
 		var title := Ui.label(row, str(line[0]), 15, line[2])
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var amount := Ui.label(row, "", 15, Ui.GOLD if int(line[1]) >= 0 else Ui.RED)
+		var amount := Ui.label(row, "", 15, Ui.IVORY if int(line[1]) >= 0 else Ui.LAMP_WARNING)
 		var target := int(line[1])
 		var tween := create_tween()
 		tween.tween_method(func(v: float) -> void: amount.text = Ui.money(int(v)) if target != 0 else "", 0.0, float(target), 0.35)
@@ -140,19 +140,19 @@ func _play() -> void:
 		await get_tree().create_timer(0.45).timeout
 	_total_label.text = "TOTAL  " + Ui.money(_total)
 	Synth.play(&"jackpot" if _total > 2000 else (&"win" if _total > 0 else &"lose"))
-	Juice.flash(Ui.GOLD if _total > 0 else Ui.RED, 0.3)
+	Juice.flash(Ui.IVORY if _total > 0 else Ui.LAMP_WARNING, 0.3)
 	if Run.boxes > 0:
 		await _open_boxes()
-	Ui.label(_col, "Creditos: %s" % Ui.money(Profile.credits), 16, Ui.TEXT)
+	Ui.label(_col, "Creditos: %s" % Ui.money(Profile.credits), 16, Ui.IVORY)
 	var back := Ui.button(_col, "Volver al hangar", func() -> void: Router.go(&"hangar"))
 	back.grab_focus()
 
 
 func _open_boxes() -> void:
-	Ui.label(_col, "CAJAS MISTERIOSAS x%d" % Run.boxes, 18, Ui.PURPLE)
+	Ui.label(_col, "CAJAS MISTERIOSAS x%d" % Run.boxes, 18, Ui.MYSTERY)
 	var row := Ui.hbox(_col, 12)
 	for i: int in 3:
-		var reel := Ui.label(row, "?", 28, Ui.PURPLE)
+		var reel := Ui.label(row, "?", 28, Ui.MYSTERY)
 		reel.custom_minimum_size = Vector2(190, 40)
 		reel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_reels.append(reel)
@@ -166,7 +166,7 @@ func _open_boxes() -> void:
 			await get_tree().create_timer(0.04 + k * 0.012).timeout
 		reel.text = prize[0]
 		reel.add_theme_color_override("font_color", prize[1])
-		Synth.play(&"jackpot" if prize[1] == Ui.GOLD else &"coin")
+		Synth.play(&"jackpot" if prize[1] == Ui.IVORY else &"coin")
 		Juice.flash(prize[1], 0.25)
 	Profile.save_profile()
 
@@ -177,14 +177,14 @@ func _box_prize() -> Array:
 	if roll < 0.12:
 		var part := Run.random_part(ShipPart.Quality.LEGENDARY)
 		Profile.inventory.append(part.to_dict())
-		return [part.def.display_name + " LEGENDARIA", Ui.GOLD]
+		return [part.def.display_name + " LEGENDARIA", Ui.IVORY]
 	if roll < 0.55:
 		var part := Run.random_part(ShipPart.Quality.MYSTERY)
 		part.reveal()
 		Profile.inventory.append(part.to_dict())
-		return ["%s (%s)" % [part.def.display_name, part.quality_text()], Ui.CYAN]
+		return ["%s (%s)" % [part.def.display_name, part.quality_text()], Ui.INFO]
 	var amount := Run.rng.randi_range(5, 40) * 10
 	if roll > 0.96:
 		amount = 1500
 	Profile.credits += amount
-	return [Ui.money(amount), Ui.GOLD if amount >= 1500 else Ui.GREEN]
+	return [Ui.money(amount), Ui.IVORY if amount >= 1500 else Ui.LAMP_GO]

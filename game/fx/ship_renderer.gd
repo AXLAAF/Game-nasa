@@ -134,9 +134,9 @@ static func draw(ci: CanvasItem, parts: Array, opts: Dictionary = {}) -> void:
 				Vector2(c - r.size.x * 0.2, r.end.y), Vector2(c + r.size.x * 0.2, r.end.y), Vector2(c, r.end.y + flame_len * 0.55),
 			]), Color(3.5, 3.2, 2.6, 0.95))
 		if i == selected:
-			ci.draw_rect(rects[i].grow(3), Ui.GOLD, false, 2.0)
+			ci.draw_rect(rects[i].grow(3), Ui.IVORY, false, 2.0)
 			if part.def.radial and part.side == 0:
-				ci.draw_rect(mirror(rects[i]).grow(3), Ui.GOLD, false, 2.0)
+				ci.draw_rect(mirror(rects[i]).grow(3), Ui.IVORY, false, 2.0)
 	var chute: int = opts.get("chute", 0)
 	if chute > 0 and not rects.is_empty():
 		var top := bounds(parts).position.y

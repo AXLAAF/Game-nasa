@@ -23,6 +23,7 @@ var lessons: Array[String] = []
 var inventory: Array = [] ## diccionarios de ShipPart.to_dict()
 var insurance: int = 0
 var assist: bool = false ## modo asistido: mas facil, menos pago
+var reduced_motion: bool = false ## sin sacudida, destellos ni lamparas intermitentes
 var tutorial_seen: Array[String] = []
 var contracts: Array = [] ## diccionarios de Contract.to_dict()
 
@@ -96,7 +97,7 @@ func mark_tutorial_all() -> void:
 func save_profile() -> void:
 	var data := {
 		"credits": credits, "runs": runs, "wins": wins, "best": best_payout,
-		"lessons": lessons, "inventory": inventory, "insurance": insurance, "assist": assist,
+		"lessons": lessons, "inventory": inventory, "insurance": insurance, "assist": assist, "reduced_motion": reduced_motion,
 		"tutorial": tutorial_seen, "contracts": contracts,
 	}
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
@@ -124,6 +125,7 @@ func load_profile() -> void:
 	inventory = data.get("inventory", [])
 	insurance = clampi(int(data.get("insurance", 0)), 0, 2)
 	assist = bool(data.get("assist", false))
+	reduced_motion = bool(data.get("reduced_motion", false))
 	tutorial_seen.clear()
 	for phase: Variant in data.get("tutorial", []):
 		tutorial_seen.append(str(phase))
@@ -139,6 +141,7 @@ func reset() -> void:
 	inventory.clear()
 	insurance = 0
 	assist = false
+	reduced_motion = false
 	tutorial_seen.clear()
 	contracts.clear()
 	save_profile()

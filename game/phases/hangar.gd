@@ -18,33 +18,33 @@ func _ready() -> void:
 	add_child(stars)
 	stars.set_sky(Color(0.01, 0.015, 0.04), 1.0)
 	var root := Ui.root(self)
-	var title := Ui.label(root, "CONTRATISTA ORBITAL", 42, Ui.CYAN)
+	var title := Ui.label(root, "CONTRATISTA ORBITAL", 42, Ui.INFO)
 	Ui.place(title, Rect2(40, 26, 800, 60))
 	title.add_theme_color_override("font_outline_color", Color(0, 0.2, 0.3))
 	title.add_theme_constant_override("outline_size", 10)
-	Ui.place(Ui.label(root, "Arma barato. Vuela lejos. Apuesta todo.", 16, Ui.DIM), Rect2(44, 82, 800, 24))
+	Ui.place(Ui.label(root, "Arma barato. Vuela lejos. Apuesta todo.", 16, Ui.IVORY_DIM), Rect2(44, 82, 800, 24))
 	var left := Ui.panel(root)
 	Ui.place(left, Rect2(40, 130, 330, 0))
 	var col := Ui.vbox(left, 8)
 	_wallet = Ui.label(col, "", 15)
-	Ui.label(col, "SEGURO DE LA NAVE", 13, Ui.DIM)
+	Ui.label(col, "SEGURO DE LA NAVE", 13, Ui.IVORY_DIM)
 	_insurance_box = Ui.hbox(col, 4)
 	Ui.button(col, "Tutorial completo", func() -> void: Tutorial.replay())
-	Ui.label(col, "DIFICULTAD", 13, Ui.DIM)
+	Ui.label(col, "DIFICULTAD", 13, Ui.IVORY_DIM)
 	var assist_row := Ui.hbox(col, 4)
 	var assist_b := Ui.button(assist_row, "Modo asistido", _toggle_assist)
 	assist_b.tooltip_text = "Menos averias, mas kits, corredores mas anchos y navegacion asistida (N). El pago del contrato baja un 15%."
 	if Profile.assist:
-		assist_b.add_theme_color_override("font_color", Ui.GREEN)
+		assist_b.add_theme_color_override("font_color", Ui.LAMP_GO)
 		assist_b.text = "> Asistido ON"
-	Ui.label(col, "LECCIONES", 13, Ui.DIM)
+	Ui.label(col, "LECCIONES", 13, Ui.IVORY_DIM)
 	if Profile.lessons.is_empty():
-		Ui.label(col, "Ninguna. Se aprenden perdiendo.", 13, Ui.DIM)
+		Ui.label(col, "Ninguna. Se aprenden perdiendo.", 13, Ui.IVORY_DIM)
 	for id: String in Profile.lessons:
-		var l := Ui.label(col, "- " + str(Profile.LESSONS[id]), 13, Ui.GREEN)
+		var l := Ui.label(col, "- " + str(Profile.LESSONS[id]), 13, Ui.LAMP_GO)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(300, 0)
-	Ui.label(col, "INVENTARIO: %d piezas guardadas" % Profile.inventory.size(), 13, Ui.GOLD)
+	Ui.label(col, "INVENTARIO: %d piezas guardadas" % Profile.inventory.size(), 13, Ui.IVORY)
 	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
 	reset.pressed.connect(func() -> void:
 		if _reset_armed:
@@ -57,7 +57,7 @@ func _ready() -> void:
 	Ui.place(right, Rect2(400, 130, 840, 0))
 	var board_col := Ui.vbox(right, 10)
 	var head := Ui.hbox(board_col)
-	Ui.label(head, "TABLERO DE CONTRATOS", 18, Ui.GOLD)
+	Ui.label(head, "TABLERO DE CONTRATOS", 18, Ui.IVORY)
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
@@ -75,7 +75,7 @@ func _refresh() -> void:
 		var b := Ui.button(_insurance_box, Profile.INSURANCE_NAMES[i], _set_insurance.bind(i))
 		b.tooltip_text = "Prima %d%% del valor de la nave, cubre %d%% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
 		if i == Profile.insurance:
-			b.add_theme_color_override("font_color", Ui.GOLD)
+			b.add_theme_color_override("font_color", Ui.IVORY)
 			b.text = "> " + b.text
 	for child: Node in _board.get_children():
 		child.queue_free()
@@ -86,25 +86,25 @@ func _refresh() -> void:
 func _contract_card(contract: Contract) -> void:
 	var body := contract.body()
 	var card := PanelContainer.new()
-	card.add_theme_stylebox_override("panel", Ui.box(Ui.PANEL_LIGHT, body.color if body != null else Ui.CYAN, 1, 6))
+	card.add_theme_stylebox_override("panel", Ui.box(Ui.BAKELITE_RAISED, body.color if body != null else Ui.INFO, 1, 6))
 	_board.add_child(card)
 	var row := Ui.hbox(card, 16)
 	var swatch := ColorRect.new()
-	swatch.color = body.color if body != null else Ui.CYAN
+	swatch.color = body.color if body != null else Ui.INFO
 	swatch.custom_minimum_size = Vector2(10, 0)
 	row.add_child(swatch)
 	var info := Ui.vbox(row, 2)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.label(info, contract.title, 18, Ui.TEXT)
+	Ui.label(info, contract.title, 18, Ui.IVORY)
 	if body != null:
-		Ui.label(info, body.description, 13, Ui.DIM)
-	Ui.label(info, "Delta-v estimado %d m/s   Plazo %d dias" % [int(contract.dv_estimate), int(contract.deadline)], 13, Ui.CYAN)
+		Ui.label(info, body.description, 13, Ui.IVORY_DIM)
+	Ui.label(info, "Delta-v estimado %d m/s   Plazo %d dias" % [int(contract.dv_estimate), int(contract.deadline)], 13, Ui.INFO)
 	if contract.hidden_hazard != &"":
-		Ui.label(info, "Rumores de peligro en la zona (+pago)", 13, Ui.RED)
+		Ui.label(info, "Rumores de peligro en la zona (+pago)", 13, Ui.LAMP_WARNING)
 	var money := Ui.vbox(row, 2)
-	Ui.label(money, Ui.money(contract.payout), 24, Ui.GOLD)
-	Ui.label(money, "Adelanto %s" % Ui.money(contract.advance), 13, Ui.DIM)
-	Ui.label(money, "Presupuesto %s" % Ui.money(Profile.budget(contract)), 13, Ui.GREEN)
+	Ui.label(money, Ui.money(contract.payout), 24, Ui.IVORY)
+	Ui.label(money, "Adelanto %s" % Ui.money(contract.advance), 13, Ui.IVORY_DIM)
+	Ui.label(money, "Presupuesto %s" % Ui.money(Profile.budget(contract)), 13, Ui.LAMP_GO)
 	var accept := Ui.button(row, "ACEPTAR", _accept.bind(contract))
 	accept.custom_minimum_size = Vector2(120, 0)
 
@@ -119,7 +119,7 @@ func _toggle_assist() -> void:
 	Profile.assist = not Profile.assist
 	Profile.save_profile()
 	Synth.play(&"beep")
-	Events.toast.emit("Modo asistido %s" % ("activado" if Profile.assist else "desactivado"), Ui.GREEN if Profile.assist else Ui.DIM)
+	Events.toast.emit("Modo asistido %s" % ("activado" if Profile.assist else "desactivado"), Ui.LAMP_GO if Profile.assist else Ui.IVORY_DIM)
 	Router.go(&"hangar")
 
 

@@ -1,21 +1,23 @@
 class_name Gauge
 extends Control
 
-## Barra animada con titulo, texto, banda opcional y parpadeo en zona de peligro.
+## Cinta de medida: leyenda, cifra en mono y barra hundida con marcas cada 10 %.
+## En peligro la barra parpadea en rojo y la cifra lleva "!" delante (no solo color).
 
 var title: String = ""
 var value: float = 0.0
 var shown: float = 0.0
 var text: String = ""
-var color: Color = Ui.CYAN
+var color: Color = Ui.INFO
 var band: Vector2 = Vector2(-1, -1)
 var danger: bool = false
+var on_enamel: bool = false ## sobre chapa: leyenda y cifra en baquelita
 
 
-func _init(gauge_title: String = "", gauge_color: Color = Ui.CYAN) -> void:
-	title = gauge_title
+func _init(gauge_title: String = "", gauge_color: Color = Ui.INFO) -> void:
+	title = gauge_title.to_upper()
 	color = gauge_color
-	custom_minimum_size = Vector2(220, 34)
+	custom_minimum_size = Vector2(200, 38)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 
 
@@ -31,19 +33,21 @@ func _process(delta: float) -> void:
 
 
 func _draw() -> void:
-	var font := Ui.mono()
-	var bar := Rect2(0, 16, size.x, size.y - 18)
-	draw_string(font, Vector2(0, 12), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ui.DIM)
-	draw_string(font, Vector2(0, 12), text, HORIZONTAL_ALIGNMENT_RIGHT, size.x, 12, Ui.TEXT)
-	draw_rect(bar, Color(0.0, 0.0, 0.0, 0.5))
+	var bar := Rect2(0, 19, size.x, size.y - 21)
+	var ink := Ui.BAKELITE if on_enamel else Ui.IVORY
+	draw_string(Ui.legend_font(), Vector2(0, 13), title, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE if on_enamel else Ui.IVORY_DIM)
+	draw_string(Ui.mono(), Vector2(0, 13), ("! " if danger else "") + text, HORIZONTAL_ALIGNMENT_RIGHT, size.x, Ui.SIZE_LEGEND, ink)
+	draw_rect(bar, Ui.BAKELITE)
+	draw_rect(Rect2(bar.position, Vector2(bar.size.x, 3)), Color("0b0c0d"))
 	var c := color
-	if danger and int(Time.get_ticks_msec() / 180.0) % 2 == 0:
-		c = Ui.RED
-	draw_rect(Rect2(bar.position, Vector2(bar.size.x * shown, bar.size.y)), c)
+	if danger and (Profile.reduced_motion or int(Time.get_ticks_msec() / 180.0) % 2 == 0):
+		c = Ui.LAMP_WARNING
+	var inner := bar.grow(-3)
+	draw_rect(Rect2(inner.position, Vector2(inner.size.x * shown, inner.size.y)), c)
+	for k: int in range(1, 10):
+		var x := inner.position.x + inner.size.x * k / 10.0
+		draw_line(Vector2(x, inner.position.y), Vector2(x, inner.end.y), Ui.BAKELITE, 1.0)
 	if band.x >= 0.0:
-		var x0 := bar.position.x + bar.size.x * clampf(band.x, 0.0, 1.0)
-		var x1 := bar.position.x + bar.size.x * clampf(band.y, 0.0, 1.0)
-		draw_rect(Rect2(x0, bar.position.y - 3, maxf(x1 - x0, 2.0), bar.size.y + 6), Color(1, 1, 1, 0.22))
-		draw_line(Vector2(x0, bar.position.y - 3), Vector2(x0, bar.end.y + 3), Ui.GOLD, 1.5)
-		draw_line(Vector2(x1, bar.position.y - 3), Vector2(x1, bar.end.y + 3), Ui.GOLD, 1.5)
-	draw_rect(bar, Color(color.r, color.g, color.b, 0.5), false, 1.0)
+		var x0 := inner.position.x + inner.size.x * clampf(band.x, 0.0, 1.0)
+		var x1 := inner.position.x + inner.size.x * clampf(band.y, 0.0, 1.0)
+		draw_rect(Rect2(x0, bar.position.y, maxf(x1 - x0, 2.0), bar.size.y), Color(Ui.IVORY, 0.9), false, 2.0)
