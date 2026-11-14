@@ -1,6 +1,7 @@
 # Especificacion Integral de Interfaz 2.5D, Naves Modulares Evolucionables y Vista Orbital KSP + FTL
 
-**Proyecto:** `Space: Deuda Orbital`  
+**Proyecto:** `Margin Zero: Deuda Orbital` (*Margin Zero: Orbital Debt*)  
+**Nave Insignia:** `MZ-1 LIBERTY` (Chasis `Orbital Mule Mk-I`)  
 **Motor:** Godot 4.7+ (`gl_compatibility`, WebGL2)  
 **Estetica Objetivo:** Pixel Art 2.5D Modular (*FTL* + *Rhine Lab / Lone Trail* + *Kerbal Space Program*)  
 **Tablero Analizado:** `https://mx.pinterest.com/AXL_MC/game/` (`pin_06`, `pin_08`, `pin_11`, `pin_14`, `pin_18`, `pin_22`, `pin_25`, `pin_26`)
@@ -32,7 +33,7 @@ Cuando un juego deja combinar modulos libremente en 2D, aparecen cuatro defectos
 
 **Solucion arquitectonica en `Space`:** Toda nave parte de una **plataforma maestra coherente** que crece y se transforma mediante **hardpoints estandarizados**, **collares/abrazaderas automaticos**, **iluminacion fija a 315 grados** y un **post-proceso de contorno unico en `CanvasGroup`**.
 
-### 2.2 El Chasis Maestro Predeterminado: `Orbital Mule Mk-I`
+### 2.2 Nave Insignia `MZ-1 LIBERTY` (Chasis Maestro `Orbital Mule Mk-I`)
 En lugar de construir un cohete descartable desde cero en cada partida, la agencia posee y evoluciona su propia nave insignia:
 
 - **Dimensiones base del fuselaje:** `160 x 224 px` nominales (`5 x 7` celdas en rejilla interna de `32 x 32 px`).
@@ -164,14 +165,14 @@ Mientras el interior muestra el caos del equipo, el **Mapa Orbital KSP 2.5D** (i
 *(Ver mockup de referencia: [mockup_1_dique_modular_25d.png](mockups/mockup_1_dique_modular_25d.png))*
 - **Zona superior (`44 px`):** Contrato activo, creditos disponibles, botones de vista (**Casco Exterior 2.5D** / **Corte FTL 6 Salas**) y retorno.
 - **Columna izquierda (`24%`):** Selector de los 7 Hardpoints del chasis predeterminado y botones de accion clara ("Instalar", "Subir a LVL N", "Calidad: Chatarra / Usada / Nueva") con indicador de costo e iconos + etiqueta sans legible (`>= 12 px`).
-- **Escena central unica (`50%`):** Nave `Orbital Mule Mk-I` centrada en escala `2x` pixel-perfect, mostrando simultaneamente los modulos acoplados con sus abrazaderas 2.5D, anillos de nivel (`pin_08`) y corte translucido de las 6 salas interiores cuando se pasa el cursor o conmuta la vista.
+- **Escena central unica (`50%`):** Nave `MZ-1 LIBERTY` (chasis `Orbital Mule Mk-I`) centrada en escala `2x` pixel-perfect, mostrando simultaneamente los modulos acoplados con sus abrazaderas 2.5D, anillos de nivel (`pin_08`) y corte translucido de las 6 salas interiores cuando se pasa el cursor o conmuta la vista.
 - **Panel derecho unico (`26%`):** Tres barras esenciales de ingenieria (Alcance $\Delta v$ vs requerido, Energia solar/RTG en destino, Riesgo de despegue $P_{explosion}$) + ficha breve del perk NASA equipado y boton **"A Rampa de Lanzamiento"**.
 
 ### Pantalla 3: HUD Principal de Vuelo Dual (FTL Interior 2.5D + KSP 2.5D Orbital)
 *(Ver mockup de referencia: [mockup_2_hud_ftl_ksp_orbital.png](mockups/mockup_2_hud_ftl_ksp_orbital.png))*
 - **Franja superior (`44 px`):** Reloj `MET`, estado de casco y O2 global, combustible restante, `AP / PE` actuales, proximo nodo `T-Node` y distancia/flujo solar del dataset NASA activo.
 - **Lienzo central (`74%` del ancho):** Dividido visualmente con fluidez espacial (sin recuadros rigidos):
-  - **Mitad izquierda/central (Escena Tactica FTL):** Nave `Orbital Mule Mk-I` en corte 2.5D animado sobre fondo estelar/debris en movimiento; los 4 bots/tripulantes se desplazan por las 6 salas; salas con incendios/brechas muestran cuenta regresiva `5.0 s`; esclusas exteriores clicables/atajo.
+  - **Mitad izquierda/central (Escena Tactica FTL):** Nave `MZ-1 LIBERTY` (chasis `Orbital Mule Mk-I`) en corte 2.5D animado sobre fondo estelar/debris en movimiento; los 4 bots/tripulantes se desplazan por las 6 salas; salas con incendios/brechas muestran cuenta regresiva `5.0 s`; esclusas exteriores clicables/atajo.
   - **Incrustacion Orbital KSP 2.5D (Sector derecho del lienzo central o toggle rapido `M` para mapa orbital ampliado):** Planeta con terminador Bayer 4x4, orbita crema `#f4ebd9`, marcadores `AP` / `PE`, arco punteado de maniobra $\Delta v$ y posicion en tiempo real de la nave + ventana de comunicacion DSN.
   - **Consola inferior integrada (centrada bajo el lienzo, `84 px` de alto):** **NavBall 2.5D** (horizonte artificial con pipas Prograde/Retrograde/Maniobra), barra deslizante de empuje de motor, palanca de armado/descarga y barra discreta FTL de **Barras de Reactor** (`helm`, `engines`, `sensors`, `shields`, `O2`, `science`) con click/atajos para reasignar energia en vivo.
 - **Panel derecho unico (`26%`):** Arriba el **Radar Topografico 3D Wireframe (`pin_26`)** exclusivo del puesto de Sensores/Radar (aviso anticipado de basura Kessler CelesTrak, asteroides NEO y tormentas solares DONKI) y debajo la lista limpia de **Alertas Activas de Sala (5 s)** con indicador de puesto sugerido y boton de venteo rapido.

@@ -123,6 +123,9 @@ var selected_instruments: Array[StringName] = [&"cam_multispectral"]
 var selected_perks: Array[StringName] = []
 var auxiliary_cargo_attached: bool = true
 var jettisoned: bool = false
+var insured: bool = false
+
+const CRATE_COST: int = 160
 
 
 func _init() -> void:
@@ -145,6 +148,46 @@ func reset_default_mule() -> void:
 	selected_perks = []
 	auxiliary_cargo_attached = true
 	jettisoned = false
+	insured = false
+
+
+func roll_scrapyard_crate(rng: RandomNumberGenerator, available_credits: int) -> Dictionary:
+	if available_credits < CRATE_COST:
+		return {"ok": false, "cost": CRATE_COST, "reason": "Creditos insuficientes"}
+	var socket_id: StringName = SOCKET_ORDER[rng.randi_range(0, SOCKET_ORDER.size() - 1)]
+	var roll := rng.randf()
+	var qual: StringName = &"USED"
+	if roll < 0.15:
+		qual = &"LEGENDARY"
+	elif roll < 0.55:
+		qual = &"NEW"
+	elif roll >= 0.85:
+		qual = &"SCRAP"
+
+	var s: Dictionary = sockets[socket_id]
+	s["quality"] = qual
+	if qual in [&"NEW", &"LEGENDARY"] and int(s["level"]) < 5:
+		s["level"] = int(s["level"]) + 1
+	hull_level = maxi(hull_level, _avg_hull_level())
+
+	var bonus_perk: StringName = &""
+	if qual == &"LEGENDARY":
+		var missing: Array[StringName] = []
+		for pid: StringName in PERKS.keys():
+			if not selected_perks.has(pid):
+				missing.append(pid)
+		if not missing.is_empty():
+			bonus_perk = missing[rng.randi_range(0, missing.size() - 1)]
+			selected_perks.append(bonus_perk)
+
+	return {
+		"ok": true,
+		"cost": CRATE_COST,
+		"socket": socket_id,
+		"quality": qual,
+		"level": int(s["level"]),
+		"bonus_perk": bonus_perk,
+	}
 
 
 func upgrade_socket(socket_id: StringName, available_credits: int) -> Dictionary:

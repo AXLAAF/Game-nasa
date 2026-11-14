@@ -1,6 +1,6 @@
 # Investigación Técnica: Arquitectura de Naves Espaciales, Física de Fallos e Incidentes Reales Documentados
 
-**Proyecto:** `Space: Deuda Orbital`  
+**Proyecto:** `Margin Zero: Deuda Orbital` (*Margin Zero: Orbital Debt* — Nave `MZ-1 LIBERTY`, programa `LIBERTY-1..N`)  
 **Propósito:** Respaldar con ingeniería aeroespacial real y reportes oficiales (NASA, ESA, Roscosmos, NOAA SWPC) cada subsistema, mecánica de avería, peligro ambiental y *perk* del simulador.
 
 ## 1. Arquitectura de Naves Espaciales Reales y los 7 Subsistemas Críticos
@@ -101,11 +101,11 @@ Para que la simulación de `Space` conserve tensión jugable sin caer en cliché
 
 ---
 
-## 4. Matriz de Trazabilidad Directa hacia `Space (Deuda Orbital)`
+## 4. Matriz de Trazabilidad Directa hacia `Margin Zero: Deuda Orbital`
 
 Cada hallazgo institucional de este documento se traduce directamente en elementos implementables de la arquitectura actual en `game/sim/`, `docs/DISEÑO-UI-NAVES-25D.md`, `docs/MECANICAS-REFERENCIA.md` y `data/nasa/*.json`:
 
-| Subsistema o Incidente Real | Sala FTL (`RoomHazards` / `ReactorPower`) | Hardpoint 2.5D (`Orbital Mule Mk-I`) | Perk NASA / Dato Oficial vinculado (`MECANICAS-REFERENCIA.md` & `data/nasa/*.json`) | Comportamiento verificado en simulación |
+| Subsistema o Incidente Real | Sala FTL (`RoomHazards` / `ReactorPower`) | Hardpoint 2.5D (`MZ-1 LIBERTY` / `Orbital Mule Mk-I`) | Perk NASA / Dato Oficial vinculado (`MECANICAS-REFERENCIA.md` & `data/nasa/*.json`) | Comportamiento verificado en simulación |
 | :--- | :--- | :--- | :--- | :--- |
 | **Impacto MMOD / Basura orbital (Iridium–Cosmos, Fengyun-1C)** | `science_bay` (`radial`) o casco general | `SOCKET_PORT_NACELLE` / `STBD_NACELLE` | `debris_leo_catalog.json` (7.66 a $14.2\text{ km/s}$, energías de $3200\text{ a }16\,500\text{ J}$) + `radar_doppler` (aviso de 14 s) | Brecha al vacío dominante en cuadrante `radial` (`DamageMatrix`); exige sellado o aislamiento antes de que caiga el $\text{O}_2$ bajo umbral |
 | **Fallo de Radiador / MLI (Soyuz MS-22, pérdida de $\text{NH}_3$)** | `life_support` + sistema `shields_thermal` | `SOCKET_WING_PORT` / `STBD` | `radiator_ammonia` (fragilidad 1.0, pierde refrigerante al romperse) e `insulation_mli` (desgarro si $q > 12\,000\text{ Pa}$) | Embalamiento térmico (`temp_norm >= 0.85`) si cae refrigeración cerca de $1\text{ AU}$; congelación (`<= 0.15`) en espacio profundo sin MLI |

@@ -1,6 +1,6 @@
 shader_type canvas_item;
 
-uniform int planet_type : hint_range(0, 3) = 0;
+uniform int planet_type : hint_range(0, 4) = 0;
 uniform float pixels = 96.0;
 uniform float seed = 4.2;
 uniform vec2 light_dir = vec2(-0.707, -0.707);
@@ -9,6 +9,7 @@ uniform vec4 col_a : source_color = vec4(0.11, 0.31, 0.56, 1.0);
 uniform vec4 col_b : source_color = vec4(0.22, 0.74, 0.97, 1.0);
 uniform vec4 col_c : source_color = vec4(0.96, 0.92, 0.85, 1.0);
 uniform vec4 col_atmo : source_color = vec4(0.22, 0.74, 0.97, 0.45);
+uniform vec4 col_night : source_color = vec4(0.031, 0.047, 0.086, 1.0);
 
 float hash21(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21) + seed);
@@ -65,66 +66,96 @@ void fragment() {
 	vec2 uv = (px + 0.5) / pixels;
 	vec2 d = (uv - 0.5) * 2.0;
 	float r2 = dot(d, d);
+	float r_lim = 1.0;
 
-	if (r2 > 1.0) {
-		float rim = smoothstep(1.12, 0.96, sqrt(r2));
-		COLOR = vec4(col_atmo.rgb, col_atmo.a * rim * 0.45);
+	if (planet_type == 4) {
+		float ang = atan(d.y, d.x);
+		float rock = fbm(vec2(cos(ang) * 1.8 + seed, sin(ang) * 1.8 - seed));
+		r_lim = 0.68 + 0.24 * rock;
+	}
+
+	if (r2 > r_lim) {
+		if (planet_type == 4) {
+			COLOR = vec4(0.0);
+		} else {
+			float dist = sqrt(r2);
+			float dither = bayer4(px);
+			float rim = smoothstep(1.14, 0.98, dist);
+			float quant = step(dither * 0.65, rim);
+			COLOR = vec4(col_atmo.rgb, col_atmo.a * quant * 0.42);
+		}
 	} else {
-		float z = sqrt(max(1.0 - r2, 0.0));
+		float nr2 = clamp(r2 / max(r_lim, 0.001), 0.0, 1.0);
+		float z = sqrt(max(1.0 - nr2, 0.0));
 		vec3 normal = normalize(vec3(d.x, d.y, z));
-		// Proyeccion esferica simple + rotacion
 		float lon = atan(d.x, z) + TIME * spin_speed;
 		float lat = asin(clamp(d.y, -1.0, 1.0));
 		vec2 sphere_uv = vec2(lon * 1.4, lat * 2.2);
 
 		float n = 0.0;
 		if (planet_type == 3) {
-			// Gigante gaseoso (Jupiter): bandas horizontales turbulentas
-			float band = sin(lat * 14.0 + fbm(sphere_uv * 2.0) * 3.0) * 0.5 + 0.5;
-			n = mix(band, fbm(vec2(lon * 2.5, lat * 6.0)), 0.35);
+			// Gigante gaseoso (Jupiter): bandas zonales turbulentas + vortice
+			float turb = fbm(sphere_uv * 2.1);
+			float band = sin(lat * 15.0 + turb * 3.4) * 0.5 + 0.5;
+			float storm_d = length(vec2(mod(lon + 1.2, 6.28318) - 3.14159, (lat - 0.35) * 2.2));
+			float spot = smoothstep(0.45, 0.12, storm_d);
+			n = mix(mix(band, fbm(vec2(lon * 2.6, lat * 6.5)), 0.32), 0.15, spot * 0.75);
 		} else if (planet_type == 1) {
-			// Luna: mares y crateres de alto contraste
-			n = fbm(sphere_uv * 2.2);
-			float cr = smoothstep(0.62, 0.72, noise(sphere_uv * 8.0));
-			n = clamp(n - cr * 0.25, 0.0, 1.0);
+			// Luna: mares basalticos y crateres anulares
+			n = fbm(sphere_uv * 2.3);
+			float c_cell = noise(sphere_uv * 7.5);
+			float crater_floor = smoothstep(0.64, 0.72, c_cell);
+			float crater_rim = smoothstep(0.58, 0.63, c_cell) * (1.0 - crater_floor);
+			n = clamp(n - crater_floor * 0.28 + crater_rim * 0.22, 0.0, 1.0);
 		} else if (planet_type == 2) {
-			// Marte: planicies oxidadas, casquetes y cañon
+			// Marte: planicies oxidadas, cañon ecuatorial y casquetes polares
 			n = fbm(sphere_uv * 2.6);
-			if (abs(lat) > 1.15) {
-				n = 0.92;
+			float canyon = smoothstep(0.18, 0.03, abs(lat + 0.12 * sin(lon * 2.0)));
+			n = clamp(n - canyon * 0.26, 0.0, 1.0);
+			if (abs(lat) > 1.12 + 0.08 * noise(sphere_uv * 4.0)) {
+				n = 0.94;
 			}
+		} else if (planet_type == 4) {
+			// Asteroide NEO: regolito gris/terroso y crateres profundos
+			n = fbm(sphere_uv * 3.1);
+			float cr = smoothstep(0.60, 0.72, noise(sphere_uv * 6.5));
+			n = clamp(n - cr * 0.32, 0.0, 1.0);
 		} else {
-			// Tierra / Terran: oceanos, continentes y nubes
+			// Tierra: oceanos, continentes y capa de nubes independiente
 			n = fbm(sphere_uv * 2.4);
-			float clouds = fbm(sphere_uv * 3.8 + vec2(TIME * spin_speed * 0.6, 0.0));
-			if (clouds > 0.64) {
+			float clouds = fbm(sphere_uv * 3.8 + vec2(TIME * spin_speed * 0.65, 0.4));
+			if (clouds > 0.63) {
 				n = 0.95;
 			}
 		}
 
 		vec3 surf = col_a.rgb;
-		if (n > 0.78) {
+		if (n > 0.76) {
 			surf = col_c.rgb;
-		} else if (n > 0.48) {
+		} else if (n > 0.46) {
 			surf = col_b.rgb;
 		}
 
 		vec3 l3 = normalize(vec3(light_dir.x, light_dir.y, 0.55));
 		float ndl = clamp(dot(normal, l3), 0.0, 1.0);
 		float dither = bayer4(px);
-		float shade = 0.14;
+
+		vec3 lit = col_night.rgb;
 		if (ndl > 0.68 + dither * 0.14) {
-			shade = 1.08;
-		} else if (ndl > 0.35 + dither * 0.16) {
-			shade = 0.76;
-		} else if (ndl > 0.14 + dither * 0.16) {
-			shade = 0.42;
+			lit = surf * 1.10;
+		} else if (ndl > 0.36 + dither * 0.16) {
+			lit = surf * 0.78;
+		} else if (ndl > 0.15 + dither * 0.16) {
+			lit = mix(col_night.rgb, surf * 0.45, 0.85);
+		} else {
+			lit = mix(col_night.rgb, surf * 0.18, 0.35);
 		}
 
-		vec3 final_col = surf * shade;
-		// Rim atmosferico del lado iluminado
-		float fresnel = pow(1.0 - z, 2.4) * smoothstep(-0.1, 0.5, ndl);
-		final_col = mix(final_col, col_atmo.rgb, clamp(fresnel * col_atmo.a * 1.6, 0.0, 0.75));
-		COLOR = vec4(final_col, 1.0);
+		if (planet_type != 4) {
+			float fresnel = pow(1.0 - z, 2.4) * smoothstep(-0.08, 0.55, ndl);
+			lit = mix(lit, col_atmo.rgb, clamp(fresnel * col_atmo.a * 1.5, 0.0, 0.75));
+		}
+
+		COLOR = vec4(lit, 1.0);
 	}
 }

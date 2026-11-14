@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Space: simulador cooperativo caotico de misiones espaciales en Godot 4.7+ (GDScript, renderer `gl_compatibility` para exportacion Web) para NASA Space Apps Challenge ("Space Mission Design Game").
+Margin Zero: Deuda Orbital (`Margin Zero: Orbital Debt`) — simulador cooperativo caotico de misiones espaciales (nave `MZ-1 LIBERTY`, chasis `Orbital Mule Mk-I`, programa `LIBERTY-1` a `LIBERTY-N`) en Godot 4.7+ (GDScript, renderer `gl_compatibility` para exportacion Web) para NASA Space Apps Challenge ("Space Mission Design Game").
 
 ## Reglas obligatorias
 

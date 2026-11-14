@@ -1,6 +1,7 @@
-# Documento Maestro de Diseño y Arquitectura (GDD): Space (Deuda Orbital)
+# Documento Maestro de Diseño y Arquitectura (GDD): Margin Zero: Deuda Orbital
 
-**Proyecto:** Simulador Cooperativo de Misiones Espaciales (Agencia en Quiebra)  
+**Proyecto:** `Margin Zero: Deuda Orbital` (*Margin Zero: Orbital Debt*) — Simulador Cooperativo de Misiones Espaciales (Naviera en Quiebra: *Margen Cero Astrologística*)  
+**Nave Insignia y Programa:** `MZ-1 LIBERTY` (Chasis `Orbital Mule Mk-I`) // Contratos `LIBERTY-1` a `LIBERTY-N`  
 **Reto Objetivo:** NASA International Space Apps Challenge — *Space Mission Design Game*  
 **Referencias Centrales:** *FTL: Faster Than Light* (interior 2.5D) + *Kerbal Space Program* (vista orbital 2.5D) + *Overcooked* (cooperativo sin pausa) + *Rhine Lab / Lone Trail*  
 **Público Objetivo:** Adolescentes (+12 años) y adultos  
@@ -48,12 +49,12 @@ El juego equilibra precisión y velocidad: ofrece una **Vista Orbital 2.5D inspi
 ## 3. Loop Completo de Partida (4 a 6 minutos)
 
 ### Fase 1: Briefing y Hangar en Quiebra (60–90 s)
-1. **Selección de Contrato NASA:** Se muestran 4 misiones reales con su presupuesto inicial, pago por Ciencia y advertencias físicas reales:
-   - **Misión 1 — Órbita Lunar (Artemis Relay):** Baja dificultad, $\Delta v$ moderado, latencia 1.3 s, radiación solar media. Ideal para aprender los puestos.
-   - **Misión 2 — Muestras en Marte (Mars Sample Return):** Dificultad media, irradiancia solar ~43% (paneles rinden menos), atmósfera tenue ($0.006\text{ bar}$) que exige escudo ablativo PICA + paracaídas, latencia de antena (3–22 min simulada como *buffer* de comandos).
-   - **Misión 3 — Sonda a Júpiter / Europa (Clipper):** Dificultad alta, irradiancia solar ~3.7% (paneles solares prácticamente inútiles; obliga a equipar **RTG**), radiación joviana extrema en cinturones.
-   - **Misión 4 — Mantenimiento de Telescopio / Desvío NEO (JWST / DART):** Enfoque en evasión de detritos orbitales LEO (CelesTrak) y tormentas solares DONKI.
-2. **Dique Seco y Nave Base Evolucionable (`Orbital Mule Mk-I` -> `LVL 1..5`):**
+1. **Selección de Contrato NASA (Programa `LIBERTY-1` a `LIBERTY-N`):** Se muestran 4 contratos reales asignados al casco `MZ-1 LIBERTY` con su presupuesto inicial, pago por Ciencia y advertencias físicas reales (cualquier reintento tras pérdida o aborto incrementa el código correlativo de vuelo a `LIBERTY-5 .. LIBERTY-N` hasta liquidar la deuda):
+   - **`LIBERTY-1` — Órbita Lunar (Artemis Relay):** Baja dificultad, $\Delta v$ moderado, latencia 1.3 s, radiación solar media. Ideal para aprender los puestos.
+   - **`LIBERTY-2` — Mantenimiento de Telescopio / Desvío NEO (JWST / DART / 2024 PDC25):** Enfoque en evasión de detritos orbitales LEO (CelesTrak), asteroides NEO y tormentas solares DONKI.
+   - **`LIBERTY-3` — Muestras en Marte (Mars Sample Return):** Dificultad media, irradiancia solar ~43% (paneles rinden menos), atmósfera tenue ($0.006\text{ bar}$) que exige escudo ablativo PICA + paracaídas, latencia de antena (3–22 min simulada como *buffer* de comandos).
+   - **`LIBERTY-4` — Sonda a Júpiter / Europa (Clipper):** Dificultad alta, irradiancia solar ~3.7% (paneles solares prácticamente inútiles; obliga a equipar **RTG**), radiación joviana extrema en cinturones.
+2. **Dique Seco y Nave Base Evolucionable (`MZ-1 LIBERTY` · Chasis `Orbital Mule Mk-I` -> `LVL 1..5`):**
    - En lugar de armar cohetes sueltos desde cero, toda campaña conserva un **Chasis Maestro predeterminado (`160x224 px`, 6 salas FTL)** con **7 Hardpoints tipados** (`SOCKET_BOW`, góndolas babor/estribor con **abrazaderas automáticas**, alas laterales, torreta dorsal y popa remetida).
    - Los módulos acoplados se ven como una sola nave coherente mediante iluminación fija a 315 grados, oclusión de contacto de 2 px y contorno exterior único en `CanvasGroup`, y evolucionan visualmente de **`LVL 1` (Chatarra)** a **`LVL 5 MAX` (Experimental)** conforme avanza la partida.
    - El tablero muestra en vivo tres barras claras (sin exceso de números): **Alcance $\Delta v$ vs Requerido**, **Balance Energético en Destino** y **Riesgo de Despegue ($P_{explosion}$)**.
@@ -154,8 +155,9 @@ Space/
 ├── project.godot               # Godot 4.7, gl_compatibility, 1280x720, zero Jolt
 ├── AGENTS.md                   # Reglas del proyecto (Godot 4.7 Web, cero JetBrains Mono, cero emojis)
 ├── docs/
+│   ├── BRANDING-MARGIN-ZERO.md  # Identidad Margin Zero, nave MZ-1 LIBERTY y programa LIBERTY-1..N
 │   ├── 00-INDICE-Y-PLAN-MAESTRO-HACKATHON.md # Indice maestro, horarios, roles, Go/No-Go y trampas
-│   ├── 01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md # Chasis Orbital Mule Mk-I, 7 sockets y evolucion LVL 1..5
+│   ├── 01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md # Nave MZ-1 LIBERTY (chasis Orbital Mule Mk-I), 7 sockets y LVL 1..5
 │   ├── 02-SISTEMA-ORBITAL-KSP-25D-Y-FISICA.md # Conicas AP/PE, nodos Delta-V, NavBall 2.5D y Radar 3D
 │   ├── 03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md # 6 salas, esclusas, controles 1P/2-4P y 10 tarjetas de 5 s
 │   ├── 04-GUION-MISIONES-Y-CONTRATOS-NASA.md # Guion de los 4 contratos NASA, deuda y Debrief Causal

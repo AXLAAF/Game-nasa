@@ -1,17 +1,17 @@
-# 01. Catálogo de Módulos, Hardpoints y Evolución de Nave (`Orbital Mule Mk-I`)
+# 01. Catálogo de Módulos, Hardpoints y Evolución de `MZ-1 LIBERTY` (Chasis `Orbital Mule Mk-I`)
 
-**Objeto:** Especificación numérica y visual del chasis maestro predeterminado `Orbital Mule Mk-I` (`160 x 224 px` nominales, rejilla interna `5 x 7` celdas de `32 x 32 px`) y sus 7 puntos de acople tipados con evolución progresiva **`LVL 1` a `LVL 5 MAX`**.
+**Objeto:** Especificación numérica y visual de la nave insignia `MZ-1 LIBERTY` sobre el chasis maestro predeterminado `Orbital Mule Mk-I` (`160 x 224 px` nominales, rejilla interna `5 x 7` celdas de `32 x 32 px`) y sus 7 puntos de acople tipados con evolución progresiva **`LVL 1` a `LVL 5 MAX`**.
 
 ## 1. Principios de Diseño Modular Coherente
 
-- **Cero piezas sueltas flotando:** Ningún módulo se coloca en coordenadas libres. Todo componente entra en uno de los **7 hardpoints tipados** definido sobre el fuselaje maestro `Z=0`.
+- **Cero piezas sueltas flotando:** Ningún módulo se coloca en coordenadas libres. Todo componente de `MZ-1 LIBERTY` entra en uno de los **7 hardpoints tipados** definido sobre el fuselaje maestro `Z=0`.
 - **Unificación visual automática:**
   - Luz direccional fija a **315 grados** (superior-izquierda $+25\%$ luminancia, bisel inferior de `3 a 4 px` a $-40\%$ luminancia).
   - Oclusión de contacto de `2 px` en tonos `#0b0e17` / `#334155` donde la pieza intercepta el casco.
   - Abrazaderas estructurales horizontales (`#f1f5f9` con borde `#334155`) generadas automáticamente al acoplar módulos en `SOCKET_PORT_NACELLE` y `SOCKET_STBD_NACELLE`.
   - Contorno exterior único de `1 a 2 px` en `#0b0e17` aplicado sobre el nodo padre `CanvasGroup` del casco completo.
 
-## 2. Mapa de Hardpoints del Chasis Base (`Orbital Mule Mk-I`)
+## 2. Mapa de Hardpoints de `MZ-1 LIBERTY` (`Orbital Mule Mk-I`)
 
 ```text
                        [ SOCKET_BOW ] (Z=2, anillo frontal 48px)

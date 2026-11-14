@@ -4,6 +4,7 @@ var _loader := NasaDataLoader.new()
 var _build := ShipBuildState.new()
 var _evaluator := MissionEvaluator.new()
 var _sfx: SynthSfx
+var _music: MusicDirector
 var _http: HTTPRequest
 
 var _ui_layer: CanvasLayer
@@ -25,6 +26,9 @@ func _ready() -> void:
 
 	_sfx = SynthSfx.new()
 	add_child(_sfx)
+
+	_music = MusicDirector.new()
+	add_child(_music)
 
 	_http = HTTPRequest.new()
 	_http.timeout = 4.0
@@ -50,6 +54,8 @@ func _swap_screen(node: Control) -> void:
 
 
 func _show_hangar() -> void:
+	if _music != null:
+		_music.set_phase(&"hangar")
 	var h := HangarScreen.new()
 	_swap_screen(h)
 	var body_id := str(_active_body.get("id", "moon"))
@@ -84,13 +90,21 @@ func _on_launch_requested(body: Dictionary) -> void:
 	var m := _build.compute_metrics(_active_body)
 	var launch_cost := mini(int(m["total_cost"]) / 4, _credits)
 	_credits -= launch_cost
+	if _build.insured:
+		var payout := int(_active_body.get("base_payout", 1800))
+		var ins_fee := mini(int(round(float(payout) * 0.12)), _credits)
+		_credits -= ins_fee
 
 	_evaluator.clear()
 	_evaluator.set_sources(_loader.source_citations())
 	_evaluator.audit_preflight(_active_body, _build.to_evaluator_config(m))
+	if _build.insured:
+		_evaluator.record_good("INSURANCE_ACTIVE", "Seguro de mision contratado (12% prima, 60% cobertura ante fallo).")
 	if not _live_dsn_note.is_empty():
 		_evaluator.record_good("LIVE_DSN", _live_dsn_note)
 
+	if _music != null:
+		_music.set_phase(&"takeoff")
 	var t := TakeoffScreen.new()
 	_swap_screen(t)
 	t.setup(_build, _active_body, _sfx)
@@ -110,9 +124,11 @@ func _on_takeoff_completed(aborted: bool, exploded: bool) -> void:
 		_show_debrief(&"failed", 0, 0, 620)
 		return
 
+	if _music != null:
+		_music.set_phase(&"flight")
 	var f := FlightScreen.new()
 	_swap_screen(f)
-	f.setup(_loader, _build, _active_body, _coop_mode, _sfx)
+	f.setup(_loader, _build, _active_body, _coop_mode, _sfx, _music)
 	f.mission_finished.connect(_on_flight_finished)
 
 
@@ -138,17 +154,27 @@ func _on_flight_finished(
 
 
 func _show_debrief(outcome: StringName, science_collected: int, science_transmitted: int, repair_cost: int) -> void:
+	if _music != null:
+		_music.set_phase(&"debrief")
 	var payout := int(_active_body.get("base_payout", 1800))
+	if outcome != &"success" and _build.insured:
+		_evaluator.record_good("INSURANCE_PAYOUT", "Seguro de mision cubrio al menos 60%% del contrato tras incidente.")
 	var report := _evaluator.build_report(outcome, science_collected, science_transmitted, payout, repair_cost)
 	var net := int(report["net_credits"])
+	var loan_msg := ""
+	if outcome != &"success" and _build.insured:
+		var floor_cover := int(round(float(payout) * 0.60))
+		if net < floor_cover:
+			var bonus_ins := floor_cover - net
+			net = floor_cover
+			loan_msg += " [+Seguro $%d]" % bonus_ins
 	_credits += net
 
-	var loan_msg := ""
 	if _loan_debt > 0 and net > 0:
 		var pay := mini(_loan_debt, _credits)
 		_loan_debt -= pay
 		_credits -= pay
-		loan_msg = "(-$%d amortizacion deuda)" % pay
+		loan_msg += " (-$%d amortizacion deuda)" % pay
 
 	if _credits < 400:
 		_credits += 1000

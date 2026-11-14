@@ -40,10 +40,15 @@ func _build_ui() -> void:
 
 	var top := PanelContainer.new()
 	root_v.add_child(top)
+	var top_h := HBoxContainer.new()
+	top_h.add_theme_constant_override("separation", 10)
+	top.add_child(top_h)
+	top_h.add_child(SpaceTheme.make_nasa_stripe(7.0, 22.0))
 	_lbl_header = Label.new()
-	_lbl_header.add_theme_font_size_override("font_size", 19)
+	_lbl_header.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	SpaceTheme.apply_mono(_lbl_header, 16)
 	_lbl_header.add_theme_color_override("font_color", SpaceTheme.COL_AMBER)
-	top.add_child(_lbl_header)
+	top_h.add_child(_lbl_header)
 
 	var cols := HBoxContainer.new()
 	cols.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -83,7 +88,7 @@ func _build_ui() -> void:
 	_lbl_sources = Label.new()
 	_lbl_sources.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_lbl_sources.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_lbl_sources.add_theme_font_size_override("font_size", 11)
+	SpaceTheme.apply_mono(_lbl_sources, 11)
 	_lbl_sources.add_theme_color_override("font_color", SpaceTheme.COL_MUTED)
 	sh.add_child(_lbl_sources)
 

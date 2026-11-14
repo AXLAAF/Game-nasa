@@ -133,6 +133,28 @@ func repair_room(room_id: StringName, dt: float, rate: float = 0.45) -> bool:
 	return changed
 
 
+func kick_repair(room_id: StringName, rng: RandomNumberGenerator) -> StringName:
+	if not rooms.has(room_id):
+		return &"none"
+	var r: Dictionary = rooms[room_id]
+	var needs_work := float(r["fire"]) > 0.05 or float(r["breach"]) > 0.05 or float(r["hp"]) < 0.99
+	if not needs_work:
+		return &"none"
+	var roll := rng.randf()
+	if roll < 0.55:
+		r["fire"] = 0.0
+		r["breach"] = 0.0
+		r["hp"] = minf(float(r["hp"]) + 0.35, 1.0)
+		r["critical_active"] = false
+		r["critical_timer_s"] = 0.0
+		return &"fixed"
+	if roll < 0.80:
+		r["hp"] = maxf(float(r["hp"]) - 0.25, 0.0)
+		r["fire"] = minf(float(r["fire"]) + 0.25, 1.0)
+		return &"worse"
+	return &"nothing"
+
+
 func damage_bars_for(room_id: StringName, max_bars: int) -> int:
 	if not rooms.has(room_id):
 		return 0

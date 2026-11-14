@@ -1,10 +1,12 @@
 class_name SpaceTheme
 extends RefCounted
 
-const COL_VOID := Color("#060a12")
+const COL_VOID := Color("#080c16")
+const COL_CRT := Color("#05070b")
 const COL_CHASSIS := Color("#0f1726")
 const COL_RAISED := Color("#172236")
 const COL_ACTIVE := Color("#1e2d47")
+const COL_SEAM := Color("#24344d")
 const COL_CREAM := Color("#f4ebd9")
 const COL_MUTED := Color("#8b9bb4")
 const COL_AMBER := Color("#f09c14")
@@ -12,12 +14,45 @@ const COL_CYAN := Color("#38bdf8")
 const COL_TERRA := Color("#c83e2b")
 const COL_OK := Color("#22c55e")
 
+static var _sans_cache: SystemFont
+static var _mono_cache: SystemFont
+
+
+static func sans_font() -> SystemFont:
+	if _sans_cache == null:
+		_sans_cache = SystemFont.new()
+		_sans_cache.font_names = PackedStringArray(["Noto Sans", "Inter", "Liberation Sans", "DejaVu Sans"])
+	return _sans_cache
+
+
+static func mono_font() -> SystemFont:
+	if _mono_cache == null:
+		_mono_cache = SystemFont.new()
+		_mono_cache.font_names = PackedStringArray(["IBM Plex Mono", "Liberation Mono", "DejaVu Sans Mono"])
+	return _mono_cache
+
+
+static func apply_mono(ctrl: Control, font_size: int = 12) -> void:
+	ctrl.add_theme_font_override("font", mono_font())
+	ctrl.add_theme_font_size_override("font_size", maxi(font_size, 11))
+
+
+static func make_nasa_stripe(bar_w: float = 8.0, bar_h: float = 24.0) -> HBoxContainer:
+	var hb := HBoxContainer.new()
+	hb.add_theme_constant_override("separation", 3)
+	hb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var cols: Array[Color] = [COL_TERRA, COL_AMBER, COL_CREAM, COL_CYAN]
+	for col: Color in cols:
+		var r := ColorRect.new()
+		r.color = col
+		r.custom_minimum_size = Vector2(bar_w, bar_h)
+		hb.add_child(r)
+	return hb
+
 
 static func build_theme() -> Theme:
 	var t := Theme.new()
-	var sys_sans := SystemFont.new()
-	sys_sans.font_names = PackedStringArray(["Noto Sans", "Inter", "Liberation Sans", "DejaVu Sans"])
-	t.default_font = sys_sans
+	t.default_font = sans_font()
 	t.default_font_size = 13
 
 	var panel_sb := StyleBoxFlat.new()
@@ -26,7 +61,7 @@ static func build_theme() -> Theme:
 	panel_sb.border_width_top = 1
 	panel_sb.border_width_right = 1
 	panel_sb.border_width_bottom = 1
-	panel_sb.border_color = COL_ACTIVE
+	panel_sb.border_color = COL_SEAM
 	panel_sb.corner_radius_top_left = 4
 	panel_sb.corner_radius_top_right = 4
 	panel_sb.corner_radius_bottom_left = 4
@@ -39,6 +74,9 @@ static func build_theme() -> Theme:
 
 	var btn_norm := StyleBoxFlat.new()
 	btn_norm.bg_color = COL_RAISED
+	btn_norm.border_width_left = 1
+	btn_norm.border_width_top = 1
+	btn_norm.border_width_right = 1
 	btn_norm.border_width_bottom = 2
 	btn_norm.border_color = COL_ACTIVE
 	btn_norm.corner_radius_top_left = 4
@@ -96,5 +134,6 @@ static func style_cta_button(btn: Button, accent: Color = COL_AMBER) -> void:
 	var hov := sb.duplicate() as StyleBoxFlat
 	hov.bg_color = accent.lightened(0.15)
 	btn.add_theme_stylebox_override("hover", hov)
-	btn.add_theme_color_override("font_color", COL_VOID if accent == COL_AMBER else Color("#ffffff"))
-	btn.add_theme_color_override("font_hover_color", COL_VOID if accent == COL_AMBER else Color("#ffffff"))
+	var text_dark := accent == COL_AMBER or accent == COL_CYAN
+	btn.add_theme_color_override("font_color", COL_VOID if text_dark else Color("#ffffff"))
+	btn.add_theme_color_override("font_hover_color", COL_VOID if text_dark else Color("#ffffff"))

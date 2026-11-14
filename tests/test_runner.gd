@@ -13,6 +13,7 @@ func _init() -> void:
 	_test_ship_build_state()
 	_test_orbital_solver()
 	_test_crew_controller()
+	_test_rescued_mechanics()
 	_test_main_scene_loads()
 	_test_no_forbidden_font()
 
@@ -154,6 +155,41 @@ func _test_crew_controller() -> void:
 	_check(rp.is_manned(&"engines"), "Ocupar Motores activa Manning Bonus en ReactorPower")
 
 
+func _test_rescued_mechanics() -> void:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 42
+	var bs := ShipBuildState.new()
+	bs.insured = true
+	_check(bs.insured, "ShipBuildState permite activar Seguro de Mision")
+	var deny := bs.roll_scrapyard_crate(rng, 50)
+	_check(not bool(deny["ok"]), "Caja Desguace bloquea si faltan creditos")
+	var ok_crate := bs.roll_scrapyard_crate(rng, 1000)
+	_check(bool(ok_crate["ok"]) and int(ok_crate["cost"]) == ShipBuildState.CRATE_COST, "Caja Desguace cobra 160 y devuelve calidad")
+
+	var rh := RoomHazards.new()
+	_check(rh.kick_repair(&"helm", rng) == &"none", "Patada en sala intacta retorna none")
+	var fixed_cnt := 0
+	var worse_cnt := 0
+	for s: int in range(30):
+		var krng := RandomNumberGenerator.new()
+		krng.seed = 100 + s
+		var r2 := RoomHazards.new()
+		r2.trigger_hazard(&"engines", 0.30, 0.80, 0.20, true)
+		var out := r2.kick_repair(&"engines", krng)
+		if out == &"fixed":
+			fixed_cnt += 1
+		elif out == &"worse":
+			worse_cnt += 1
+	_check(fixed_cnt > 0 and worse_cnt > 0, "Patada de emergencia produce reparacion o empeoramiento segun RNG")
+
+	var md := MusicDirector.new()
+	md.set_phase(&"flight")
+	md.set_chaos_active(true)
+	_check(md.active_phase == &"flight" and md.chaos_active, "MusicDirector cambia fase a vuelo y activa caos")
+	_check(md.toggle_mute(), "MusicDirector alterna silencio correctamente")
+	md.free()
+
+
 func _test_main_scene_loads() -> void:
 	var packed := ResourceLoader.load("res://game/main.tscn") as PackedScene
 	_check(packed != null, "Carga main.tscn sin errores de recursos o shaders")
@@ -170,6 +206,7 @@ func _test_no_forbidden_font() -> void:
 		"res://project.godot",
 		"res://game/main.gd",
 		"res://game/audio/synth_sfx.gd",
+		"res://game/audio/music_director.gd",
 		"res://game/actors/modular_ship_25d.gd",
 		"res://game/phases/hangar_screen.gd",
 		"res://game/phases/takeoff_screen.gd",
