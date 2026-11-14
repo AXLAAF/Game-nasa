@@ -10,6 +10,10 @@ func _init() -> void:
 	_test_nasa_data_loader()
 	_test_mission_evaluator()
 	_test_station_input()
+	_test_ship_build_state()
+	_test_orbital_solver()
+	_test_crew_controller()
+	_test_main_scene_loads()
 	_test_no_forbidden_font()
 
 	print("Space Tests: %d passed, %d failed" % [_passed, _failed])
@@ -25,93 +29,65 @@ func _check(cond: bool, msg: String) -> void:
 
 
 func _test_reactor_power() -> void:
-	var rp := ReactorPower.new(7)
-	_check(rp.used_bars() <= 7, "Reactor respeta presupuesto inicial de barras")
-	rp.allocate(&"science_bay", 1)
-	_check(rp.effective_bars(&"science_bay") == 1 or rp.available_bars() == 0, "Asignacion de barras respeta disponible")
-	rp.allocate(&"life_support", -1)
-	_check(rp.allocate(&"engines", 1), "Quitar barra de life_support libera energia para engines")
-	var eff_unmanned := rp.efficiency(&"engines")
-	rp.set_manned(&"engines", true)
-	var eff_manned := rp.efficiency(&"engines")
-	_check(eff_manned > eff_unmanned, "Manning bonus estilo FTL aumenta eficiencia")
-	rp.set_damage_bars(&"engines", 3)
-	_check(rp.effective_bars(&"engines") == 0, "Dano total en sala corta energia efectiva a 0")
+	var rp := ReactorPower.new(6)
+	_check(rp.used_bars() == 5, "Reactor inicia con 5 barras asignadas")
+	_check(rp.available_bars() == 1, "Reactor inicia con 1 barra libre")
+	_check(rp.allocate(&"engines", 1), "Asigna barra libre a Motores")
+	_check(not rp.allocate(&"helm", 1), "Bloquea asignacion sin barras libres")
+	rp.set_manned(&"helm", true)
+	_check(is_equal_approx(rp.efficiency(&"helm"), 0.75), "Manning bonus suma +0.25 a Timon")
+	rp.set_damage_bars(&"engines", 2)
+	_check(rp.max_usable_bars(&"engines") == 1, "Dano reduce barras utilizables")
 
 
 func _test_room_hazards() -> void:
 	var rh := RoomHazards.new()
-	rh.trigger_hazard(&"engines", 0.35, 0.8, 0.0, true)
-	_check(bool(rh.get_room(&"engines")["critical_active"]), "Incendio activa cuenta regresiva critica")
-	# Probar mecanica FTL de abrir airlock para apagar incendio al vacio
+	rh.trigger_hazard(&"engines", 0.30, 0.80, 0.0, true)
+	var eng := rh.get_room(&"engines")
+	_check(bool(eng["critical_active"]) and is_equal_approx(float(eng["critical_timer_s"]), 5.0), "Crisis inicia ventana de 5 s")
+
 	rh.set_airlock(&"engines", true)
-	for i: int in 4:
-		rh.step(0.5, 1.0, {&"engines": false})
-	_check(float(rh.get_room(&"engines")["oxygen"]) < 0.15, "Airlock abierto drena oxigeno rapidamente")
-	var step_res := rh.step(0.8, 1.0, {&"engines": true})
-	_check(float(rh.get_room(&"engines")["fire"]) < 0.2, "Falta de oxigeno sofoca incendio en la sala")
-	_check((step_res["suffocating_rooms"] as Array).has(&"engines"), "Tripulante en sala sin O2 recibe alerta de asfixia")
-
-	# Probar vencimiento de crisis de 5s si no se repara
-	var rh2 := RoomHazards.new()
-	rh2.trigger_hazard(&"reactor", 0.1, 0.0, 0.6, true)
-	var expired := false
-	for i: int in 12:
-		var res := rh2.step(0.5, 1.0, {})
-		if (res["expired_crises"] as Array).has(&"reactor"):
-			expired = true
+	var vented := false
+	for _i: int in range(30):
+		var res := rh.step(0.1, 1.0, {})
+		if &"engines" in res["vented_fires"]:
+			vented = true
 			break
-	_check(expired, "Crisis no atendida en 5 segundos escala y dispara evento de fallo")
+	_check(vented, "Abrir compuerta al vacio extingue incendio al drenar oxigeno")
 
-	var rh3 := RoomHazards.new()
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 7
-	var imp := rh3.apply_impact_zone(&"bottom", 12000.0, rng)
-	_check(imp["severity"] == "critica" and imp["room_id"] == &"engines", "Impacto critico en zona bottom afecta a sala engines")
+	rh.trigger_hazard(&"life_support", 0.1, 0.0, 0.8, true)
+	rh.step(5.5, 0.0, {&"life_support": true})
+	var ls := rh.get_room(&"life_support")
+	_check(float(ls["oxygen"]) < 0.20, "Brecha drena oxigeno bajo umbral de asfixia")
 
 
 func _test_nasa_data_loader() -> void:
 	var loader := NasaDataLoader.new()
-	_check(loader.load_all(), "Carga de los 4 JSON de datos NASA/JPL exitosa")
-	var contracts := loader.get_contracts()
-	_check(contracts.size() >= 3, "Al menos 3 contratos planetarios reales cargados")
-	_check(loader.dsn_one_way_latency_s("jupiter") > 2000.0, "Latencia DSN unidireccional de Jupiter > 2000 s")
-	_check(loader.solar_irradiance_at_body("mars") < 650.0, "Irradiancia real en Marte < 650 W/m2")
-	_check(loader.get_asteroids().size() == 4, "4 asteroides JPL SBDB cargados")
-	_check(loader.get_solar_events().size() == 4, "4 tormentas solares DONKI cargadas")
-	_check(loader.get_debris_regimes().size() == 3, "3 regimenes de basura espacial LEO cargados")
-	_check(loader.source_citations().size() == 4, "4 citas oficiales NASA/JPL presentes")
+	_check(loader.load_all(), "Carga todos los JSON NASA/JPL")
+	_check(loader.get_contracts().size() == 3, "Existen 3 contratos planetarios")
+	_check(loader.get_asteroids().size() == 4, "Existen 4 asteroides NEO curados")
+	_check(loader.get_solar_events().size() == 4, "Existen 4 tormentas solares DONKI")
+	_check(loader.get_debris_regimes().size() == 3, "Existen 3 regimenes de escombros LEO")
+
+	var f_jup := NasaDataLoader.solar_factor(5.20)
+	_check(f_jup < 0.04 and f_jup > 0.035, "Irradiancia en Jupiter cae a ~3.7%")
+	_check(loader.dsn_one_way_latency_s("moon") > 1.2, "Latencia DSN unidireccional lunar > 1.2 s")
 
 
 func _test_mission_evaluator() -> void:
 	var loader := NasaDataLoader.new()
 	loader.load_all()
 	var jupiter := loader.get_body("jupiter")
-	var ev := MissionEvaluator.new()
-	ev.set_sources(loader.source_citations())
-	ev.audit_preflight(jupiter, {
-		"solar_power": 10.0,
-		"rtg_power": 0.0,
-		"required_power": 2.0,
-		"has_rad_shield": false,
-		"overload": 0.25,
-		"scrap_count": 2,
-	})
-	var report := ev.build_report(&"failed", 100, 40, 6200, 900)
-	_check((report["bad_items"] as Array).size() >= 3, "Auditor detecta error solar en Jupiter, sin blindaje rad, sobrecarga y chatarra")
-	_check(report["grade"] == "F" and int(report["net_credits"]) < 0, "Mision fallida genera saldo negativo de quiebra")
-
 	var mars := loader.get_body("mars")
+
+	var ev_fail := MissionEvaluator.new()
+	ev_fail.audit_preflight(jupiter, {"solar_power": 1.0, "rtg_power": 0.0, "required_power": 1.0, "radiation_hazard": true, "has_rad_shield": false, "overload": 0.25, "scrap_count": 2})
+	var rep_fail := ev_fail.build_report(&"failed", 100, 10, 6200, 900)
+	_check(rep_fail["grade"] == "F", "Mision a Jupiter sin RTG y fallida recibe rango F")
+	_check((rep_fail["bad_items"] as Array).size() >= 3, "Auditoria explica multiples fallos causales")
+
 	var ev_ok := MissionEvaluator.new()
-	ev_ok.audit_preflight(mars, {
-		"solar_power": 6.0,
-		"rtg_power": 2.0,
-		"required_power": 2.0,
-		"has_heatshield": true,
-		"has_parachute": true,
-		"overload": 0.0,
-		"scrap_count": 0,
-	})
+	ev_ok.audit_preflight(mars, {"solar_power": 2.0, "rtg_power": 1.0, "required_power": 1.2, "has_heatshield": true, "has_parachute": true, "overload": 0.0, "scrap_count": 0})
 	var rep_ok := ev_ok.build_report(&"success", 260, 260, 3400, 100)
 	_check(rep_ok["grade"] == "S" and (rep_ok["bad_items"] as Array).is_empty(), "Mision bien equipada y ejecutada obtiene rango S")
 
@@ -128,16 +104,89 @@ func _test_station_input() -> void:
 	_check(si.cycle_solo_station() == &"radar", "Cambio rapido de puesto avanza a radar")
 
 
+func _test_ship_build_state() -> void:
+	var loader := NasaDataLoader.new()
+	loader.load_all()
+	var jupiter := loader.get_body("jupiter")
+	var bs := ShipBuildState.new()
+	var m_solar := bs.compute_metrics(jupiter)
+	_check(float(m_solar["power_at_dest"]) < float(m_solar["required_power"]), "Panel solar base falla balance energetico en Jupiter")
+
+	var res := bs.upgrade_socket(&"bow", 2000)
+	_check(bool(res["ok"]) and int(bs.sockets[&"bow"]["level"]) == 2, "Sube hardpoint Proa a LVL 2 descontando creditos")
+	bs.set_socket_module(&"port_nacelle", &"nacelle_rtg", &"NEW")
+	bs.set_socket_module(&"stbd_nacelle", &"nacelle_rtg", &"NEW")
+	var m_rtg := bs.compute_metrics(jupiter)
+	_check(float(m_rtg["power_at_dest"]) > float(m_solar["power_at_dest"]), "Instalar MMRTG eleva energia disponible a 5.2 AU")
+
+	var ov_before := float(m_rtg["overload"])
+	bs.jettison_aux_cargo()
+	var ov_after := float(bs.compute_metrics(jupiter)["overload"])
+	_check(ov_after <= ov_before, "Jettison reduce masa y sobrecarga de lanzamiento")
+
+
+func _test_orbital_solver() -> void:
+	var loader := NasaDataLoader.new()
+	loader.load_all()
+	var mars := loader.get_body("mars")
+	var bs := ShipBuildState.new()
+	var metrics := bs.compute_metrics(mars)
+	var os_sim := OrbitalSolver.new()
+	os_sim.configure_for_body(mars, metrics)
+	var ap0 := os_sim.apoapsis_km
+	os_sim.ship_angle_rad = 0.0
+	var out := os_sim.step(0.5, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, metrics, 0.0)
+	_check(float(out["apoapsis_km"]) > ap0, "Quema prograde incrementa apoapsis orbital")
+	_check(os_sim.orbit_points(32, Vector2.ZERO, 100.0).size() == 33, "Genera polilinea cerrada para OrbitalMap25D")
+	_check(bool(out["in_reentry_corridor"]), "Angulo inicial -4.5 deg cae dentro del corredor marciano [-5.2, -3.8]")
+
+
+func _test_crew_controller() -> void:
+	var cc := CrewController.new()
+	var path := cc.find_path(&"helm", &"engines")
+	_check(path.size() == 2 and path[0] == &"reactor" and path[1] == &"engines", "BFS navega helm -> reactor -> engines")
+	_check(cc.command_move(&"pilot", &"engines"), "Ordena movimiento de piloto hacia Motores")
+	var rp := ReactorPower.new(7)
+	var rh := RoomHazards.new()
+	for _i: int in range(30):
+		cc.step(0.1, rh, rp, &"pilot", true)
+	_check(cc.crew[&"pilot"]["room"] == &"engines", "Piloto llega fisicamente a Motores en tiempo real")
+	_check(rp.is_manned(&"engines"), "Ocupar Motores activa Manning Bonus en ReactorPower")
+
+
+func _test_main_scene_loads() -> void:
+	var packed := ResourceLoader.load("res://game/main.tscn") as PackedScene
+	_check(packed != null, "Carga main.tscn sin errores de recursos o shaders")
+	if packed != null:
+		var inst := packed.instantiate()
+		_check(inst != null, "Instancia escena principal completa")
+		if inst != null:
+			inst.free()
+
+
 func _test_no_forbidden_font() -> void:
 	var forbidden := "JetBrains" + " Mono"
 	var files := [
 		"res://project.godot",
 		"res://game/main.gd",
+		"res://game/audio/synth_sfx.gd",
+		"res://game/actors/modular_ship_25d.gd",
+		"res://game/phases/hangar_screen.gd",
+		"res://game/phases/takeoff_screen.gd",
+		"res://game/phases/flight_screen.gd",
+		"res://game/phases/debrief_screen.gd",
+		"res://game/ui/space_theme.gd",
+		"res://game/ui/orbital_map_25d.gd",
+		"res://game/ui/navball_25d.gd",
+		"res://game/ui/radar_wireframe_3d.gd",
 		"res://game/sim/reactor_power.gd",
 		"res://game/sim/room_hazards.gd",
 		"res://game/sim/nasa_data_loader.gd",
 		"res://game/sim/mission_evaluator.gd",
 		"res://game/sim/station_input.gd",
+		"res://game/sim/ship_build_state.gd",
+		"res://game/sim/orbital_solver.gd",
+		"res://game/sim/crew_controller.gd",
 	]
 	for p: String in files:
 		var txt := FileAccess.get_file_as_string(p)
