@@ -1,0 +1,113 @@
+{
+  "n": 1500,
+  "rows": [
+    {
+      "avg_final_debt": 19277.4347520625,
+      "avg_missions": 8.61133333333333,
+      "explosions_per_run": 0.532,
+      "n": 1500,
+      "policy": "prudente",
+      "seized_rate": 0.912,
+      "skill": 0.6,
+      "timeout_rate": 0.082,
+      "tows_per_run": 1.29733333333333,
+      "win_rate": 0.006
+    },
+    {
+      "avg_final_debt": 18998.0122801259,
+      "avg_missions": 6.38933333333333,
+      "explosions_per_run": 0.447333333333333,
+      "n": 1500,
+      "policy": "equilibrada",
+      "seized_rate": 0.981333333333333,
+      "skill": 0.6,
+      "timeout_rate": 0.006,
+      "tows_per_run": 1.782,
+      "win_rate": 0.0126666666666667
+    },
+    {
+      "avg_final_debt": 18001.3359936701,
+      "avg_missions": 7.09733333333333,
+      "explosions_per_run": 0.540666666666667,
+      "n": 1500,
+      "policy": "codiciosa",
+      "seized_rate": 0.965333333333333,
+      "skill": 0.6,
+      "timeout_rate": 0.004,
+      "tows_per_run": 2.52266666666667,
+      "win_rate": 0.0306666666666667
+    },
+    {
+      "avg_final_debt": 10251.7772415059,
+      "avg_missions": 15.7666666666667,
+      "explosions_per_run": 0.552666666666667,
+      "n": 1500,
+      "policy": "prudente",
+      "seized_rate": 0.342666666666667,
+      "skill": 0.75,
+      "timeout_rate": 0.416,
+      "tows_per_run": 0.450666666666667,
+      "win_rate": 0.241333333333333
+    },
+    {
+      "avg_final_debt": 8836.78088280233,
+      "avg_missions": 8.68666666666667,
+      "explosions_per_run": 0.358,
+      "n": 1500,
+      "policy": "equilibrada",
+      "seized_rate": 0.478666666666667,
+      "skill": 0.75,
+      "timeout_rate": 0.026,
+      "tows_per_run": 1.06933333333333,
+      "win_rate": 0.495333333333333
+    },
+    {
+      "avg_final_debt": 4861.17424657694,
+      "avg_missions": 9.708,
+      "explosions_per_run": 0.462,
+      "n": 1500,
+      "policy": "codiciosa",
+      "seized_rate": 0.276,
+      "skill": 0.75,
+      "timeout_rate": 0.0386666666666667,
+      "tows_per_run": 1.73133333333333,
+      "win_rate": 0.685333333333333
+    },
+    {
+      "avg_final_debt": 2251.35020103455,
+      "avg_missions": 16.6666666666667,
+      "explosions_per_run": 0.228,
+      "n": 1500,
+      "policy": "prudente",
+      "seized_rate": 0.044,
+      "skill": 0.9,
+      "timeout_rate": 0.166666666666667,
+      "tows_per_run": 0.00466666666666667,
+      "win_rate": 0.789333333333333
+    },
+    {
+      "avg_final_debt": 2965.47550503031,
+      "avg_missions": 7.098,
+      "explosions_per_run": 0.0933333333333333,
+      "n": 1500,
+      "policy": "equilibrada",
+      "seized_rate": 0.164,
+      "skill": 0.9,
+      "timeout_rate": 0.004,
+      "tows_per_run": 0.0313333333333333,
+      "win_rate": 0.832
+    },
+    {
+      "avg_final_debt": 263.724039461772,
+      "avg_missions": 6.702,
+      "explosions_per_run": 0.128,
+      "n": 1500,
+      "policy": "codiciosa",
+      "seized_rate": 0.0126666666666667,
+      "skill": 0.9,
+      "timeout_rate": 0.00133333333333333,
+      "tows_per_run": 0.0313333333333333,
+      "win_rate": 0.986
+    }
+  ]
+}
