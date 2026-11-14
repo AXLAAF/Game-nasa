@@ -26,6 +26,6 @@ lose_text = "Visores empanados y radio muda."
 script = ExtResource("2_fgl6i")
 id = &"fuga_cabina"
 title = "Fuga de aire en cabina"
-text = "Silbido en %part%. La tripulacion se pone el casco."
+text = "Silbido en %part%. La tripulación se pone el casco."
 kinds = Array[StringName]([&"capsule"])
 choices = Array[ExtResource("1_bgovd")]([SubResource("Resource_fwbg1"), SubResource("Resource_qhp1t")])

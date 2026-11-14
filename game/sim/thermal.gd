@@ -52,16 +52,16 @@ static func requirements(ship: ShipModel, target: BodyDef) -> Array:
 	var f_max := maxf(f_target, 1.0)
 	var t_hot := equilibrium(f_max, ship)
 	var t_cold := equilibrium(f_min, ship)
-	out.append(["Calor en ruta (%d%%)" % int(t_hot * 100.0), t_hot < HOT])
-	out.append(["Frio en ruta (%d%%)" % int(t_cold * 100.0), t_cold > COLD])
+	out.append(["Calor en ruta (%d %%)" % int(t_hot * 100.0), t_hot < HOT])
+	out.append(["Frío en ruta (%d %%)" % int(t_cold * 100.0), t_cold > COLD])
 	var gen := power_gen(f_min, ship)
-	out.append(["Energia %.1f / %.1f" % [gen, power_use(ship)], gen >= power_use(ship)])
+	out.append(["Energía %.1f / %.1f" % [gen, power_use(ship)], gen >= power_use(ship)])
 	if target.atmosphere > 0.0:
-		out.append(["Escudo termico", ship.has_kind(&"heatshield")])
-		out.append(["Paracaidas", ship.has_kind(&"parachute")])
+		out.append(["Escudo térmico", ship.has_kind(&"heatshield")])
+		out.append(["Paracaídas", ship.has_kind(&"parachute")])
 	else:
 		out.append(["Motor en la ultima etapa (sin aire)", ship.stage_thrust(ship.stages().back()) > 0.0])
-	out.append(["Capsula", ship.has_kind(&"capsule")])
+	out.append(["Cápsula", ship.has_kind(&"capsule")])
 	if target.hazards.has(&"radiation"):
-		out.append(["Blindaje anti radiacion", ship.sum_stat(&"rad_resist") >= 0.5])
+		out.append(["Blindaje antirradiación", ship.sum_stat(&"rad_resist") >= 0.5])
 	return out

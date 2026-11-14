@@ -5,7 +5,7 @@ enum Quality { SCRAP, USED, NEW, MYSTERY, LEGENDARY }
 enum Health { SOUND, WORN, FAULTY, BROKEN }
 const NAMES: Array[String] = ["Chatarra", "Usada", "Nueva", "Misteriosa", "Legendaria"]
 const HEALTH_NAME: Array[String] = ["Sano", "Gastado", "Defectuoso", "Roto"]
-const HEALTH_NOTE: Array[String] = ["pleno rendimiento", "rinde menos", "a medias, falla facil", "fuera de servicio"]
+const HEALTH_NOTE: Array[String] = ["pleno rendimiento", "rinde menos", "a medias, falla fácil", "fuera de servicio"]
 const HEALTH_COLOR: Array[String] = ["#6dff9a", "#ffd15a", "#ff7a32", "#ff4d45"]
 const OUTPUT: Array[float] = [1.0, 0.82, 0.55, 0.0]
 const PRICE: Array[float] = [0.35, 0.65, 1.0, 0.5, 1.0]
@@ -84,7 +84,7 @@ func health_text(fog: bool = false) -> String:
 
 func status_bbcode() -> String:
 	var h := health()
-	return "[color=%s]%s[/color]   %s   ·   %s   ·   %s" % [HEALTH_COLOR[h], HEALTH_NAME[h], def.display_name, quality_text(), HEALTH_NOTE[h]]
+	return "[color=%s]%s[/color]   %s,   %s,   %s" % [HEALTH_COLOR[h], HEALTH_NAME[h], def.display_name, quality_text(), HEALTH_NOTE[h]]
 
 
 func fail_chance(stress: float) -> float:
@@ -118,11 +118,11 @@ func quality_text() -> String:
 
 func condition_text() -> String:
 	if inspected:
-		return "%d%%" % int(round(condition * 100.0))
+		return "%d %%" % int(round(condition * 100.0))
 	if not revealed:
 		return "??"
 	var span: Vector2 = CONDITION[hidden_quality]
-	return "%d-%d%%" % [int(span.x * 100.0), int(span.y * 100.0)]
+	return "%d-%d %%" % [int(span.x * 100.0), int(span.y * 100.0)]
 
 
 func reveal() -> bool:

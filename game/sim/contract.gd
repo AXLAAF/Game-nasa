@@ -1,7 +1,7 @@
 class_name Contract
 extends RefCounted
 
-const CARGO: Array[String] = ["Muestras de ciencia", "Paquetes urgentes", "Fauna exotica", "Satelite averiado", "Sonda geologica"]
+const CARGO: Array[String] = ["Muestras de ciencia", "Paquetes urgentes", "Fauna exótica", "Satélite averiado", "Sonda geológica"]
 const HIDDEN: Array[StringName] = [&"storms", &"dust", &"radiation", &"cold", &"heat"]
 
 var target: StringName = &""

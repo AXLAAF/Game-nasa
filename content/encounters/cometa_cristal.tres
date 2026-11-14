@@ -16,7 +16,7 @@ lose = {
 "wear": 0.2
 }
 win_text = "Propelente gratis y muestras."
-lose_text = "El frio agarroto las lineas."
+lose_text = "El frío agarrotó las líneas."
 
 [sub_resource type="Resource" id="Resource_b"]
 script = ExtResource("1_cc")
@@ -25,7 +25,7 @@ odds = 1.0
 win = {
 "credits": 320
 }
-win_text = "La agencia pago por la ruta."
+win_text = "La agencia pagó por la ruta."
 
 [sub_resource type="Resource" id="Resource_c"]
 script = ExtResource("1_cc")
@@ -35,7 +35,7 @@ label = "Ignorar"
 script = ExtResource("2_cc")
 id = &"cometa_cristal"
 title = "Cometa de cristal"
-text = "Un nucleo brillante arrastra una cola de hielo puro."
+text = "Un núcleo brillante arrastra una cola de hielo puro."
 poi = &"comet"
 rarity = 1
 choices = Array[ExtResource("1_cc")]([SubResource("Resource_a"), SubResource("Resource_b"), SubResource("Resource_c")])

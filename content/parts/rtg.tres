@@ -6,7 +6,7 @@
 script = ExtResource("1_8obke")
 id = &"rtg"
 display_name = "RTG nuclear"
-description = "Energia constante en cualquier sitio. Tambien calienta."
+description = "Energía constante en cualquier sitio. También calienta."
 kind = &"rtg"
 radial = true
 cost = 380

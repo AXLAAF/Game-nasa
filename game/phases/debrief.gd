@@ -64,14 +64,14 @@ func _settle() -> void:
 		_add("Pago del contrato", base, Ui.IVORY)
 		if Profile.assist:
 			var cut := int(base * (1.0 - Run.assist_payout_mult()))
-			_add("Modo asistido  -15%", -cut, Ui.LAMP_CAUTION)
+			_add("Modo asistido, -15 %", -cut, Ui.LAMP_CAUTION)
 			base -= cut
 		var grade_mult: float = GRADE_MULT.get(Run.grade, 1.0)
 		if grade_mult != 1.0:
 			_add("Aterrizaje %s  x%.2f" % [Run.grade, grade_mult], int(base * (grade_mult - 1.0)), Ui.INFO)
 		var t: float = Run.space_state.get("t", 0.0)
 		if t <= contract.deadline:
-			_add("A tiempo  +15%", int(base * 0.15), Ui.LAMP_GO)
+			_add("A tiempo, +15 %", int(base * 0.15), Ui.LAMP_GO)
 		else:
 			_add("Fuera de plazo  -30%", -int(base * 0.3), Ui.LAMP_WARNING)
 		if Run.streak > 0:
@@ -79,7 +79,7 @@ func _settle() -> void:
 	elif contract != null:
 		_add("Adelanto ya cobrado", 0, Ui.IVORY_DIM)
 	if Run.earnings != 0:
-		_add("Botin en ruta", Run.earnings, Ui.IVORY)
+		_add("Botín en ruta", Run.earnings, Ui.IVORY)
 	if Run.science > 0:
 		_add("Ciencia  %d x %d" % [Run.science, SCIENCE_VALUE], Run.science * SCIENCE_VALUE, Ui.MYSTERY)
 	for bet: Dictionary in Run.side_bets:
@@ -103,7 +103,7 @@ func _settle() -> void:
 	if not delivered:
 		var lesson := Profile.learn_random(Run.rng)
 		if lesson != "":
-			_add("LECCION: " + str(Profile.LESSONS[lesson]), 0, Ui.LAMP_GO)
+			_add("Lección: " + str(Profile.LESSONS[lesson]), 0, Ui.LAMP_GO)
 	Profile.save_profile()
 
 
@@ -184,7 +184,7 @@ func _box_prize() -> Array:
 	if roll < 0.12:
 		var part := Run.random_part(ShipPart.Quality.LEGENDARY)
 		Profile.inventory.append(part.to_dict())
-		return [part.def.display_name + " LEGENDARIA", Ui.IVORY]
+		return [part.def.display_name + " legendaria", Ui.IVORY]
 	if roll < 0.55:
 		var part := Run.random_part(ShipPart.Quality.MYSTERY)
 		part.reveal()

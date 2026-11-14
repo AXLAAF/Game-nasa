@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_7a2ls")
 id = &"escudo_termico"
-display_name = "Escudo termico"
+display_name = "Escudo térmico"
 description = "Ablativo: se consume en la reentrada."
 kind = &"heatshield"
 cost = 230

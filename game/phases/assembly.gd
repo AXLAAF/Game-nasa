@@ -235,7 +235,7 @@ func _build_left(root: Control) -> void:
 	for q: int in [ShipPart.Quality.SCRAP, ShipPart.Quality.USED, ShipPart.Quality.NEW, ShipPart.Quality.MYSTERY]:
 		var b := Ui.button(row, ShipPart.NAMES[q], _set_quality.bind(q))
 		b.toggle_mode = true
-		b.tooltip_text = "%s: precio x%.2f, estado %d-%d%%" % [ShipPart.NAMES[q], ShipPart.PRICE[q], int(ShipPart.CONDITION[q].x * 100), int(ShipPart.CONDITION[q].y * 100)]
+		b.tooltip_text = "%s: precio x%.2f, estado %d-%d %%" % [ShipPart.NAMES[q], ShipPart.PRICE[q], int(ShipPart.CONDITION[q].x * 100), int(ShipPart.CONDITION[q].y * 100)]
 		b.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 		Ui.mark_selected(b, q == _quality)
 		_quality_buttons.append(b)
@@ -435,7 +435,7 @@ func _inspect() -> void:
 	part.revealed = true
 	Synth.play(&"beep")
 	var color := Ui.LAMP_GO if part.condition > 0.8 else (Ui.LAMP_CAUTION if part.condition > 0.55 else Ui.LAMP_WARNING)
-	Events.toast.emit("%s: %s, %d%%" % [part.def.display_name, part.health_text(), int(part.condition * 100.0)], color)
+	Events.toast.emit("%s: %s, %d %%" % [part.def.display_name, part.health_text(), int(part.condition * 100.0)], color)
 	_refresh()
 
 
@@ -447,9 +447,9 @@ func stats_text(def: PartDef) -> String:
 	if def.power > 0.0: bits.append("Energía %.1f" % def.power)
 	if def.battery > 0.0: bits.append("Batería %.1f" % def.battery)
 	if def.cooling > 0.0: bits.append("Enfriamiento %.1f" % def.cooling)
-	if def.cold_resist > 0.0: bits.append("Aislamiento %d%%" % int(def.cold_resist * 100))
-	if def.heat_resist > 0.0: bits.append("Resist. calor %d%%" % int(def.heat_resist * 100))
-	if def.rad_resist > 0.0: bits.append("Blindaje %d%%" % int(def.rad_resist * 100))
+	if def.cold_resist > 0.0: bits.append("Aislamiento %d %%" % int(def.cold_resist * 100))
+	if def.heat_resist > 0.0: bits.append("Resist. calor %d %%" % int(def.heat_resist * 100))
+	if def.rad_resist > 0.0: bits.append("Blindaje %d %%" % int(def.rad_resist * 100))
 	if def.ablative > 0.0: bits.append("Ablativo %.0f" % def.ablative)
 	bits.append("Fragilidad x%.1f" % def.fragility)
 	return "  ".join(bits)
@@ -512,7 +512,7 @@ func _refresh_part() -> void:
 	var place := "pila / %s" % Run.ship.zone_of(part)
 	if part.def.radial:
 		var side := "ambos" if part.side == 0 else ("izq" if part.side < 0 else "der")
-		place = "montaje %s  altura %d%%" % [side, int(part.mount * 100.0)]
+		place = "montaje %s  altura %d %%" % [side, int(part.mount * 100.0)]
 	Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
 	var stats := Ui.label(_part_box, stats_text(part.def), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

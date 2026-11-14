@@ -9,7 +9,7 @@ label = "Ventilar"
 win = {
 "leak": 0.12
 }
-win_text = "Presion normal, menos combustible."
+win_text = "Presión normal, menos combustible."
 
 [sub_resource type="Resource" id="Resource_4l4rj"]
 script = ExtResource("1_me2ip")
@@ -18,13 +18,13 @@ odds = 0.7
 lose = {
 "explode": true
 }
-win_text = "Se estabilizo solo."
-lose_text = "El tanque reviento."
+win_text = "Se estabilizó solo."
+lose_text = "El tanque reventó."
 
 [resource]
 script = ExtResource("2_pkpwb")
 id = &"sobrepresion"
-title = "Sobrepresion en tanque"
-text = "La presion de %part% sube sin control."
+title = "Sobrepresión en tanque"
+text = "La presión de %part% sube sin control."
 kinds = Array[StringName]([&"tank"])
 choices = Array[ExtResource("1_me2ip")]([SubResource("Resource_ip5uy"), SubResource("Resource_4l4rj")])

@@ -5,7 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_a"]
 script = ExtResource("1_fa")
-label = "Descifrar la senal"
+label = "Descifrar la señal"
 odds = 0.45
 win = {
 "boxes": 2,
@@ -17,7 +17,7 @@ lose = {
 "comms": -0.25
 }
 win_text = "Mapas olvidados y dos cajas selladas."
-lose_text = "El protocolo te dejo ciego un rato."
+lose_text = "El protocolo te dejó ciego un rato."
 
 [sub_resource type="Resource" id="Resource_b"]
 script = ExtResource("1_fa")
@@ -31,7 +31,7 @@ lose = {
 "battery": -0.2
 }
 win_text = "Pagaron por el enlace."
-lose_text = "Se corto a mitad."
+lose_text = "Se cortó a mitad."
 
 [sub_resource type="Resource" id="Resource_c"]
 script = ExtResource("1_fa")
@@ -41,7 +41,7 @@ label = "Apagar receptores"
 script = ExtResource("2_fa")
 id = &"faro_antiguo"
 title = "Faro antiguo"
-text = "Una baliza late con un codigo que nadie ha oido en decadas."
+text = "Una baliza late con un código que nadie ha oído en décadas."
 poi = &"signal"
 rarity = 2
 choices = Array[ExtResource("1_fa")]([SubResource("Resource_a"), SubResource("Resource_b"), SubResource("Resource_c")])

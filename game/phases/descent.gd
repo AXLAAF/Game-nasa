@@ -88,7 +88,7 @@ func _ready() -> void:
 		if Run.channel(&"map") < 0.6 and not Profile.assist:
 			corridor += Vector2.ONE * Run.rng.randf_range(-2.0, 2.0)
 		gamma = edge - width * 0.5
-		_say("CORREDOR DE ENTRADA", Ui.INFO)
+		_say("Corredor de entrada", Ui.INFO)
 
 
 func _hidden_hazard() -> void:
@@ -100,21 +100,21 @@ func _hidden_hazard() -> void:
 		&"storms":
 			wind *= 3.0
 			wind += 18.0 * signf(wind + 0.01)
-			text = "TORMENTA en la zona de aterrizaje"
+			text = "tormenta en la zona de aterrizaje"
 		&"dust":
 			Run.apply({"vision": -0.35})
-			text = "POLVO: visibilidad reducida"
+			text = "polvo, visibilidad reducida"
 		&"radiation":
-			text = "RADIACION en superficie"
+			text = "Radiación en superficie"
 			_raise(Run.roll_stress(0.6, [&"computer", &"sensor", &"antenna", &"battery"]))
 		&"cold":
 			Run.temp = 0.05
-			text = "FRIO EXTREMO: el combustible se espesa"
+			text = "Frío extremo: el combustible se espesa"
 			_raise(Run.roll_stress(0.4, [&"tank", &"engine"]))
 		&"heat":
 			hull_heat = 0.35
-			text = "CALOR EXTREMO: el casco ya viene caliente"
-	Events.toast.emit("PELIGRO OCULTO: " + text, Ui.LAMP_WARNING)
+			text = "calor extremo, el casco ya viene caliente"
+	Events.toast.emit("Peligro oculto: " + text, Ui.LAMP_WARNING)
 	Run.note("Peligro oculto: " + text)
 	Synth.play(&"alarm")
 
@@ -231,9 +231,9 @@ func _commit() -> void:
 	state = State.ENTRY if body.atmosphere > 0.0 else State.FLIGHT
 	Synth.play(&"whoosh")
 	if body.atmosphere > 0.0:
-		_say("INTERFAZ DE ENTRADA  %.1f grados" % gamma, Ui.LAMP_CAUTION)
+		_say("Interfaz de entrada: %.1f grados" % gamma, Ui.LAMP_CAUTION)
 	else:
-		_say("SIN ATMOSFERA: frena con el motor (T retro)", Ui.LAMP_CAUTION)
+		_say("Sin atmósfera: frena con el motor (T retro)", Ui.LAMP_CAUTION)
 
 
 func _stage() -> void:
@@ -264,7 +264,7 @@ func _deploy_chute() -> void:
 	if speed > limit and Run.rng.randf() < clampf((speed - limit) / 250.0, 0.15, 0.95):
 		var torn := live[0]
 		torn.broken = true
-		_say("PARACAIDAS DESGARRADO", Ui.LAMP_WARNING)
+		_say("Paracaídas desgarrado", Ui.LAMP_WARNING)
 		Juice.hit(0.6)
 		Run.lose_streak()
 		return
@@ -274,12 +274,12 @@ func _deploy_chute() -> void:
 	if chute == 2:
 		for part: ShipPart in live:
 			part.deployed = true
-	_say("FRENO DESPLEGADO" if chute == 1 else "PRINCIPAL DESPLEGADO", Ui.LAMP_GO)
+	_say("Freno desplegado" if chute == 1 else "Principal desplegado", Ui.LAMP_GO)
 	for part: ShipPart in failed:
 		Card.malfunction(part, func(ok: bool) -> void:
 			if not ok:
 				chute = 0
-				Events.toast.emit("Paracaidas perdido", Ui.LAMP_WARNING))
+				Events.toast.emit("Paracaídas perdido", Ui.LAMP_WARNING))
 
 
 func _eject() -> void:
@@ -291,8 +291,8 @@ func _eject() -> void:
 	Synth.play(&"boom", -8.0)
 	Juice.hit(0.6)
 	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 70, 260)
-	_say("CAPSULA EYECTADA", Ui.LAMP_CAUTION)
-	Run.note("Capsula eyectada en %s" % body.display_name)
+	_say("Cápsula eyectada", Ui.LAMP_CAUTION)
+	Run.note("Cápsula eyectada en %s" % body.display_name)
 
 
 # ---------------------------------------------------------------- simulacion
@@ -332,7 +332,7 @@ func _fly(delta: float) -> void:
 		pitch = rad_to_deg(atan2(-vx, -vy))
 		if Vector2(vx, vy).length() < v_orb * 0.45 or agl() < 7000.0:
 			state = State.FLIGHT
-			_say("CONTROL MANUAL", Ui.INFO)
+			_say("Control manual", Ui.INFO)
 	else:
 		lift = 0.0
 		if Input.is_physical_key_pressed(KEY_W): throttle = minf(throttle + delta * 1.2, 1.0)
@@ -376,7 +376,7 @@ func _fly(delta: float) -> void:
 		Juice.shake(delta * 2.0)
 		if _stress_clock > 0.8:
 			_stress_clock = 0.0
-			_say("SOBRECARGA %.1f G" % g_load, Ui.LAMP_WARNING)
+			_say("Sobrecarga: %.1f G" % g_load, Ui.LAMP_WARNING)
 			Synth.play(&"alarm", -6.0)
 			_raise(Run.roll_stress((g_load - g_cap) / g_cap + 0.4))
 	Juice.shake(clampf(q / 30000.0, 0.0, 1.0) * delta * 1.5)
@@ -399,7 +399,7 @@ func _heat(speed: float, dt: float) -> void:
 		part.ablative -= absorbed * SHIELD_USE
 		load -= absorbed
 		if part.ablative <= 0.0:
-			Events.toast.emit("ESCUDO TERMICO AGOTADO", Ui.LAMP_WARNING)
+			Events.toast.emit("Escudo térmico agotado", Ui.LAMP_WARNING)
 	hull_heat = maxf(hull_heat + load * 0.6 * (1.0 - resist * 0.6) - dt * 0.012, 0.0)
 	if hull_heat > 1.0:
 		_stress_clock += dt
@@ -421,7 +421,7 @@ func _heat(speed: float, dt: float) -> void:
 
 func _skip_out() -> void:
 	state = State.OVER
-	_say("REBOTE EN LA ATMOSFERA", Ui.LAMP_CAUTION)
+	_say("Rebote en la atmósfera", Ui.LAMP_CAUTION)
 	Run.lose_streak()
 	Run.space_state.return_body = body.id
 	Run.space_state.return_boost = 1.12
@@ -473,7 +473,7 @@ func _touchdown() -> void:
 		Events.toast.emit("Aterrizaje en plataforma: +$200", Ui.IVORY)
 	Run.landed_body = body.id
 	Run.grade = grade
-	_say("ATERRIZAJE %s" % grade, Ui.LAMP_GO if grade in ["S", "A"] else Ui.IVORY)
+	_say("Aterrizaje %s" % grade, Ui.LAMP_GO if grade in ["S", "A"] else Ui.IVORY)
 	Synth.play(&"jackpot" if grade == "S" else &"chime")
 	if grade == "S":
 		Run.win_streak()
@@ -505,7 +505,7 @@ func _show_surface() -> void:
 	if at_target:
 		var text := "Entregar %s" % Run.contract.cargo.to_lower()
 		if ejected:
-			text += "  (capsula sola: entrega parcial)"
+			text += "  (cápsula sola: entrega parcial)"
 		Ui.primary(Ui.button(col, text, _deliver))
 	if not explored:
 		Ui.button(col, "Explorar la zona", _explore)
@@ -518,7 +518,7 @@ func _show_surface() -> void:
 	var takeoff := Ui.button(col, "Despegar a órbita (%d / %d m/s)" % [int(dv), int(need)], _take_off)
 	takeoff.disabled = not can_fly
 	if body.is_home:
-		Ui.button(col, "Terminar la mision en casa", _go_home)
+		Ui.button(col, "Terminar la misión en casa", _go_home)
 	elif not at_target:
 		Ui.button(col, "Abandonar y pedir rescate", _abandon)
 
@@ -651,18 +651,18 @@ func _update_hud() -> void:
 	(_readouts.alt as Label).text = "%.1f" % (agl() / 1000.0)
 	(_readouts.vertical as Label).text = "%d" % int(vy)
 	(_readouts.horizontal as Label).text = "%d" % int(vx)
-	(_gauges.heat as Gauge).set_value(hull_heat / 1.5, "%d%%" % int(hull_heat / 1.5 * 100.0), hull_heat > 0.8)
+	(_gauges.heat as Gauge).set_value(hull_heat / 1.5, "%d %%" % int(hull_heat / 1.5 * 100.0), hull_heat > 0.8)
 	var ablative := 0.0
 	var ablative_max := 0.0
 	for part: ShipPart in ship.of_kind(&"heatshield"):
 		ablative += part.ablative
 		ablative_max += part.def.ablative
-	(_gauges.shield as Gauge).set_value(ablative / maxf(ablative_max, 0.001), "SIN ESCUDO" if ablative_max <= 0.0 else "%d%%" % int(ablative / ablative_max * 100.0), ablative_max > 0.0 and ablative < ablative_max * 0.2)
+	(_gauges.shield as Gauge).set_value(ablative / maxf(ablative_max, 0.001), "Sin escudo" if ablative_max <= 0.0 else "%d %%" % int(ablative / ablative_max * 100.0), ablative_max > 0.0 and ablative < ablative_max * 0.2)
 	(_gauges.g as Gauge).set_value(g_load / 12.0, "%.1f G" % g_load, g_load > G_LIMIT)
 	var max_acc := ship.thrust() * Run.channel(&"thrust") / maxf(ship.mass(), 0.01) - body.surface_gravity
 	var stop := vy * vy / (2.0 * maxf(max_acc, 0.1)) if vy < 0.0 else 0.0
 	var ratio := stop / maxf(agl(), 1.0)
-	(_gauges.burn as Gauge).set_value(ratio, "QUEMAR YA" if ratio > 0.85 else "%d%%" % int(ratio * 100.0), ratio > 0.85)
+	(_gauges.burn as Gauge).set_value(ratio, "Quemar ya" if ratio > 0.85 else "%d %%" % int(ratio * 100.0), ratio > 0.85)
 	var stage := ship.active_stage()
 	var cap := 0.0
 	for part: ShipPart in stage:

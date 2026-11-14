@@ -17,11 +17,11 @@ static func fog(chance: float, scanned: bool) -> Vector2:
 
 static func fog_text(chance: float, scanned: bool) -> String:
 	if chance >= 1.0:
-		return "SEGURO"
+		return "Seguro"
 	var span := fog(chance, scanned)
 	if is_equal_approx(span.x, span.y):
-		return "%d%%" % int(round(chance * 100.0))
-	return "%d-%d%%" % [int(round(span.x * 100.0)), int(round(span.y * 100.0))]
+		return "%d %%" % int(round(chance * 100.0))
+	return "%d-%d %%" % [int(round(span.x * 100.0)), int(round(span.y * 100.0))]
 
 
 static func streak_mult(streak: int) -> float:
@@ -35,7 +35,7 @@ static func risk_color(chance: float) -> Color:
 		return Color("58c96b")
 	if chance >= 0.45:
 		return Color("ffb000")
-	return Color("f0503f")
+	return Color("f46452")
 
 
 ## Fiabilidad estimada de la nave en un viaje: rango [peor, mejor] segun lo que se sabe.

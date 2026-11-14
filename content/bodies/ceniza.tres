@@ -6,7 +6,7 @@
 script = ExtResource("1_ceniza")
 id = &"ceniza"
 display_name = "Ceniza"
-description = "Luna de Rubra. Sin aire y llena de polvo magnetico."
+description = "Luna de Rubra. Sin aire y llena de polvo magnético."
 color = Color(0.55, 0.38, 0.32, 1)
 parent_id = &"rubra"
 orbit_radius = 95.0

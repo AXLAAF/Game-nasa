@@ -3,16 +3,16 @@ extends Node
 const PATH := "user://profile.json"
 const START_CREDITS := 1500
 const MIN_BUDGET := 900
-const INSURANCE_NAMES: Array[String] = ["Sin seguro", "Basico", "Premium"]
+const INSURANCE_NAMES: Array[String] = ["Sin seguro", "Básico", "Premium"]
 const INSURANCE_PREMIUM: Array[float] = [0.0, 0.12, 0.28]
 const INSURANCE_COVER: Array[float] = [0.0, 0.45, 0.85]
 const LESSONS: Dictionary = {
-	"inspector": "Una inspeccion gratis por partida.",
-	"odds": "Las averias muestran probabilidades exactas.",
+	"inspector": "Una inspección gratis por partida.",
+	"odds": "Las averías muestran probabilidades exactas.",
 	"seguro": "El seguro cuesta la mitad.",
-	"kit": "Empiezas con un kit de reparacion extra.",
+	"kit": "Empiezas con un kit de reparación extra.",
 	"budget": "La agencia suma 250 al presupuesto.",
-	"sensors": "Ves la rareza de las senales desde lejos.",
+	"sensors": "Ves la rareza de las señales desde lejos.",
 }
 
 var credits: int = START_CREDITS

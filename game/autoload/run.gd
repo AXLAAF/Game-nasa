@@ -210,7 +210,7 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 		var value: Variant = effects[key]
 		match str(key):
 			"explode":
-				destroy("%s exploto." % (part.def.display_name if part != null else "La nave"))
+				destroy("%s explotó." % (part.def.display_name if part != null else "La nave"))
 			"break":
 				if part != null:
 					part.broken = true
@@ -254,9 +254,9 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 					var victim: ShipPart = intact[rng.randi_range(0, intact.size() - 1)]
 					if admit(victim):
 						victim.broken = true
-						Events.toast.emit("%s se rompio" % victim.def.display_name, Color(1, 0.35, 0.3))
+						Events.toast.emit("%s se rompió" % victim.def.display_name, Color(1, 0.35, 0.3))
 					else:
-						Events.toast.emit("La suerte salvo %s" % victim.def.display_name, Color(1.0, 0.82, 0.3))
+						Events.toast.emit("La suerte salvó %s" % victim.def.display_name, Color(1.0, 0.82, 0.3))
 			"restore":
 				for mod_name: Variant in mods.keys():
 					mods[mod_name] = maxf(float(mods[mod_name]), 0.0)
@@ -270,7 +270,7 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 				salvage.erase(part)
 			"rescue":
 				outcome = &"stranded"
-				outcome_text = "Rescate pagado por la agencia. La carga se perdio."
+				outcome_text = "Rescate pagado por la agencia. La carga se perdió."
 			"stake":
 				Profile.credits -= int(value)
 			"bet":
@@ -286,17 +286,17 @@ func describe(effects: Dictionary) -> String:
 	for key: Variant in effects:
 		var value: Variant = effects[key]
 		match str(key):
-			"explode": bits.append("EXPLOTA")
+			"explode": bits.append("explota")
 			"break": bits.append("se rompe")
 			"fix": bits.append("reparada")
-			"wear": bits.append("desgaste %+d%%" % int(float(value) * 100.0))
-			"thrust": bits.append("empuje %+d%%" % int(float(value) * 100.0))
-			"leak": bits.append("pierdes %d%% combustible" % int(float(value) * 100.0))
-			"fuel": bits.append("+%d%% combustible" % int(float(value) * 100.0))
+			"wear": bits.append("desgaste %+d %%" % int(float(value) * 100.0))
+			"thrust": bits.append("empuje %+d %%" % int(float(value) * 100.0))
+			"leak": bits.append("pierdes %d %% combustible" % int(float(value) * 100.0))
+			"fuel": bits.append("+%d %% combustible" % int(float(value) * 100.0))
 			"credits": bits.append("%+d $" % int(value))
 			"science": bits.append("+%d ciencia" % int(value))
 			"kits": bits.append("%+d kit" % int(value))
-			"battery": bits.append("bateria %+d%%" % int(float(value) * 100.0))
+			"battery": bits.append("batería %+d %%" % int(float(value) * 100.0))
 			"heat": bits.append("calor %+d" % int(float(value) * 100.0))
 			"salvage": bits.append("+%d pieza misteriosa" % int(value))
 			"boxes": bits.append("+%d caja" % int(value))
@@ -304,11 +304,11 @@ func describe(effects: Dictionary) -> String:
 			"restore": bits.append("sistemas restaurados")
 			"install": bits.append("pieza instalada")
 			"discard": bits.append("pieza perdida")
-			"rescue": bits.append("fin de la mision")
+			"rescue": bits.append("fin de la misión")
 			"stake": bits.append("apuestas %d $" % int(value))
 			"bet": bits.append("apuesta registrada")
 			"mult", "amount": pass
-			_: bits.append("%s %+d%%" % [str(key), int(float(value) * 100.0)])
+			_: bits.append("%s %+d %%" % [str(key), int(float(value) * 100.0)])
 	return ", ".join(bits)
 
 

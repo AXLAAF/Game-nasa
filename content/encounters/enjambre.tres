@@ -15,7 +15,7 @@ lose = {
 "rand_break": true
 }
 win_text = "Saliste del otro lado."
-lose_text = "El casco quedo como colador."
+lose_text = "El casco quedó como colador."
 minigame = &"asteroids"
 
 [sub_resource type="Resource" id="Resource_i6icp"]
@@ -30,6 +30,6 @@ win_text = "Rodeo seguro."
 script = ExtResource("2_prawq")
 id = &"enjambre"
 title = "Enjambre de rocas"
-text = "Un cumulo de escombros en tu ruta. Dentro hay cristales."
+text = "Un cúmulo de escombros en tu ruta. Dentro hay cristales."
 poi = &"asteroid"
 choices = Array[ExtResource("1_ohk75")]([SubResource("Resource_xkjfl"), SubResource("Resource_i6icp")])

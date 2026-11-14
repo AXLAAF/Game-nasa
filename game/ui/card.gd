@@ -234,8 +234,8 @@ func _draw_bar() -> void:
 	_bar.draw_rect(Rect2(0, 10, w, h), Ui.BAKELITE)
 	_bar.draw_rect(Rect2(0, 10, w * _odds, h).grow(-2), Ui.LAMP_GO)
 	_bar.draw_rect(Rect2(w * _odds, 10, w * (1.0 - _odds), h).grow(-2), Ui.LAMP_WARNING)
-	_bar.draw_string(Ui.legend_font(), Vector2(10, 28), "ÉXITO", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE)
-	_bar.draw_string(Ui.legend_font(), Vector2(0, 28), "FALLO", HORIZONTAL_ALIGNMENT_RIGHT, w - 10, Ui.SIZE_LEGEND, Ui.BAKELITE)
+	_bar.draw_string(Ui.legend_font(), Vector2(10, 28), "Éxito", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE)
+	_bar.draw_string(Ui.legend_font(), Vector2(0, 28), "Fallo", HORIZONTAL_ALIGNMENT_RIGHT, w - 10, Ui.SIZE_LEGEND, Ui.BAKELITE)
 	var x := w * _needle
 	_bar.draw_colored_polygon(PackedVector2Array([Vector2(x - 8, 0), Vector2(x + 8, 0), Vector2(x, 12)]), Ui.IVORY)
 	_bar.draw_line(Vector2(x, 8), Vector2(x, 12 + h), Ui.BAKELITE, 5.0)
@@ -263,7 +263,7 @@ func _resolve(choice: ChoiceDef, success: bool) -> void:
 		child.queue_free()
 	var verdict := choice.win_text if success else choice.lose_text
 	if verdict == "":
-		verdict = "Salio bien." if success else "Salio mal."
+		verdict = "Salió bien." if success else "Salió mal."
 	Ui.label(_body, ("Éxito. " if success else "Fallo. ") + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
 	var summary := Run.describe(effects)
 	if summary != "":

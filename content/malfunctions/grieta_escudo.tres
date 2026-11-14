@@ -14,7 +14,7 @@ lose = {
 "break": true
 }
 win_text = "El calor se reparte."
-lose_text = "La grieta se abrio."
+lose_text = "La grieta se abrió."
 
 [sub_resource type="Resource" id="Resource_ypg8r"]
 script = ExtResource("1_fh6d5")
@@ -23,7 +23,7 @@ odds = 0.35
 lose = {
 "break": true
 }
-win_text = "Increible, aguanto."
+win_text = "Increíble, aguantó."
 lose_text = "El escudo se desprende."
 
 [resource]

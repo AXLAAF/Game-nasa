@@ -96,7 +96,7 @@ func _refresh() -> void:
 		child.queue_free()
 	for i: int in Profile.INSURANCE_NAMES.size():
 		var b := Ui.button(_insurance_box, Profile.INSURANCE_NAMES[i], _set_insurance.bind(i))
-		b.tooltip_text = "Prima %d%% del valor de la nave, cubre %d%% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
+		b.tooltip_text = "Prima %d %% del valor de la nave, cubre %d %% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
 		child.queue_free()

@@ -25,11 +25,11 @@ lose = {
 "leak": 0.35
 }
 win_text = "Aguanta la soldadura."
-lose_text = "La grieta se abrio mas."
+lose_text = "La grieta se abrió más."
 
 [sub_resource type="Resource" id="Resource_ln5gc"]
 script = ExtResource("1_wa6am")
-label = "Dejar que se vacie"
+label = "Dejar que se vacíe"
 win = {
 "leak": 0.18
 }

@@ -6,7 +6,7 @@
 script = ExtResource("1_yy03h")
 id = &"glacia"
 display_name = "Glacia"
-description = "Gigante helado con cinturones de radiacion. Usalo para asistencias."
+description = "Gigante helado con cinturones de radiación. Úsalo para asistencias."
 color = Color(0.55, 0.8, 0.9, 1)
 atmo_color = Color(0.6, 0.9, 1, 0.35)
 parent_id = &"sol"

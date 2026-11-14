@@ -14,8 +14,8 @@ win = {
 lose = {
 "rand_break": true
 }
-win_text = "Tanques un poco mas llenos."
-lose_text = "El taladro reboto contra la nave."
+win_text = "Tanques un poco más llenos."
+lose_text = "El taladro rebotó contra la nave."
 minigame = &"drill"
 
 [sub_resource type="Resource" id="Resource_th48e"]

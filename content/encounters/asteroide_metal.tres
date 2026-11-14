@@ -14,12 +14,12 @@ lose = {
 "rand_break": true
 }
 win_text = "Bodega llena de metal."
-lose_text = "Un fragmento golpeo la nave."
+lose_text = "Un fragmento golpeó la nave."
 minigame = &"drill"
 
 [sub_resource type="Resource" id="Resource_llelv"]
 script = ExtResource("1_54q5x")
-label = "Aterrizaje relampago"
+label = "Aterrizaje relámpago"
 odds = 0.5
 win = {
 "boxes": 1,
@@ -39,8 +39,8 @@ label = "Seguir de largo"
 [resource]
 script = ExtResource("2_d23fg")
 id = &"asteroide_metal"
-title = "Asteroide metalico"
-text = "Hierro y niquel puro. Vale una fortuna... si no te parte el casco."
+title = "Asteroide metálico"
+text = "Hierro y níquel puro. Vale una fortuna... si no te parte el casco."
 poi = &"asteroid"
 rarity = 1
 choices = Array[ExtResource("1_54q5x")]([SubResource("Resource_xsjmn"), SubResource("Resource_llelv"), SubResource("Resource_3tbei")])

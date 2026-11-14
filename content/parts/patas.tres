@@ -6,7 +6,7 @@
 script = ExtResource("1_vldkr")
 id = &"patas"
 display_name = "Patas de aterrizaje"
-description = "Aguantan aterrizajes mas duros."
+description = "Aguantan aterrizajes más duros."
 kind = &"legs"
 radial = true
 mass = 0.3

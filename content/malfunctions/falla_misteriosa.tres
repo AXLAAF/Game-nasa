@@ -28,5 +28,5 @@ win_text = "Ajustado."
 script = ExtResource("2_bylel")
 id = &"falla_misteriosa"
 title = "Falla misteriosa"
-text = "Algo en %part% hace un ruido que no deberia."
+text = "Algo en %part% hace un ruido que no debería."
 choices = Array[ExtResource("1_xvex0")]([SubResource("Resource_j502e"), SubResource("Resource_p5wh4")])

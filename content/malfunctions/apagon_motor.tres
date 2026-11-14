@@ -11,7 +11,7 @@ lose = {
 "thrust": -0.5
 }
 win_text = "Ruge otra vez."
-lose_text = "Encendio a medias."
+lose_text = "Encendió a medias."
 
 [sub_resource type="Resource" id="Resource_ah38p"]
 script = ExtResource("1_5p5pw")
@@ -24,7 +24,7 @@ lose = {
 "break": true
 }
 win_text = "Limpio y estable."
-lose_text = "Murio del todo."
+lose_text = "Murió del todo."
 
 [sub_resource type="Resource" id="Resource_s53j2"]
 script = ExtResource("1_5p5pw")
@@ -37,7 +37,7 @@ win_text = "Un motor menos."
 [resource]
 script = ExtResource("2_uo627")
 id = &"apagon_motor"
-title = "Apagon de motor"
-text = "%part% se apago en pleno encendido."
+title = "Apagón de motor"
+text = "%part% se apagó en pleno encendido."
 kinds = Array[StringName]([&"engine"])
 choices = Array[ExtResource("1_5p5pw")]([SubResource("Resource_q3icb"), SubResource("Resource_ah38p"), SubResource("Resource_s53j2")])

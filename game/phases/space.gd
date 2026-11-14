@@ -206,7 +206,7 @@ func _toggle_nav() -> void:
 	if nav_assist:
 		hold = 0
 	Synth.play(&"beep")
-	Events.toast.emit("Navegacion asistida %s" % ("ON" if nav_assist else "OFF"), Ui.LAMP_GO if nav_assist else Ui.IVORY_DIM)
+	Events.toast.emit("Navegación asistida %s" % ("ON" if nav_assist else "OFF"), Ui.LAMP_GO if nav_assist else Ui.IVORY_DIM)
 
 
 func _set_warp(index: int) -> void:
@@ -286,7 +286,7 @@ func _poi_name(poi: Dictionary) -> String:
 	match poi.kind:
 		&"asteroid": return "asteroide"
 		&"derelict": return "nave abandonada"
-		&"signal": return "senal"
+		&"signal": return "señal"
 		&"comet": return "cometa"
 	return "luna"
 
@@ -374,13 +374,13 @@ func _nav_text() -> String:
 	var aligned := absf(angle_difference(heading, float(_nav.aim))) < 0.35
 	match _nav.phase:
 		&"boost":
-			return ("EMPUJA W  (acelera hacia el objetivo)" if aligned else "GIRA al marcador cian  luego W") + "   Vobj %d" % int(_nav.v_want)
+			return ("Empuja con W: acelera hacia el objetivo" if aligned else "Gira hacia el marcador turquesa y luego W") + ", hasta %d" % int(_nav.v_want)
 		&"brake":
-			return ("EMPUJA W  (frena el cierre)" if aligned else "GIRA al marcador cian para FRENAR") + "   cierre %d" % int(_nav.closing)
+			return ("Empuja con W: frena el cierre" if aligned else "Gira hacia el marcador ámbar para frenar") + ", cierre %d" % int(_nav.closing)
 		&"capture":
-			return "CERCA  baja la velocidad relativa y pulsa L si es planeta"
+			return "Cerca: baja la velocidad relativa y pulsa L si es un planeta"
 		&"coast":
-			return "COAST  espera  (cierre %d  falta %d)" % [int(_nav.closing), int(_nav.need)]
+			return "Inercia: espera (cierre %d, falta %d)" % [int(_nav.closing), int(_nav.need)]
 	return ""
 
 
@@ -432,7 +432,7 @@ func _collide(body: BodyDef) -> void:
 	if body.is_star:
 		Run.destroy("La nave se fundio al caer en %s." % body.display_name)
 	else:
-		Run.destroy("La presion de %s aplasto la nave." % body.display_name)
+		Run.destroy("La presión de %s aplastó la nave." % body.display_name)
 
 
 func _sun_flux() -> float:
@@ -461,10 +461,10 @@ func _environment(dt: float) -> void:
 	if _env_clock > 15.0:
 		_env_clock = 0.0
 		if Run.temp > Thermal.HOT:
-			Events.toast.emit("SOBRECALENTAMIENTO: la electronica sufre", Ui.LAMP_WARNING)
+			Events.toast.emit("Sobrecalentamiento: la electrónica sufre", Ui.LAMP_WARNING)
 			_raise(Run.roll_stress(0.35 + (Run.temp - Thermal.HOT) * 2.0, ELECTRONICS))
 		elif Run.temp < Thermal.COLD:
-			Events.toast.emit("CONGELACION: lineas de combustible rigidas", Ui.INFO)
+			Events.toast.emit("Congelación: líneas de combustible rígidas", Ui.INFO)
 			ship.leak(0.03)
 			_raise(Run.roll_stress(0.3 + (Thermal.COLD - Run.temp) * 2.0, [&"tank", &"engine", &"battery"]))
 		if f > 2.5:
@@ -484,7 +484,7 @@ func _hazards(dt: float) -> void:
 		flare_warn = flare_timer
 		warp_i = 0
 		Synth.play(&"alarm")
-		Events.toast.emit("LLAMARADA SOLAR en %d s - escondete tras un planeta" % int(warn_time), Ui.LAMP_CAUTION)
+		Events.toast.emit("Llamarada solar en %d s, escóndete tras un planeta" % int(warn_time), Ui.LAMP_CAUTION)
 	if flare_timer <= 0.0:
 		flare_warn = -1.0
 		flare_timer = Run.rng.randf_range(90.0, 170.0)
@@ -507,7 +507,7 @@ func _hazards(dt: float) -> void:
 			_rad_clock += dt
 			if _rad_clock > 10.0:
 				_rad_clock = 0.0
-				Events.toast.emit("Radiacion de %s" % body.display_name, Ui.MYSTERY)
+				Events.toast.emit("Radiación de %s" % body.display_name, Ui.MYSTERY)
 				_raise(Run.roll_stress(0.5 * (1.0 - shield), ELECTRONICS))
 			break
 
@@ -515,7 +515,7 @@ func _hazards(dt: float) -> void:
 func _flare() -> void:
 	var f := _sun_flux()
 	if f <= 0.0:
-		Events.toast.emit("La llamarada paso. A salvo en la sombra.", Ui.LAMP_GO)
+		Events.toast.emit("La llamarada pasó. A salvo en la sombra.", Ui.LAMP_GO)
 		Run.apply({"science": 1})
 		Run.win_streak()
 		return
@@ -524,11 +524,11 @@ func _flare() -> void:
 	var shield := clampf(Run.ship.sum_stat(&"rad_resist"), 0.0, 0.9)
 	var hold_odds := clampf(0.85 - minf(f, 4.0) * 0.12 + shield * 0.5, 0.15, 0.97)
 	var choices: Array = [
-		_choice("Apagar sistemas", 0.9, {}, {"rand_break": true}, {"battery": -0.4}, "Todo volvio a encender.", "Algo no volvio a encender."),
+		_choice("Apagar sistemas", 0.9, {}, {"rand_break": true}, {"battery": -0.4}, "Todo volvió a encender.", "Algo no volvió a encender."),
 		_choice("Aguantar", hold_odds, {}, {"rand_break": true, "map": -0.25, "comms": -0.25}, {}, "El blindaje aguanto.", "Circuitos fritos."),
 	]
 	if Run.ship.has_kind(&"solar"):
-		choices.append(_choice("Absorber con los paneles", 0.4, {"battery": 1.0, "science": 2}, {"rand_break": true, "vision": -0.3}, {}, "Bateria a tope.", "Los paneles se quemaron."))
+		choices.append(_choice("Absorber con los paneles", 0.4, {"battery": 1.0, "science": 2}, {"rand_break": true, "vision": -0.3}, {}, "Batería a tope.", "Los paneles se quemaron."))
 	Card.show_card({
 		"title": "Llamarada solar",
 		"text": "Una tormenta de protones barre la nave. Flujo solar x%.1f." % f,
@@ -694,10 +694,10 @@ func _repair_card() -> void:
 	if damaged:
 		choices.append(_choice("Kit: recalibrar sensores", 1.0, {"restore": true}, {}, {"kits": -1}, "Sistemas limpios."))
 		choices.append(_choice("Reiniciar a lo bruto", 0.5, {"restore": true}, {"rand_break": true}, {}, "Reinicio limpio.", "Algo salto en chispas."))
-	choices.append(_choice("Dejarlo asi", 1.0, {}))
+	choices.append(_choice("Dejarlo así", 1.0, {}))
 	Card.show_card({
 		"title": "Taller de a bordo",
-		"text": ("%s. Estado: %s." % [part.def.display_name, part.health_text()]) if part != null else "Los sensores estan degradados.",
+		"text": ("%s. Estado: %s." % [part.def.display_name, part.health_text()]) if part != null else "Los sensores están degradados.",
 		"tone": &"info",
 		"part": part,
 		"choices": choices,
@@ -729,7 +729,7 @@ func _stranded_card() -> void:
 		return
 	Card.show_card({
 		"title": "A la deriva",
-		"text": "Tanques secos. La agencia puede enviar un remolque, pero la mision se da por perdida.",
+		"text": "Tanques secos. La agencia puede enviar un remolque, pero la misión se da por perdida.",
 		"tone": &"bet",
 		"choices": [
 			_choice("Pedir rescate", 1.0, {"rescue": true}),
@@ -782,10 +782,10 @@ func _update_hud() -> void:
 	var dv := ship.delta_v()
 	(_gauges.dv as Gauge).set_value(dv / float(st.get("dv0", 1.0)), "%d m/s" % int(dv), dv < 300.0)
 	var cap := Thermal.battery_capacity(ship)
-	(_gauges.battery as Gauge).set_value(Run.battery / cap, "%d%%" % int(Run.battery / cap * 100.0), Run.battery < cap * 0.15)
-	var temp_text := "CALIENTE" if Run.temp > Thermal.HOT else ("HELADO" if Run.temp < Thermal.COLD else "%d%%" % int(Run.temp * 100.0))
+	(_gauges.battery as Gauge).set_value(Run.battery / cap, "%d %%" % int(Run.battery / cap * 100.0), Run.battery < cap * 0.15)
+	var temp_text := "Caliente" if Run.temp > Thermal.HOT else ("Helado" if Run.temp < Thermal.COLD else "%d %%" % int(Run.temp * 100.0))
 	(_gauges.temp as Gauge).set_value(Run.temp / 1.2, temp_text, Run.temp > Thermal.HOT or Run.temp < Thermal.COLD)
-	(_gauges.od as Gauge).set_value(overdrive, "%d%%" % int(overdrive * 100.0), overdrive > 0.5)
+	(_gauges.od as Gauge).set_value(overdrive, "%d %%" % int(overdrive * 100.0), overdrive > 0.5)
 	# Kits y chatarra van en su tecla; el desgaste por pieza lo dice la matriz de lamparas.
 	_repair_button.text = "Reparar (R): %d kits" % Run.kits
 	_salvage_button.text = "Instalar (I): %d" % Run.salvage.size()
@@ -799,13 +799,13 @@ func _update_hud() -> void:
 		_prompt.text = "Entrar a %s (L), %d m/s relativa" % [approach.display_name, int(rel)]
 		_prompt.add_theme_color_override("font_color", Ui.LAMP_GO if approach == Run.target() else Ui.IVORY)
 	elif flare_warn >= 0.0:
-		_prompt.text = "LLAMARADA EN %d" % maxi(int(flare_timer), 0)
+		_prompt.text = "Llamarada en %d s" % maxi(int(flare_timer), 0)
 		_prompt.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
 	elif not _nav.is_empty() and (nav_assist or Profile.assist):
 		_prompt.text = _nav_text()
 		_prompt.add_theme_color_override("font_color", Ui.INFO)
 	else:
-		_prompt.text = "HOLD %s" % ("PROGRADE" if hold == 1 else "RETROGRADE") if hold != 0 else ""
+		_prompt.text = "Manteniendo %s" % ("progrado" if hold == 1 else "retrógrado") if hold != 0 else ""
 		_prompt.add_theme_color_override("font_color", Ui.INFO)
 
 

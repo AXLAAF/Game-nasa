@@ -6,7 +6,7 @@
 script = ExtResource("1_wt7on")
 id = &"motor_chispa"
 display_name = "Motor Chispa"
-description = "Motor pequeno y eficiente. Poco empuje: no levanta naves pesadas."
+description = "Motor pequeño y eficiente. Poco empuje: no levanta naves pesadas."
 kind = &"engine"
 cost = 220
 thrust = 140.0

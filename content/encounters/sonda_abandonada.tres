@@ -29,8 +29,8 @@ win = {
 lose = {
 "vision": -0.2
 }
-win_text = "Bateria y chatarra."
-lose_text = "Un panel rayo las camaras."
+win_text = "Batería y chatarra."
+lose_text = "Un panel rayó las cámaras."
 
 [sub_resource type="Resource" id="Resource_3tbei"]
 script = ExtResource("1_xf3dp")
@@ -40,6 +40,6 @@ label = "Seguir de largo"
 script = ExtResource("2_c5vin")
 id = &"sonda_abandonada"
 title = "Sonda abandonada"
-text = "Una sonda vieja de otra mision. Paneles intactos y una caja negra."
+text = "Una sonda vieja de otra misión. Paneles intactos y una caja negra."
 poi = &"derelict"
 choices = Array[ExtResource("1_xf3dp")]([SubResource("Resource_wx63r"), SubResource("Resource_ex0hf"), SubResource("Resource_3tbei")])

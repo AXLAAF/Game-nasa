@@ -144,12 +144,12 @@ func _ignite() -> void:
 	var timing := absf(countdown)
 	var failed: Array[ShipPart]
 	if timing <= 0.3:
-		_say("IGNICION PERFECTA", Ui.LAMP_GO)
+		_say("Ignición perfecta", Ui.LAMP_GO)
 		ignition_bonus = 1.05
 		failed = Run.roll_stress(0.3, [&"engine"], Run.ship.active_stage())
 		Juice.flash(Ui.LAMP_GO, 0.3)
 	else:
-		_say("ARRANQUE DURO" if countdown > 0.0 else "IGNICION TARDIA", Ui.LAMP_CAUTION)
+		_say("Arranque duro" if countdown > 0.0 else "Ignición tardía", Ui.LAMP_CAUTION)
 		stress += 0.25
 		failed = Run.roll_stress(0.9, [&"engine"], Run.ship.active_stage())
 		Juice.shake(0.5)
@@ -180,7 +180,7 @@ func _try_stage() -> void:
 			if ok:
 				_do_stage()
 			else:
-				Events.toast.emit("Desacoplador trabado: ESPACIO para reintentar", Ui.LAMP_CAUTION))
+				Events.toast.emit("Desacoplador trabado: pulsa Espacio para reintentar", Ui.LAMP_CAUTION))
 
 
 func _do_stage() -> void:
@@ -193,19 +193,19 @@ func _do_stage() -> void:
 	Juice.shake(0.35)
 	_rebuild_exhausts()
 	_raise(Run.roll_stress(0.5, [&"engine"], Run.ship.active_stage()))
-	Events.toast.emit("Separacion de etapa", Ui.INFO)
+	Events.toast.emit("Separación de etapa", Ui.INFO)
 
 
 func _abort() -> void:
 	if not Run.ship.has_kind(&"escape") or not Run.ship.has_kind(&"capsule"):
 		if Run.ship.fuel_total() <= 0.01:
-			Run.destroy("Autodestruccion tras quedarse sin combustible.")
+			Run.destroy("Autodestrucción tras quedarse sin combustible.")
 			return
 		Synth.play(&"deny")
 		Events.toast.emit("Sin torre de escape funcional", Ui.LAMP_WARNING)
 		return
 	Run.outcome = &"aborted"
-	Run.outcome_text = "Abortaste el despegue. La torre salvo la capsula."
+	Run.outcome_text = "Abortaste el despegue. La torre salvó la cápsula."
 	Synth.play(&"boom", -6.0)
 	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 90, 500)
 	Juice.shake(0.8)
@@ -311,7 +311,7 @@ func _fly(delta: float) -> void:
 	if stress >= 1.0:
 		stress = 0.45
 		overloads += 1
-		_say("SOBRECARGA ESTRUCTURAL", Ui.LAMP_WARNING)
+		_say("Sobrecarga estructural", Ui.LAMP_WARNING)
 		Synth.play(&"alarm")
 		Juice.hit(0.8)
 		Juice.hitstop(0.12)
@@ -322,7 +322,7 @@ func _fly(delta: float) -> void:
 	Juice.shake(clampf(q / Q_SAFE, 0.0, 1.5) * delta * 1.6 + throttle * acc * 0.0006)
 	if h <= 0.0 and vy < 0.0 and flight_time > 1.0:
 		h = 0.0
-		Run.destroy("La nave se estrello contra el suelo.")
+		Run.destroy("La nave se estrelló contra el suelo.")
 		return
 	if h >= top * 0.8 and vx >= v_orb * 0.97 and vy > -60.0:
 		_reach_orbit()
@@ -358,7 +358,7 @@ func _reach_orbit() -> void:
 	elif ratio > 0.3:
 		grade = "B"
 	Run.launch_grade = grade
-	_say("EN ORBITA  -  ascenso %s" % grade, Ui.LAMP_GO)
+	_say("En órbita, ascenso %s" % grade, Ui.LAMP_GO)
 	Synth.play(&"chime")
 	Juice.slowmo(0.35, 0.8)
 	Juice.flash(Ui.INFO, 0.4)
@@ -369,7 +369,7 @@ func _reach_orbit() -> void:
 func _offer_bets() -> void:
 	Card.show_card({
 		"title": "Mesa de apuestas",
-		"text": "La agencia acepta apuestas laterales sobre tu propia mision. Se cobran en la liquidacion. Tienes %s." % Ui.money(Profile.credits),
+		"text": "La agencia acepta apuestas laterales sobre tu propia misión. Se cobran en la liquidación. Tienes %s." % Ui.money(Profile.credits),
 		"tone": &"bet",
 		"choices": [
 			_bet("Sin apuesta", 0, "", 0.0),
@@ -517,10 +517,10 @@ func _update_hud() -> void:
 	(_readouts.speed as Label).text = "%d" % int(Vector2(vx, vy).length())
 	(_readouts.dv_readout as Label).text = "%d" % int(ship.delta_v())
 	_info.text = "Apoapsis %.1f km\nTWR %.2f\nCabeceo %d, objetivo %d\nTiempo %s" % [ap / 1000.0, ship.twr(body.surface_gravity), int(pitch), int(target_pitch()), warp_txt]
-	(_gauges.orbit as Gauge).set_value(vx / v_orb, "%d%%" % int(vx / v_orb * 100.0))
+	(_gauges.orbit as Gauge).set_value(vx / v_orb, "%d %%" % int(vx / v_orb * 100.0))
 	(_gauges.q as Gauge).set_value(q / (Q_SAFE * 1.6), "%.0f kPa" % (q / 1000.0), q > Q_SAFE)
-	(_gauges.stress as Gauge).set_value(stress, "%d%%" % int(stress * 100.0), stress > 0.7)
-	(_gauges.throttle as Gauge).set_value(throttle, "%d%%" % int(throttle * 100.0))
+	(_gauges.stress as Gauge).set_value(stress, "%d %%" % int(stress * 100.0), stress > 0.7)
+	(_gauges.throttle as Gauge).set_value(throttle, "%d %%" % int(throttle * 100.0))
 	var stage := ship.active_stage()
 	var cap := 0.0
 	for part: ShipPart in stage:
@@ -528,7 +528,7 @@ func _update_hud() -> void:
 	var fuel := ship.stage_fuel(stage)
 	(_gauges.fuel as Gauge).set_value(fuel / maxf(cap, 0.001), "%.1f t" % fuel, cap > 0.0 and fuel / cap < 0.1 and ship.can_stage())
 	if state == State.COUNTDOWN:
-		_banner.text = "T-%d   pulsa ESPACIO en T-0" % maxi(ceili(countdown), 0) if countdown > 0.3 else "AHORA"
+		_banner.text = "T-%d. Pulsa Espacio en T-0" % maxi(ceili(countdown), 0) if countdown > 0.3 else "Ahora"
 		_banner.modulate.a = 1.0
 		_banner.add_theme_color_override("font_color", Ui.LAMP_GO if absf(countdown) <= 0.3 else Ui.IVORY)
 

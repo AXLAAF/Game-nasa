@@ -5,7 +5,7 @@
 
 [sub_resource type="Resource" id="Resource_jaaqc"]
 script = ExtResource("1_v3im6")
-label = "TODO O NADA"
+label = "Todo o nada"
 odds = 0.35
 win = {
 "boxes": 3,
@@ -14,7 +14,7 @@ win = {
 lose = {
 "explode": true
 }
-win_text = "PREMIO MAYOR."
+win_text = "Premio mayor."
 lose_text = "La baliza era una mina."
 
 [sub_resource type="Resource" id="Resource_2lj15"]
@@ -28,6 +28,6 @@ win = {
 script = ExtResource("2_a73sj")
 id = &"baliza_dorada"
 title = "Baliza dorada"
-text = "Una baliza brilla en dorado. Nadie sabe quien la puso. Todo o nada."
+text = "Una baliza brilla en dorado. Nadie sabe quién la puso. Todo o nada."
 rarity = 2
 choices = Array[ExtResource("1_v3im6")]([SubResource("Resource_jaaqc"), SubResource("Resource_2lj15")])

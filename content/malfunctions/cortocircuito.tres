@@ -15,11 +15,11 @@ lose_text = "Frito."
 
 [sub_resource type="Resource" id="Resource_qfe3t"]
 script = ExtResource("1_legsv")
-label = "Desviar energia"
+label = "Desviar energía"
 win = {
 "battery": -0.3
 }
-win_text = "Funciona, pero chupa bateria."
+win_text = "Funciona, pero chupa batería."
 
 [sub_resource type="Resource" id="Resource_goscn"]
 script = ExtResource("1_legsv")

@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_p8cyg")
 id = &"paracaidas"
-display_name = "Paracaidas"
+display_name = "Paracaídas"
 description = "Freno (P) y principal (P otra vez). Respeta las ventanas de velocidad."
 kind = &"parachute"
 cost = 120

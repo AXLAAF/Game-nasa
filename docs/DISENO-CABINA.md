@@ -25,7 +25,7 @@ Los tokens viven en `game/ui/ui.gd`. No se escriben colores sueltos en la interf
 | `INFO` | `#8FD6CE` | Dato nominal o informativo. |
 | `LAMP_GO` | `#58C96B` | En orden. |
 | `LAMP_CAUTION` | `#FFB000` | Precaucion. |
-| `LAMP_WARNING` | `#F0503F` | Fallo. |
+| `LAMP_WARNING` | `#F46452` | Fallo. |
 | `MYSTERY` | `#B48CF2` | Piezas misteriosas y radiacion. |
 
 El texto largo va siempre sobre fondo oscuro. Sobre esmalte el marfil no llega a 4.5:1, por eso

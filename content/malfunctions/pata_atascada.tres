@@ -5,17 +5,17 @@
 
 [sub_resource type="Resource" id="Resource_y80f7"]
 script = ExtResource("1_7feu2")
-label = "Forzar el piston"
+label = "Forzar el pistón"
 odds = 0.6
 lose = {
 "break": true
 }
 win_text = "Clack. Desplegada."
-lose_text = "Se doblo."
+lose_text = "Se dobló."
 
 [sub_resource type="Resource" id="Resource_br7ut"]
 script = ExtResource("1_7feu2")
-label = "Dejarla asi"
+label = "Dejarla así"
 win = {
 "break": true
 }

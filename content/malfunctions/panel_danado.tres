@@ -11,7 +11,7 @@ lose = {
 "break": true
 }
 win_text = "Vuelve a su sitio."
-lose_text = "Se partio."
+lose_text = "Se partió."
 
 [sub_resource type="Resource" id="Resource_0sj28"]
 script = ExtResource("1_2pw54")
@@ -23,7 +23,7 @@ win = {
 [resource]
 script = ExtResource("2_jwf0d")
 id = &"panel_danado"
-title = "Panel danado"
+title = "Panel dañado"
 text = "%part% se dobla y pierde rendimiento."
 kinds = Array[StringName]([&"solar", &"radiator"])
 choices = Array[ExtResource("1_2pw54")]([SubResource("Resource_joos0"), SubResource("Resource_0sj28")])

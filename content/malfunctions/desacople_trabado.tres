@@ -21,7 +21,7 @@ lose = {
 "rand_break": true
 }
 win_text = "Se solto de un tiron."
-lose_text = "Algo mas se rompio."
+lose_text = "Algo más se rompió."
 
 [resource]
 script = ExtResource("2_lqbhn")

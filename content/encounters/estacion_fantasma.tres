@@ -16,8 +16,8 @@ lose = {
 "rand_break": true,
 "vision": -0.3
 }
-win_text = "Botin completo."
-lose_text = "Algo exploto dentro."
+win_text = "Botín completo."
+lose_text = "Algo explotó dentro."
 
 [sub_resource type="Resource" id="Resource_f2k4f"]
 script = ExtResource("1_ekvq6")
@@ -41,8 +41,8 @@ label = "Seguir de largo"
 [resource]
 script = ExtResource("2_rvtil")
 id = &"estacion_fantasma"
-title = "Estacion fantasma"
-text = "Una estacion apagada gira lentamente. Las luces de emergencia parpadean."
+title = "Estación fantasma"
+text = "Una estación apagada gira lentamente. Las luces de emergencia parpadean."
 poi = &"derelict"
 rarity = 1
 choices = Array[ExtResource("1_ekvq6")]([SubResource("Resource_u1moo"), SubResource("Resource_f2k4f"), SubResource("Resource_3tbei")])

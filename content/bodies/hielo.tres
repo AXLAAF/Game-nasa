@@ -6,7 +6,7 @@
 script = ExtResource("1_nc52s")
 id = &"hielo"
 display_name = "Hielo"
-description = "Luna congelada. El contrato mas caro del sistema."
+description = "Luna congelada. El contrato más caro del sistema."
 color = Color(0.85, 0.95, 1, 1)
 parent_id = &"glacia"
 orbit_radius = 260.0

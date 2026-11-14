@@ -6,7 +6,7 @@
 script = ExtResource("1_j041m")
 id = &"panel_solar"
 display_name = "Panel solar"
-description = "Energia gratis cerca del sol. Inutil lejos. Se sobrecalienta muy cerca."
+description = "Energía gratis cerca del sol. Inútil lejos. Se sobrecalienta muy cerca."
 kind = &"solar"
 radial = true
 cost = 110

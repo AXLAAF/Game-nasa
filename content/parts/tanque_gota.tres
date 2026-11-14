@@ -6,7 +6,7 @@
 script = ExtResource("1_gota")
 id = &"tanque_gota"
 display_name = "Tanque gota"
-description = "Tanque barato y fragil. 6 t de propelente si no se raja."
+description = "Tanque barato y frágil. 6 t de propelente si no se raja."
 cost = 95
 mass = 0.55
 fuel = 6.0

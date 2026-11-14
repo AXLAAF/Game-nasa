@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_apnma")
 id = &"aislante"
-display_name = "Manta termica MLI"
+display_name = "Manta térmica MLI"
 description = "Mantiene el calor lejos del sol."
 kind = &"insulation"
 cost = 90

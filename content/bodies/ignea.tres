@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_hdrd8")
 id = &"ignea"
-display_name = "Ignea"
+display_name = "Ígnea"
 description = "Roca ardiente pegada al sol."
 color = Color(0.95, 0.4, 0.15, 1)
 atmo_color = Color(1, 0.5, 0.2, 0.35)

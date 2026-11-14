@@ -21,18 +21,18 @@ win = {
 lose = {
 "explode": true
 }
-win_text = "Aguanto. De milagro."
-lose_text = "El motor se desintegro."
+win_text = "Aguantó. De milagro."
+lose_text = "El motor se desintegró."
 
 [sub_resource type="Resource" id="Resource_cth0s"]
 script = ExtResource("1_2mg33")
-label = "Reiniciar ignicion"
+label = "Reiniciar ignición"
 odds = 0.8
 lose = {
 "break": true
 }
-win_text = "Volvio a la normalidad."
-lose_text = "No volvio a encender."
+win_text = "Volvió a la normalidad."
+lose_text = "No volvió a encender."
 
 [resource]
 script = ExtResource("2_twtss")

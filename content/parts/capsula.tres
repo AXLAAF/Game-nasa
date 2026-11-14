@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_p3is1")
 id = &"capsula"
-display_name = "Capsula Mk1"
-description = "La tripulacion. Sin ella no hay mision."
+display_name = "Cápsula Mk1"
+description = "La tripulación. Sin ella no hay misión."
 kind = &"capsule"
 cost = 260
 mass = 2.2

@@ -6,7 +6,7 @@
 script = ExtResource("1_bcmia")
 id = &"computadora"
 display_name = "Computadora de vuelo"
-description = "Prediccion de trayectoria completa."
+description = "Predicción de trayectoria completa."
 kind = &"computer"
 cost = 150
 mass = 0.1
