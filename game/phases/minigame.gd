@@ -39,6 +39,7 @@ static func start(game_mode: StringName, callback: Callable) -> void:
 
 
 func _ready() -> void:
+	add_to_group(&"minigame")
 	layer = 60
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_rng.seed = Run.rng.randi()

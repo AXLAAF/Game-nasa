@@ -1,7 +1,8 @@
 extends Node
 
 ## Audio sintetizado: efectos generados como WAV al arrancar y un rugido de motor
-## continuo con AudioStreamGenerator. El canal "audio" de la nave amortigua el bus.
+## continuo con AudioStreamGenerator. Van al bus SFX. El canal "audio" de la nave
+## amortigua ese bus; la musica queda en el suyo.
 
 const RATE := 22050
 const FLIGHT_PHASES: Array[StringName] = [&"launch", &"space", &"descent"]
@@ -27,6 +28,7 @@ func _ready() -> void:
 	_build_sounds()
 	for i: int in 10:
 		var player := AudioStreamPlayer.new()
+		player.bus = &"SFX"
 		add_child(player)
 		_players.append(player)
 	var gen := AudioStreamGenerator.new()
@@ -34,13 +36,18 @@ func _ready() -> void:
 	gen.buffer_length = 0.15
 	_engine = AudioStreamPlayer.new()
 	_engine.stream = gen
+	_engine.bus = &"SFX"
 	_engine.volume_db = -6.0
 	add_child(_engine)
 	_engine.play()
 	_playback = _engine.get_stream_playback()
 	_lowpass = AudioEffectLowPassFilter.new()
 	_lowpass.cutoff_hz = 20000.0
-	AudioServer.add_bus_effect(0, _lowpass)
+	var sfx := AudioServer.get_bus_index(&"SFX")
+	if sfx < 0:
+		push_error("No existe el bus SFX")
+		sfx = 0
+	AudioServer.add_bus_effect(sfx, _lowpass)
 
 
 func play(sound: StringName, volume_db: float = 0.0, pitch: float = 1.0) -> void:

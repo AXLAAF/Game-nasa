@@ -13,7 +13,13 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var failed: int = suite.new().run(root)
-	quit(1 if failed + broken > 0 else 0)
+	var music_suite: Script = load("res://tests/music_tests.gd")
+	if music_suite == null:
+		push_error("FAIL: los tests de musica no compilan")
+		quit(1)
+		return
+	var music_failed: int = await music_suite.new().run()
+	quit(1 if failed + broken + music_failed > 0 else 0)
 
 
 func _compile(path: String) -> int:

@@ -23,8 +23,13 @@ Catalog="*res://game/autoload/catalog.gd"
 Profile="*res://game/autoload/profile.gd"
 Run="*res://game/autoload/run.gd"
 Synth="*res://game/autoload/synth.gd"
+Music="*res://game/autoload/music.gd"
 Juice="*res://game/autoload/juice.gd"
 Router="*res://game/autoload/router.gd"
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
 
 [display]
 
