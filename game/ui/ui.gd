@@ -102,13 +102,13 @@ static func well_box() -> StyleBoxFlat:
 	return style
 
 
-static func _key(bg: Color, edge: Color, pressed: bool = false) -> StyleBoxFlat:
+static func _key(bg: Color, edge: Color, pressed: bool = false, pad: int = 7) -> StyleBoxFlat:
 	var style := box(bg, edge, 1, 4)
 	style.border_width_bottom = 1 if pressed else 4
-	style.content_margin_top = 10 if pressed else 7
-	style.content_margin_bottom = 7
-	style.content_margin_left = 14
-	style.content_margin_right = 14
+	style.content_margin_top = pad + 3 if pressed else pad
+	style.content_margin_bottom = pad
+	style.content_margin_left = pad * 2
+	style.content_margin_right = pad * 2
 	return style
 
 
@@ -155,6 +155,86 @@ static func primary(b: Button) -> Button:
 		b.add_theme_color_override(state, BAKELITE)
 	b.add_theme_font_override("font", bold())
 	return b
+
+
+## Tecla baja para la consola de vuelo: caben tres filas en CONSOLE_H.
+static func compact(b: Button) -> Button:
+	b.add_theme_stylebox_override("normal", _key(BAKELITE_RAISED, BAKELITE_EDGE, false, 3))
+	b.add_theme_stylebox_override("hover", _key(Color("30353a"), IVORY_DIM, false, 3))
+	b.add_theme_stylebox_override("pressed", _key(Color("101113"), IVORY_DIM, true, 3))
+	b.add_theme_stylebox_override("disabled", _key(Color("1b1d1f"), Color("26292c"), false, 3))
+	b.add_theme_font_size_override("font_size", SIZE_LEGEND)
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return b
+
+
+## Rejilla de teclas compactas al final de la consola.
+static func console_keys(row: HBoxContainer, columns: int = 2) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = columns
+	grid.add_theme_constant_override("h_separation", 4)
+	grid.add_theme_constant_override("v_separation", 4)
+	grid.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(grid)
+	return grid
+
+
+## Rejilla de cintas de medida sobre la consola. Las cintas se anaden con console_gauge.
+static func console_gauges(row: HBoxContainer, columns: int) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = columns
+	grid.add_theme_constant_override("h_separation", 10)
+	grid.add_theme_constant_override("v_separation", 6)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(grid)
+	return grid
+
+
+static func console_gauge(grid: GridContainer, title: String, color: Color) -> Gauge:
+	var g := Gauge.new(title, color)
+	g.on_enamel = true
+	g.custom_minimum_size.x = 150
+	g.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	grid.add_child(g)
+	return g
+
+
+## Linea de teclas justo encima de la consola, abajo a la izquierda.
+static func keys(root: Control, text: String) -> Label:
+	var l := label(root, text, SIZE_LEGEND, IVORY)
+	l.add_theme_stylebox_override("normal", box(Color(BAKELITE, 0.9), BAKELITE_EDGE, 0, 3))
+	l.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	l.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	l.offset_left = 12
+	l.offset_bottom = -CONSOLE_H - 10
+	l.offset_top = l.offset_bottom
+	return l
+
+
+## Rotulo grande centrado arriba (cuenta atras, avisos de fase).
+static func banner(root: Control, size: int, y: float) -> Label:
+	var l := label(root, "", size, IVORY)
+	l.add_theme_font_override("font", bold())
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	l.offset_top = y
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.add_theme_color_override("font_outline_color", Color.BLACK)
+	l.add_theme_constant_override("outline_size", 8)
+	return l
+
+
+## Matriz de lamparas de la nave, arriba a la derecha.
+static func annunciator(root: Control) -> Annunciator:
+	var board := Annunciator.new()
+	board.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	board.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	board.offset_right = -12
+	board.offset_left = -12
+	board.offset_top = 12
+	root.add_child(board)
+	return board
 
 
 ## Opcion elegida en un selector (seguro, calidad): borde marfil y negrita.
@@ -295,12 +375,7 @@ static func place(control: Control, rect: Rect2) -> Control:
 ## Despliega el detalle de la matriz de lamparas. Si la fase no tiene una, la crea arriba a la derecha.
 static func toggle_status(host: Node) -> void:
 	if Annunciator.current == null or not is_instance_valid(Annunciator.current):
-		var holder := root(host, 30)
-		var board := Annunciator.new()
-		board.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-		board.grow_horizontal = Control.GROW_DIRECTION_BEGIN
-		board.position += Vector2(-12, 12)
-		holder.add_child(board)
+		annunciator(root(host, 30))
 	Annunciator.toggle_detail()
 
 

@@ -3,6 +3,7 @@ shader_type canvas_item;
 uniform float pixel_size = 2.0;
 uniform vec2 scroll_offset = vec2(0.0, 0.0);
 uniform float nebula_intensity = 0.40;
+uniform float stars = 1.0; // 0 = cielo de dia: sin estrellas ni nebulosa
 uniform vec4 bg_void : source_color = vec4(0.024, 0.039, 0.071, 1.0);
 uniform vec4 nebula_col : source_color = vec4(0.086, 0.15, 0.27, 1.0);
 uniform vec4 nebula_accent : source_color = vec4(0.14, 0.24, 0.42, 1.0);
@@ -68,24 +69,24 @@ void fragment() {
 	float band = smoothstep(0.42, 0.88, neb);
 	vec3 col = bg_void.rgb;
 	if (band > 0.58 + dither * 0.34) {
-		col = mix(bg_void.rgb, nebula_accent.rgb, nebula_intensity);
+		col = mix(bg_void.rgb, nebula_accent.rgb, nebula_intensity * stars);
 	} else if (band > 0.24 + dither * 0.34) {
-		col = mix(bg_void.rgb, nebula_col.rgb, nebula_intensity * 0.78);
+		col = mix(bg_void.rgb, nebula_col.rgb, nebula_intensity * 0.78 * stars);
 	}
 
 	// Capa 1: estrellas de fondo lejanas con paralaje lento
 	vec2 px_far = px + floor(scroll_offset * 0.18);
 	float s_far = hash21(px_far);
-	if (s_far > 0.9945) {
-		col = mix(col, vec3(0.55, 0.61, 0.71), 0.65);
+	if (s_far > 0.9975) {
+		col = mix(col, vec3(0.55, 0.61, 0.71), 0.65 * stars);
 	}
 
 	// Capa 2: estrellas cercanas con paralaje medio y parpadeo
 	vec2 px_near = px + floor(scroll_offset * 0.42);
 	float s_near = hash21(px_near + vec2(17.0, 31.0));
-	if (s_near > 0.9972) {
+	if (s_near > 0.9986) {
 		float twinkle = 0.72 + 0.28 * sin(TIME * 2.4 + s_near * 120.0);
-		col = mix(col, vec3(0.957, 0.922, 0.851), twinkle);
+		col = mix(col, vec3(0.957, 0.922, 0.851), twinkle * stars);
 	}
 
 	// Capa 3: estrellas en cruz de 4 puntas (pin_11 + pin_15)
@@ -104,7 +105,7 @@ void fragment() {
 		if (is_center || is_arm) {
 			float tw = 0.75 + 0.25 * sin(TIME * 3.0 + c_hash * 90.0);
 			vec3 star_col = c_hash > 0.96 ? vec3(0.22, 0.74, 0.97) : vec3(0.957, 0.922, 0.851);
-			col = mix(col, star_col, is_center ? tw : tw * 0.68);
+			col = mix(col, star_col, (is_center ? tw : tw * 0.68) * stars);
 		}
 	}
 

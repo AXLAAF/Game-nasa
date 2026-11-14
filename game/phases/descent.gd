@@ -48,6 +48,7 @@ var _plasma: CPUParticles2D
 var _scale: float = 1.0
 var _gauges: Dictionary = {}
 var _info: Label
+var _readouts: Dictionary = {}
 var _banner: Label
 var _prompt: Label
 var _panel: PanelContainer
@@ -120,28 +121,25 @@ func _hidden_hazard() -> void:
 
 func _build_hud() -> void:
 	var root := Ui.root(self)
-	var panel := Ui.panel(root)
-	Ui.place(panel, Rect2(12, 12, 270, 0))
-	var col := Ui.vbox(panel, 4)
-	Ui.label(col, "DESCENSO  %s" % body.display_name.to_upper(), 16, Ui.INFO)
-	_info = Ui.label(col, "", 13)
-	for key: Array in [["heat", "CALOR DEL CASCO", Ui.LAMP_WARNING], ["shield", "ESCUDO ABLATIVO", Ui.LAMP_CAUTION], ["g", "CARGA G", Ui.IVORY], ["burn", "FRENADO SUICIDA", Ui.LAMP_GO], ["fuel", "COMBUSTIBLE", Ui.INFO]]:
-		var g := Gauge.new(key[1], key[2])
-		col.add_child(g)
-		_gauges[key[0]] = g
-	Ui.button(col, "Estado [C]", func() -> void: Ui.toggle_status(self))
+	var row := Ui.console(root)
+	for key: Array in [["alt", "Altitud", "km"], ["vertical", "Vel. vertical", "m/s"], ["horizontal", "Vel. horizontal", "m/s"]]:
+		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 110.0)
+	var well := Ui.well(row)
+	well.custom_minimum_size = Vector2(200, 0)
+	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
+	var gauges := Ui.console_gauges(row, 3)
+	for key: Array in [["heat", "Calor del casco", Ui.LAMP_WARNING], ["shield", "Escudo ablativo", Ui.LAMP_CAUTION], ["g", "Carga G", Ui.IVORY], ["burn", "Frenado", Ui.LAMP_GO], ["fuel", "Combustible", Ui.INFO]]:
+		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
+	var buttons := Ui.console_keys(row, 1)
+	Ui.compact(Ui.button(buttons, "Estado (C)", func() -> void: Ui.toggle_status(self)))
+	Ui.compact(Ui.button(buttons, "Paracaídas (P)", _deploy_chute))
+	Ui.compact(Ui.button(buttons, "Eyectar (E)", _eject))
+	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(900, 12, 370, 300))
+	Ui.place(ticker, Rect2(12, 12, 380, 200))
 	root.add_child(ticker)
-	_banner = Ui.label(root, "", 32, Ui.IVORY)
-	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_banner.position.y = 80
-	_banner.add_theme_color_override("font_outline_color", Color.BLACK)
-	_banner.add_theme_constant_override("outline_size", 8)
-	_prompt = Ui.label(root, "", 15, Ui.IVORY_DIM)
-	_prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	_prompt.position += Vector2(-420, -34)
+	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
+	_prompt = Ui.keys(root, "")
 	_panel = Ui.panel(root)
 	_panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	_panel.position += Vector2(-200, -120)
@@ -502,13 +500,13 @@ func _show_surface() -> void:
 		child.queue_free()
 	_panel.visible = true
 	var col := Ui.vbox(_panel, 8)
-	Ui.label(col, "EN LA SUPERFICIE DE %s" % body.display_name.to_upper(), 18, Ui.INFO)
+	Ui.plate(col, "Superficie de %s" % body.display_name)
 	var at_target := body == Run.target()
 	if at_target:
 		var text := "Entregar %s" % Run.contract.cargo.to_lower()
 		if ejected:
 			text += "  (capsula sola: entrega parcial)"
-		Ui.button(col, text, _deliver)
+		Ui.primary(Ui.button(col, text, _deliver))
 	if not explored:
 		Ui.button(col, "Explorar la zona", _explore)
 	if not Run.ship.broken_parts().is_empty():
@@ -517,7 +515,7 @@ func _show_surface() -> void:
 	var need := RocketMath.ascent_dv(body)
 	var dv := Run.ship.delta_v()
 	var can_fly := not ejected and dv >= need and Run.ship.twr(body.surface_gravity) > 1.0
-	var takeoff := Ui.button(col, "Despegar a orbita  (%d / %d m/s)" % [int(dv), int(need)], _take_off)
+	var takeoff := Ui.button(col, "Despegar a órbita (%d / %d m/s)" % [int(dv), int(need)], _take_off)
 	takeoff.disabled = not can_fly
 	if body.is_home:
 		Ui.button(col, "Terminar la mision en casa", _go_home)
@@ -627,29 +625,32 @@ func _update_hud() -> void:
 	var lines := PackedStringArray()
 	if state == State.APPROACH:
 		var c := _corridor()
-		lines.append("ANGULO  %.1f" % gamma)
-		lines.append("CORREDOR %.1f a %.1f" % [c.x, c.y])
-		lines.append("VEL ENTRADA %d m/s" % int(v0))
-		_prompt.text = "W/S ajustar angulo   ESPACIO confirmar   (muy plano: rebote, muy empinado: calor y G)"
+		lines.append("Ángulo %.1f" % gamma)
+		lines.append("Corredor de %.1f a %.1f" % [c.x, c.y])
+		lines.append("Velocidad de entrada %d m/s" % int(v0))
+		_prompt.text = "W/S ajustar ángulo   Espacio confirmar   Muy plano rebotas; muy empinado, calor y G"
 	elif blackout:
-		lines.append("APAGON DE PLASMA")
-		lines.append("--- sin telemetria ---")
-		_prompt.text = "W/S sustentacion arriba/abajo   P paracaidas   E eyectar"
+		lines.append("Apagón de plasma")
+		lines.append("Sin telemetría")
+		_prompt.text = "W/S sustentación arriba o abajo   P paracaídas   E eyectar"
 	else:
-		lines.append("ALT  %6.0f m" % agl())
-		lines.append("VEL  %5d m/s  (H %d  V %d)" % [int(speed), int(vx), int(vy)])
-		lines.append("DV   %5d m/s  TWR %.2f" % [int(ship.delta_v()), ship.twr(body.surface_gravity)])
+		lines.append("Sobre el suelo %d m" % int(agl()))
+		lines.append("Velocidad %d m/s" % int(speed))
+		lines.append("Delta-v %d m/s, TWR %.2f" % [int(ship.delta_v()), ship.twr(body.surface_gravity)])
 		var pad := nearest_pad(x)
-		lines.append("PLATAFORMA %s %d m" % ["<" if pad < x else ">", int(absf(pad - x))])
+		lines.append("Plataforma a %d m a la %s" % [int(absf(pad - x)), "izquierda" if pad < x else "derecha"])
 		if absf(wind) > 1.0:
-			lines.append("VIENTO %+d m/s" % int(wind))
+			lines.append("Viento %+d m/s" % int(wind))
 		if state == State.ENTRY:
-			_prompt.text = "W/S sustentacion   P paracaidas (freno <450, principal <120)   E eyectar   1-4 tiempo"
+			_prompt.text = "W/S sustentación   P paracaídas (freno bajo 450 m/s, principal bajo 120)   E eyectar   1-4 tiempo"
 		else:
-			_prompt.text = "W/S acelerador  A/D inclinar  T retro  P paracaidas  ESPACIO etapa  E eyectar  1-4 tiempo"
+			_prompt.text = "W/S acelerador   A/D inclinar   T retro   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
 	if state == State.LANDED:
 		_prompt.text = ""
 	_info.text = "\n".join(lines)
+	(_readouts.alt as Label).text = "%.1f" % (agl() / 1000.0)
+	(_readouts.vertical as Label).text = "%d" % int(vy)
+	(_readouts.horizontal as Label).text = "%d" % int(vx)
 	(_gauges.heat as Gauge).set_value(hull_heat / 1.5, "%d%%" % int(hull_heat / 1.5 * 100.0), hull_heat > 0.8)
 	var ablative := 0.0
 	var ablative_max := 0.0
@@ -735,4 +736,4 @@ func _draw_corridor(view: Vector2) -> void:
 	var aim := origin + Vector2.from_angle(deg_to_rad(-gamma)) * length
 	draw_line(origin, aim, Ui.IVORY if inside else Ui.LAMP_WARNING, 3.0)
 	draw_colored_polygon(PackedVector2Array([origin + Vector2(-7, 14), origin + Vector2(7, 14), origin + Vector2(0, -16)]), Color(0.95, 0.97, 1.0))
-	draw_string(Ui.mono(), origin + Vector2(length * 0.15, -36), "PLANO = REBOTE" if gamma > c.y else ("EMPINADO = CALOR" if gamma < c.x else "DENTRO DEL CORREDOR"), HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.IVORY if inside else Ui.LAMP_WARNING)
+	draw_string(Ui.sans(), origin + Vector2(length * 0.15, -36), "Plano: rebotas" if gamma > c.y else ("Empinado: calor" if gamma < c.x else "Dentro del corredor"), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY if inside else Ui.LAMP_WARNING)

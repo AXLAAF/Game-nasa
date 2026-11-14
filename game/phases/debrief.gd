@@ -27,23 +27,30 @@ func _ready() -> void:
 	panel.custom_minimum_size = Vector2(640, 0)
 	_col = Ui.vbox(panel, 8)
 	var good := Run.outcome == &"delivered" or Run.outcome == &"partial"
-	Ui.label(_col, _headline(), 30, Ui.LAMP_GO if good else Ui.LAMP_WARNING)
-	var why := Ui.label(_col, Run.outcome_text, 14, Ui.IVORY_DIM)
+	var head := Ui.hbox(_col, 8)
+	head.add_child(Lamp.new("Entrega" if good else "Pérdida", Lamp.GO if good else Lamp.WARNING))
+	var headline := Ui.label(head, _headline(), Ui.SIZE_READOUT, Ui.IVORY)
+	headline.add_theme_font_override("font", Ui.bold())
+	var why := Ui.label(_col, Run.outcome_text, Ui.SIZE_TEXT, Ui.IVORY)
 	why.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	why.custom_minimum_size = Vector2(600, 0)
 	_list = Ui.vbox(_col, 2)
-	_total_label = Ui.label(_col, "", 34, Ui.IVORY)
+	var total_well := Ui.well(_col)
+	var total_col := Ui.vbox(total_well, 2)
+	Ui.legend(total_col, "Total")
+	_total_label = Ui.label(total_col, "", Ui.SIZE_HERO, Ui.IVORY)
+	_total_label.add_theme_font_override("font", Ui.mono())
 	_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	_play()
 
 
 func _headline() -> String:
 	match Run.outcome:
-		&"delivered": return "ENTREGA COMPLETA"
-		&"partial": return "ENTREGA PARCIAL"
-		&"aborted": return "MISION ABORTADA"
-		&"stranded": return "A LA DERIVA"
-	return "NAVE PERDIDA"
+		&"delivered": return "Entrega completa"
+		&"partial": return "Entrega parcial"
+		&"aborted": return "Misión abortada"
+		&"stranded": return "A la deriva"
+	return "Nave perdida"
 
 
 ## Calcula todas las lineas y aplica el resultado al perfil antes de animar.
@@ -138,18 +145,18 @@ func _play() -> void:
 		if target > 500:
 			Juice.shake(0.15)
 		await get_tree().create_timer(0.45).timeout
-	_total_label.text = "TOTAL  " + Ui.money(_total)
+	_total_label.text = Ui.money(_total)
 	Synth.play(&"jackpot" if _total > 2000 else (&"win" if _total > 0 else &"lose"))
 	Juice.flash(Ui.IVORY if _total > 0 else Ui.LAMP_WARNING, 0.3)
 	if Run.boxes > 0:
 		await _open_boxes()
-	Ui.label(_col, "Creditos: %s" % Ui.money(Profile.credits), 16, Ui.IVORY)
-	var back := Ui.button(_col, "Volver al hangar", func() -> void: Router.go(&"hangar"))
+	Ui.label(_col, "Créditos: %s" % Ui.money(Profile.credits), Ui.SIZE_TEXT, Ui.IVORY)
+	var back := Ui.primary(Ui.button(_col, "Volver al hangar", func() -> void: Router.go(&"hangar")))
 	back.grab_focus()
 
 
 func _open_boxes() -> void:
-	Ui.label(_col, "CAJAS MISTERIOSAS x%d" % Run.boxes, 18, Ui.MYSTERY)
+	Ui.legend(_col, "Cajas misteriosas x%d" % Run.boxes)
 	var row := Ui.hbox(_col, 12)
 	for i: int in 3:
 		var reel := Ui.label(row, "?", 28, Ui.MYSTERY)

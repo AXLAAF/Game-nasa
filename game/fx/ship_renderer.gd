@@ -112,168 +112,212 @@ static func nozzles(parts: Array, active: Array) -> PackedVector2Array:
 	return out
 
 
+const TEXEL := 2.0
+const OUTLINE := Color("0d1014")
+const FIRE: Texture2D = preload("res://assets/fx/fire_sheet.png")
+
+
+static func _snap(r: Rect2) -> Rect2:
+	var p := (r.position / TEXEL).round() * TEXEL
+	var e := (r.end / TEXEL).round() * TEXEL
+	return Rect2(p, (e - p).max(Vector2(TEXEL, TEXEL)))
+
+
+## Rect dentro de r en fracciones (0-1), ajustado a la rejilla.
+static func _sub(r: Rect2, x0: float, y0: float, x1: float, y1: float) -> Rect2:
+	return _snap(Rect2(r.position + r.size * Vector2(x0, y0), r.size * Vector2(x1 - x0, y1 - y0)))
+
+
+## Silueta de la pieza como bloques escalonados: sirve para el contorno y para el relleno.
+static func _slabs(part: ShipPart, r: Rect2, flipped: bool) -> Array[Rect2]:
+	match part.def.kind:
+		&"engine":
+			return [_sub(r, 0.22, 0.0, 0.78, 0.4), _sub(r, 0.26, 0.4, 0.74, 0.6), _sub(r, 0.14, 0.6, 0.86, 0.8), _sub(r, 0.0, 0.8, 1.0, 1.0)]
+		&"capsule":
+			return [_sub(r, 0.3, 0.0, 0.7, 0.3), _sub(r, 0.18, 0.3, 0.82, 0.65), _sub(r, 0.05, 0.65, 0.95, 1.0)]
+		&"heatshield":
+			return [_sub(r, 0.0, 0.0, 1.0, 0.6), _sub(r, 0.12, 0.6, 0.88, 1.0)]
+		&"parachute":
+			return [_sub(r, 0.25, 0.0, 0.75, 0.35), _sub(r, 0.08, 0.35, 0.92, 0.6), _sub(r, 0.0, 0.6, 1.0, 1.0)]
+		&"legs":
+			var out: Array[Rect2] = []
+			for k: int in 4:
+				var fx := k / 4.0 if not flipped else 0.75 - k / 4.0
+				out.append(_sub(r, fx, k / 4.0, fx + 0.3, (k + 1) / 4.0))
+			out.append(_snap(Rect2(r.position.x - 2.0, r.end.y - TEXEL, r.size.x + 4.0, TEXEL)))
+			return out
+		&"antenna":
+			return [_sub(r, 0.4, 0.3, 0.6, 1.0), _sub(r, 0.0, 0.1, 1.0, 0.3), _sub(r, 0.3, 0.0, 0.7, 0.1)]
+		&"escape":
+			return [_sub(r, 0.35, 0.3, 0.65, 1.0), _sub(r, 0.2, 0.0, 0.8, 0.3)]
+	return [_snap(r)]
+
+
+static func _tone(part: ShipPart) -> Color:
+	var c := part.def.color
+	match part.health():
+		ShipPart.Health.WORN:
+			c = c.darkened(0.22)
+		ShipPart.Health.FAULTY:
+			c = c.lerp(Color(0.9, 0.32, 0.08), 0.5)
+		ShipPart.Health.BROKEN:
+			c = c.darkened(0.55)
+	return c
+
+
+## Pieza y su espejo (radiales a ambos lados): [rect, volteada].
+static func _placements(part: ShipPart, r: Rect2) -> Array:
+	var out: Array = [[r, part.side < 0]]
+	if part.def.radial and part.side == 0:
+		out.append([mirror(r), true])
+	return out
+
+
 static func draw(ci: CanvasItem, parts: Array, opts: Dictionary = {}) -> void:
+	if ci.texture_filter != CanvasItem.TEXTURE_FILTER_NEAREST:
+		ci.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	var rects := layout(parts)
 	var selected: int = opts.get("selected", -1)
 	var t: float = Time.get_ticks_msec() / 1000.0
 	var flame: float = opts.get("flame", 0.0)
 	var active: Array = opts.get("active", [])
+	# Primera pasada: todas las siluetas crecidas un texel. Da un solo contorno sin lineas dobles entre piezas.
+	for i: int in parts.size():
+		for place: Array in _placements(parts[i], rects[i]):
+			for slab: Rect2 in _slabs(parts[i], place[0], place[1]):
+				ci.draw_rect(slab.grow(TEXEL), OUTLINE)
 	for i: int in parts.size():
 		var part: ShipPart = parts[i]
-		_draw_part(ci, part, rects[i], part.side < 0, t)
-		if part.def.radial and part.side == 0:
-			_draw_part(ci, part, mirror(rects[i]), true, t)
 		if flame > 0.0 and part.def.kind == &"engine" and not part.broken and active.has(part):
-			var r := rects[i]
-			var flame_len := r.size.y * (1.2 + flame * 2.8) * (0.85 + 0.15 * sin(t * 40.0 + i))
-			var c := r.get_center().x
-			ci.draw_colored_polygon(PackedVector2Array([
-				Vector2(c - r.size.x * 0.42, r.end.y), Vector2(c + r.size.x * 0.42, r.end.y), Vector2(c, r.end.y + flame_len),
-			]), Color(2.6, 1.3, 0.45, 0.85))
-			ci.draw_colored_polygon(PackedVector2Array([
-				Vector2(c - r.size.x * 0.2, r.end.y), Vector2(c + r.size.x * 0.2, r.end.y), Vector2(c, r.end.y + flame_len * 0.55),
-			]), Color(3.5, 3.2, 2.6, 0.95))
-		if i == selected:
-			ci.draw_rect(rects[i].grow(3), Ui.IVORY, false, 2.0)
-			if part.def.radial and part.side == 0:
-				ci.draw_rect(mirror(rects[i]).grow(3), Ui.IVORY, false, 2.0)
+			_draw_flame(ci, _snap(rects[i]), flame, t + i)
+		for place: Array in _placements(part, rects[i]):
+			_draw_part(ci, part, place[0], place[1], t)
+			if i == selected:
+				ci.draw_rect(_snap(place[0]).grow(TEXEL * 2.0), Ui.IVORY, false, TEXEL)
 	var chute: int = opts.get("chute", 0)
 	if chute > 0 and not rects.is_empty():
-		var top := bounds(parts).position.y
-		var span := 26.0 if chute == 1 else 90.0
-		var lift := 60.0 if chute == 1 else 150.0
-		var canopy := PackedVector2Array()
-		for k: int in 13:
-			var a := PI + PI * k / 12.0
-			canopy.append(Vector2(cos(a) * span, top - lift + sin(a) * span * 0.45))
-		canopy.append(Vector2(span, top - lift))
-		ci.draw_colored_polygon(canopy, Color(1.0, 0.45, 0.2) if chute == 2 else Color(1.0, 0.85, 0.3))
-		for k: int in 5:
-			var x := -span + span * 2.0 * k / 4.0
-			ci.draw_line(Vector2(x, top - lift), Vector2(0, top), Color(0.9, 0.9, 0.9, 0.7), 1.0)
+		_draw_chute(ci, bounds(parts).position.y, chute)
 
 
-static func _draw_part(ci: CanvasItem, part: ShipPart, r: Rect2, flipped: bool, t: float) -> void:
-	var c := part.def.color
-	var h := part.health()
-	if h == ShipPart.Health.WORN:
-		c = c.darkened(0.22)
-	elif h == ShipPart.Health.FAULTY:
-		c = c.lerp(Color(0.9, 0.32, 0.08), 0.5)
-	elif h == ShipPart.Health.BROKEN:
-		c = c.darkened(0.55)
-	var dark := c.darkened(0.35)
+static func _draw_flame(ci: CanvasItem, r: Rect2, flame: float, t: float) -> void:
+	var length := r.size.y * (1.2 + flame * 2.8) * (0.85 + 0.15 * sin(t * 40.0))
 	var cx := r.get_center().x
-	var outline := Color(0, 0, 0, 0.55)
-	match part.def.kind:
-		&"engine":
-			ci.draw_rect(Rect2(cx - r.size.x * 0.3, r.position.y, r.size.x * 0.6, r.size.y * 0.4), dark)
-			ci.draw_colored_polygon(PackedVector2Array([
-				Vector2(cx - r.size.x * 0.22, r.position.y + r.size.y * 0.4), Vector2(cx + r.size.x * 0.22, r.position.y + r.size.y * 0.4),
-				Vector2(r.end.x, r.end.y), Vector2(r.position.x, r.end.y),
-			]), c)
-			ci.draw_line(Vector2(r.position.x + 2, r.end.y - 1), Vector2(r.end.x - 2, r.end.y - 1), c.lightened(0.4), 2.0)
+	var steps := 5
+	for k: int in steps:
+		var f := float(k) / steps
+		var w := r.size.x * 0.8 * (1.0 - f)
+		ci.draw_rect(_snap(Rect2(cx - w * 0.5, r.end.y + length * f, w, length / steps)), Color(2.6, 1.3 - f * 0.5, 0.45, 0.9))
+		if k < 3:
+			var core := w * 0.45
+			ci.draw_rect(_snap(Rect2(cx - core * 0.5, r.end.y + length * f * 0.6, core, length * 0.6 / steps)), Color(3.5, 3.2, 2.6, 0.95))
+
+
+static func _draw_chute(ci: CanvasItem, top: float, chute: int) -> void:
+	var span := 26.0 if chute == 1 else 90.0
+	var lift := 60.0 if chute == 1 else 150.0
+	var color := Color(1.0, 0.45, 0.2) if chute == 2 else Color(1.0, 0.85, 0.3)
+	var rows := 5
+	for k: int in rows:
+		var w := span * 2.0 * sin(PI * 0.5 * (k + 1.0) / rows)
+		var slab := _snap(Rect2(-w * 0.5, top - lift - span * 0.45 * (1.0 - float(k) / rows), w, span * 0.45 / rows))
+		ci.draw_rect(slab.grow(TEXEL), OUTLINE)
+	for k: int in rows:
+		var w := span * 2.0 * sin(PI * 0.5 * (k + 1.0) / rows)
+		ci.draw_rect(_snap(Rect2(-w * 0.5, top - lift - span * 0.45 * (1.0 - float(k) / rows), w, span * 0.45 / rows)), color if k % 2 == 0 else color.lightened(0.25))
+	for k: int in 5:
+		var x := -span + span * 2.0 * k / 4.0
+		ci.draw_line(Vector2(x, top - lift), Vector2(0, top), Color(0.9, 0.9, 0.9, 0.7), 1.0)
+
+
+## Bloque con luz fija arriba-izquierda: borde claro arriba e izquierda, oscuro abajo y derecha.
+static func _block(ci: CanvasItem, r: Rect2, c: Color) -> void:
+	ci.draw_rect(r, c)
+	if r.size.x < TEXEL * 3.0 or r.size.y < TEXEL * 2.0:
+		return
+	ci.draw_rect(Rect2(r.position.x, r.end.y - TEXEL, r.size.x, TEXEL), c.darkened(0.3))
+	ci.draw_rect(Rect2(r.end.x - TEXEL, r.position.y, TEXEL, r.size.y), c.darkened(0.3))
+	ci.draw_rect(Rect2(r.position.x, r.position.y, r.size.x - TEXEL, TEXEL), c.lightened(0.25))
+	ci.draw_rect(Rect2(r.position.x, r.position.y, TEXEL, r.size.y - TEXEL), c.lightened(0.25))
+
+
+static func _draw_part(ci: CanvasItem, part: ShipPart, raw: Rect2, flipped: bool, t: float) -> void:
+	var r := _snap(raw)
+	var c := _tone(part)
+	var dark := c.darkened(0.35)
+	var kind: StringName = part.def.kind
+	var slabs := _slabs(part, raw, flipped)
+	for k: int in slabs.size():
+		var shade := c
+		if kind == &"engine" and k == 0:
+			shade = dark
+		elif kind == &"escape" and k == 1:
+			shade = Color(0.9, 0.3, 0.2)
+		elif kind == &"parachute" and k == 2:
+			shade = dark
+		elif kind == &"heatshield" and part.ablative <= 0.5:
+			shade = c.darkened(0.5)
+		elif kind == &"solar":
+			shade = Color(0.12, 0.22, 0.55) if not part.broken else Color(0.1, 0.1, 0.15)
+		elif kind == &"decoupler":
+			shade = Color(0.15, 0.15, 0.17)
+		_block(ci, slabs[k], shade)
+	match kind:
 		&"tank":
-			ci.draw_rect(r, c)
-			ci.draw_rect(Rect2(r.position, Vector2(r.size.x, 4)), dark)
-			ci.draw_rect(Rect2(r.position.x, r.end.y - 4, r.size.x, 4), dark)
+			ci.draw_rect(Rect2(r.position.x, r.position.y + TEXEL * 2.0, r.size.x, TEXEL), dark)
+			ci.draw_rect(Rect2(r.position.x, r.end.y - TEXEL * 3.0, r.size.x, TEXEL), dark)
 			var cap := maxf(part.def.fuel * part.boost, 0.001)
 			var frac := clampf(part.fuel / cap, 0.0, 1.0)
-			var gauge := Rect2(r.position.x + 4, r.position.y + 7, 4, r.size.y - 14)
-			ci.draw_rect(gauge, Color(0, 0, 0, 0.5))
-			ci.draw_rect(Rect2(gauge.position.x, gauge.end.y - gauge.size.y * frac, 4, gauge.size.y * frac), Color(1.6, 0.8, 0.2))
-			ci.draw_line(Vector2(cx + 6, r.position.y + 6), Vector2(cx + 6, r.end.y - 6), c.lightened(0.25), 2.0)
+			var slot := _snap(Rect2(r.position.x + 4.0, r.position.y + 8.0, 4.0, r.size.y - 16.0))
+			ci.draw_rect(slot, OUTLINE)
+			ci.draw_rect(_snap(Rect2(slot.position.x, slot.end.y - slot.size.y * frac, slot.size.x, slot.size.y * frac)), Color(1.6, 0.8, 0.2))
 		&"capsule":
-			ci.draw_colored_polygon(PackedVector2Array([
-				Vector2(r.position.x + r.size.x * 0.05, r.end.y), Vector2(r.end.x - r.size.x * 0.05, r.end.y),
-				Vector2(cx + r.size.x * 0.2, r.position.y), Vector2(cx - r.size.x * 0.2, r.position.y),
-			]), c)
-			ci.draw_circle(Vector2(cx, r.position.y + r.size.y * 0.5), r.size.x * 0.12, Color(0.4, 1.4, 1.8) if not part.broken else Color(0.2, 0.2, 0.2))
+			ci.draw_rect(_sub(r, 0.38, 0.38, 0.62, 0.58), Color(0.4, 1.4, 1.8) if not part.broken else Color(0.2, 0.2, 0.2))
 		&"decoupler":
-			ci.draw_rect(r, Color(0.15, 0.15, 0.17))
-			var stripes := int(r.size.x / 8.0)
-			for k: int in stripes:
-				var x0 := r.position.x + k * 8.0
-				ci.draw_colored_polygon(PackedVector2Array([
-					Vector2(x0, r.end.y), Vector2(x0 + 4, r.position.y), Vector2(x0 + 8, r.position.y), Vector2(x0 + 4, r.end.y),
-				]), Color(1.0, 0.8, 0.1))
-		&"heatshield":
-			ci.draw_colored_polygon(PackedVector2Array([
-				r.position, Vector2(r.end.x, r.position.y), Vector2(r.end.x - 3, r.end.y - 2),
-				Vector2(cx, r.end.y + 3), Vector2(r.position.x + 3, r.end.y - 2),
-			]), c if part.ablative > 0.5 else c.darkened(0.5))
-		&"parachute":
-			ci.draw_rect(Rect2(r.position.x, r.position.y + r.size.y * 0.4, r.size.x, r.size.y * 0.6), dark)
-			ci.draw_circle(Vector2(cx, r.position.y + r.size.y * 0.45), r.size.x * 0.42, c)
-		&"legs":
-			var foot := Vector2(r.end.x if not flipped else r.position.x, r.end.y)
-			var hip := Vector2(r.position.x if not flipped else r.end.x, r.position.y)
-			ci.draw_line(hip, foot, c, 3.0)
-			ci.draw_line(foot - Vector2(5, 0), foot + Vector2(5, 0), c.lightened(0.3), 3.0)
+			for k: int in int(r.size.x / (TEXEL * 4.0)):
+				ci.draw_rect(Rect2(r.position.x + k * TEXEL * 4.0, r.position.y, TEXEL * 2.0, r.size.y), Color(1.0, 0.8, 0.1))
 		&"radiator":
-			ci.draw_rect(r, c)
 			for k: int in int(r.size.y / 6.0):
-				ci.draw_line(Vector2(r.position.x, r.position.y + k * 6.0 + 3), Vector2(r.end.x, r.position.y + k * 6.0 + 3), dark, 1.0)
+				ci.draw_rect(_snap(Rect2(r.position.x + TEXEL, r.position.y + k * 6.0 + 2.0, r.size.x - TEXEL * 2.0, TEXEL)), dark)
 		&"solar":
-			ci.draw_rect(r, Color(0.1, 0.2, 0.55) if not part.broken else Color(0.1, 0.1, 0.15))
-			for k: int in int(r.size.y / 8.0):
-				ci.draw_line(Vector2(r.position.x, r.position.y + k * 8.0), Vector2(r.end.x, r.position.y + k * 8.0), Color(0.5, 0.7, 1.0, 0.6), 1.0)
-			ci.draw_line(Vector2(cx, r.position.y), Vector2(cx, r.end.y), Color(0.5, 0.7, 1.0, 0.6), 1.0)
+			for k: int in range(1, int(r.size.y / 8.0)):
+				ci.draw_rect(_snap(Rect2(r.position.x, r.position.y + k * 8.0, r.size.x, TEXEL)), Color(0.5, 0.7, 1.0, 0.7))
 		&"rtg":
-			ci.draw_rect(r, Color(0.25, 0.25, 0.28))
 			for k: int in 3:
-				ci.draw_line(Vector2(r.position.x - 2, r.position.y + 4 + k * 6), Vector2(r.end.x + 2, r.position.y + 4 + k * 6), Color(0.4, 0.4, 0.45), 2.0)
-			ci.draw_circle(r.get_center(), 2.5, Color(2.0, 0.4, 0.2, 0.6 + 0.4 * sin(t * 3.0)))
+				ci.draw_rect(_snap(Rect2(r.position.x - TEXEL, r.position.y + 4.0 + k * 6.0, r.size.x + TEXEL * 2.0, TEXEL)), Color(0.42, 0.42, 0.47))
+			ci.draw_rect(_sub(r, 0.35, 0.42, 0.65, 0.58), Color(2.0, 0.4, 0.2, 0.6 + 0.4 * sin(t * 3.0)))
 		&"battery":
-			ci.draw_rect(r, c)
-			ci.draw_line(Vector2(cx - 4, r.get_center().y), Vector2(cx + 4, r.get_center().y), Color(0.1, 0.1, 0.1), 2.0)
-			ci.draw_line(Vector2(cx, r.get_center().y - 3), Vector2(cx, r.get_center().y + 3), Color(0.1, 0.1, 0.1), 2.0)
-		&"antenna":
-			var base := Vector2(r.position.x if not flipped else r.end.x, r.end.y)
-			var tip := Vector2(r.get_center().x, r.position.y + 4)
-			ci.draw_line(base, tip, c, 2.0)
-			ci.draw_arc(tip, r.size.x * 0.45, PI * 0.15 if not flipped else PI * 0.85, PI * 0.85 if not flipped else PI * 1.85, 8, c.lightened(0.3), 2.0)
+			ci.draw_rect(_sub(r, 0.35, 0.4, 0.65, 0.6), OUTLINE)
+			ci.draw_rect(_sub(r, 0.45, 0.2, 0.55, 0.8), OUTLINE)
 		&"computer":
-			ci.draw_rect(r, c)
 			for k: int in 3:
 				var lit := not part.broken and int(t * 4.0 + k) % 3 != 0
-				ci.draw_circle(Vector2(r.position.x + 6 + k * 6, r.get_center().y), 1.6, Color(0.3, 2.0, 0.6) if lit else Color(0.1, 0.2, 0.1))
+				ci.draw_rect(_snap(Rect2(r.position.x + 6.0 + k * 6.0, r.get_center().y - TEXEL * 0.5, TEXEL, TEXEL)), Color(0.3, 2.0, 0.6) if lit else Color(0.1, 0.2, 0.1))
 		&"sensor":
-			ci.draw_rect(r, c)
-			ci.draw_circle(Vector2(cx, r.get_center().y), minf(r.size.x, r.size.y) * 0.35, Color(0.6, 1.2, 1.8) if not part.broken else Color(0.1, 0.1, 0.1))
-			var inward := r.position.x if not flipped else r.end.x
-			ci.draw_line(Vector2(inward, r.get_center().y), Vector2(inward + (-4.0 if not flipped else 4.0), r.get_center().y), dark, 2.0)
+			ci.draw_rect(_sub(r, 0.25, 0.3, 0.75, 0.7), Color(0.6, 1.2, 1.8) if not part.broken else Color(0.1, 0.1, 0.1))
 		&"shielding", &"insulation":
-			ci.draw_rect(r, c)
-			for k: int in int(r.size.x / 6.0):
-				ci.draw_line(Vector2(r.position.x + k * 6.0, r.position.y), Vector2(r.position.x + k * 6.0 + 4, r.end.y), c.darkened(0.25), 1.0)
+			for k: int in range(1, int(r.size.x / 8.0)):
+				ci.draw_rect(_snap(Rect2(r.position.x + k * 8.0, r.position.y + TEXEL, TEXEL, r.size.y - TEXEL * 2.0)), c.darkened(0.25))
 		&"rcs":
-			ci.draw_rect(r, c)
-			ci.draw_line(Vector2(r.position.x, r.position.y + 2), Vector2(r.position.x - 3, r.position.y - 2), dark, 2.0)
-			ci.draw_line(Vector2(r.end.x, r.end.y - 2), Vector2(r.end.x + 3, r.end.y + 2), dark, 2.0)
-		&"escape":
-			ci.draw_line(Vector2(cx - 3, r.end.y), Vector2(cx, r.position.y + 12), c, 1.5)
-			ci.draw_line(Vector2(cx + 3, r.end.y), Vector2(cx, r.position.y + 12), c, 1.5)
-			ci.draw_rect(Rect2(cx - 3, r.position.y, 6, 14), Color(0.9, 0.3, 0.2))
-		_:
-			ci.draw_rect(r, c)
-	if part.def.kind in [&"tank", &"computer", &"sensor", &"battery", &"radiator", &"shielding", &"insulation", &"decoupler"]:
-		ci.draw_rect(r, outline, false, 1.0)
+			ci.draw_rect(_snap(Rect2(r.position.x - TEXEL, r.position.y, TEXEL, TEXEL * 2.0)), dark)
+			ci.draw_rect(_snap(Rect2(r.end.x, r.end.y - TEXEL * 2.0, TEXEL, TEXEL * 2.0)), dark)
 	if part.revealed and part.hidden_quality == ShipPart.Quality.SCRAP:
-		ci.draw_rect(Rect2(r.position + r.size * Vector2(0.55, 0.2), r.size * Vector2(0.25, 0.18)), Color(0.5, 0.25, 0.1, 0.55))
-		ci.draw_rect(Rect2(r.position + r.size * Vector2(0.15, 0.62), r.size * Vector2(0.2, 0.15)), Color(0.5, 0.25, 0.1, 0.5))
+		ci.draw_rect(_sub(r, 0.55, 0.2, 0.8, 0.38), Color(0.5, 0.25, 0.1, 0.6))
+		ci.draw_rect(_sub(r, 0.15, 0.62, 0.35, 0.77), Color(0.5, 0.25, 0.1, 0.55))
 	if part.revealed and part.hidden_quality == ShipPart.Quality.LEGENDARY:
-		ci.draw_rect(r.grow(1), Color(1.6, 1.3, 0.4, 0.5 + 0.3 * sin(t * 4.0)), false, 1.5)
+		ci.draw_rect(r.grow(TEXEL), Color(1.6, 1.3, 0.4, 0.5 + 0.3 * sin(t * 4.0)), false, TEXEL)
 	if not part.revealed:
-		ci.draw_rect(r, Color(0.7, 0.3, 1.0, 0.25 + 0.15 * sin(t * 5.0)))
-		ci.draw_string(Ui.mono(), r.get_center() + Vector2(-4, 5), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(1.6, 1.0, 2.0))
+		ci.draw_rect(r, Color(Ui.MYSTERY, 0.3 + 0.15 * sin(t * 5.0)))
+		ci.draw_string(Ui.bold(), r.get_center() + Vector2(-4, 5), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
+	var h := part.health()
 	if h == ShipPart.Health.WORN:
-		ci.draw_line(r.position + r.size * Vector2(0.15, 0.35), r.position + r.size * Vector2(0.8, 0.42), Color(0.12, 0.08, 0.05, 0.8), 1.0)
+		ci.draw_rect(_sub(r, 0.15, 0.35, 0.45, 0.35), Color(0.12, 0.08, 0.05, 0.8))
+		ci.draw_rect(_sub(r, 0.45, 0.42, 0.8, 0.42), Color(0.12, 0.08, 0.05, 0.8))
 	elif h == ShipPart.Health.FAULTY:
-		ci.draw_circle(r.position + Vector2(3, 3), 2.4, Color(1.5, 0.35, 0.05, 0.4 + 0.6 * absf(sin(t * 9.0))))
+		var frame := int(t * 8.0) % 4
+		ci.draw_texture_rect_region(FIRE, Rect2(r.get_center().x - 8.0, r.position.y - 10.0, 16.0, 16.0), Rect2(frame * 24.0, 0, 24, 24))
 	if part.broken:
-		ci.draw_line(r.position, r.end, Color(1, 0.2, 0.15), 2.0)
-		ci.draw_line(Vector2(r.end.x, r.position.y), Vector2(r.position.x, r.end.y), Color(1, 0.2, 0.15), 2.0)
-		if int(t * 10.0 + r.position.y) % 7 == 0:
-			ci.draw_circle(r.get_center() + Vector2(randf_range(-6, 6), randf_range(-6, 6)), 2.0, Color(3, 2, 0.5))
-
+		var n := int(minf(r.size.x, r.size.y) / TEXEL)
+		for k: int in n:
+			var f := (k + 0.5) / n
+			ci.draw_rect(_snap(Rect2(r.position + r.size * Vector2(f, f) - Vector2(1, 1), Vector2(TEXEL, TEXEL))), Ui.LAMP_WARNING)
+			ci.draw_rect(_snap(Rect2(r.position + r.size * Vector2(1.0 - f, f) - Vector2(1, 1), Vector2(TEXEL, TEXEL))), Ui.LAMP_WARNING)

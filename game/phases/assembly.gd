@@ -5,10 +5,11 @@ extends Node
 
 const INSPECT_COST := 25
 const BOX_COST := 90
+const HAZARD_NAMES := {&"heat": "calor", &"cold": "frío", &"radiation": "radiación", &"dust": "polvo", &"storms": "tormentas"}
 const GROUPS: Array = [
-	["Propulsion", [&"engine", &"tank", &"decoupler", &"rcs"]],
+	["Propulsión", [&"engine", &"tank", &"decoupler", &"rcs"]],
 	["Mando", [&"capsule", &"computer", &"sensor", &"antenna", &"battery"]],
-	["Energia y termico", [&"solar", &"rtg", &"radiator", &"insulation", &"shielding"]],
+	["Energía y térmico", [&"solar", &"rtg", &"radiator", &"insulation", &"shielding"]],
 	["Descenso y seguridad", [&"heatshield", &"parachute", &"legs", &"escape"]],
 ]
 
@@ -174,7 +175,7 @@ class ShipView extends Control:
 		var stage := 1
 		for i: int in Run.ship.parts.size():
 			if Run.ship.parts[i].def.kind == &"decoupler":
-				draw_string(Ui.mono(), Vector2(rects[i].end.x + 40, rects[i].get_center().y + 4), "^ etapa %d" % (stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Ui.IVORY)
+				draw_string(Ui.sans(), Vector2(rects[i].end.x + 40, rects[i].get_center().y + 4), "etapa %d" % (stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY)
 				stage += 1
 		if hint.get("radial", false) and hint.get("host", -1) >= 0:
 			var hr: Rect2 = hint.host_rect
@@ -186,14 +187,14 @@ class ShipView extends Control:
 				draw_rect(ShipRenderer.mirror(ghost), Color(Ui.IVORY, 0.35))
 				draw_rect(ShipRenderer.mirror(ghost), Ui.IVORY, false, 1.5)
 			var tag := "ambos lados" if hint.side == 0 else ("izquierda" if hint.side < 0 else "derecha")
-			draw_string(Ui.mono(), Vector2(hr.end.x + 12, ghost.get_center().y), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Ui.IVORY)
+			draw_string(Ui.sans(), Vector2(hr.end.x + 12, ghost.get_center().y), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		if not hint.is_empty() and not hint.get("radial", false):
 			draw_line(Vector2(o.x - 120, float(hint.y)), Vector2(o.x + 120, float(hint.y)), Ui.IVORY, 2.0)
 		if Run.ship.parts.is_empty():
-			draw_string(Ui.mono(), Vector2(o.x - 200, o.y - 200), "Arrastra piezas aqui (motor abajo, capsula arriba)", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY_DIM)
-			draw_string(Ui.mono(), Vector2(o.x - 200, o.y - 176), "Paneles, antenas y sensores: suelta a lo largo del casco", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Ui.INFO)
-		draw_string(Ui.mono(), Vector2(12, size.y - 12), "Pila: centro  |  Montaje: izq/der del bloque  |  Click der./Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Arrastra piezas aquí (motor abajo, cápsula arriba)", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Paneles, antenas y sensores: suelta a lo largo del casco", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.INFO)
+		draw_string(Ui.sans(), Vector2(12, size.y - 12), "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 
 
 func _ready() -> void:
@@ -217,17 +218,26 @@ func _ready() -> void:
 func _build_left(root: Control) -> void:
 	var zone := DropZone.new()
 	zone.phase = self
-	Ui.place(zone, Rect2(10, 10, 330, 700))
+	zone.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+	zone.offset_left = 10
+	zone.offset_right = 340
+	zone.offset_top = 10
+	zone.offset_bottom = -10
 	root.add_child(zone)
 	var col := Ui.vbox(zone, 8)
-	Ui.label(col, "ENSAMBLAJE", 22, Ui.INFO)
-	Ui.label(col, "Calidad de compra:", 12, Ui.IVORY_DIM)
-	var row := Ui.hbox(col, 4)
+	Ui.plate(col, "Catálogo")
+	Ui.legend(col, "Calidad de compra")
+	var row := GridContainer.new()
+	row.columns = 2
+	row.add_theme_constant_override("h_separation", 4)
+	row.add_theme_constant_override("v_separation", 4)
+	col.add_child(row)
 	for q: int in [ShipPart.Quality.SCRAP, ShipPart.Quality.USED, ShipPart.Quality.NEW, ShipPart.Quality.MYSTERY]:
-		var b := Ui.button(row, ShipPart.NAMES[q].left(6), _set_quality.bind(q))
+		var b := Ui.button(row, ShipPart.NAMES[q], _set_quality.bind(q))
 		b.toggle_mode = true
 		b.tooltip_text = "%s: precio x%.2f, estado %d-%d%%" % [ShipPart.NAMES[q], ShipPart.PRICE[q], int(ShipPart.CONDITION[q].x * 100), int(ShipPart.CONDITION[q].y * 100)]
-		b.add_theme_font_size_override("font_size", 12)
+		b.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
+		Ui.mark_selected(b, q == _quality)
 		_quality_buttons.append(b)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -243,15 +253,16 @@ func _fill_catalog() -> void:
 		child.queue_free()
 	for i: int in _quality_buttons.size():
 		_quality_buttons[i].button_pressed = [ShipPart.Quality.SCRAP, ShipPart.Quality.USED, ShipPart.Quality.NEW, ShipPart.Quality.MYSTERY][i] == _quality
+		Ui.mark_selected(_quality_buttons[i], _quality_buttons[i].button_pressed)
 	if not _inventory.is_empty():
-		Ui.label(_catalog, "INVENTARIO (gratis)", 13, Ui.IVORY)
+		Ui.legend(_catalog, "Inventario (gratis)")
 		for part: ShipPart in _inventory:
 			_catalog_button(part.def, "%s  [%s]" % [part.def.display_name, part.quality_text()], part)
 	var box := Ui.button(_catalog, "Caja misteriosa  %s" % Ui.money(BOX_COST), _buy_box)
 	box.tooltip_text = "Una pieza al azar de calidad oculta. Puede ser legendaria. O basura."
 	box.add_theme_color_override("font_color", Ui.MYSTERY)
 	for group: Array in GROUPS:
-		Ui.label(_catalog, String(group[0]).to_upper(), 13, Ui.INFO)
+		Ui.legend(_catalog, String(group[0]))
 		for def: PartDef in Catalog.part_list():
 			if (group[1] as Array).has(def.kind):
 				var price := int(round(def.cost * ShipPart.PRICE[_quality]))
@@ -282,16 +293,23 @@ func _build_center(root: Control) -> void:
 
 func _build_right(root: Control) -> void:
 	var panel := Ui.panel(root)
-	Ui.place(panel, Rect2(940, 10, 330, 700))
+	panel.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	panel.offset_left = -340
+	panel.offset_right = -10
+	panel.offset_top = 10
+	panel.offset_bottom = -10
 	var col := Ui.vbox(panel, 6)
+	Ui.plate(col, "Ingeniería")
 	_contract_label = Ui.label(col, "", 13, Ui.IVORY)
 	_contract_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_contract_label.custom_minimum_size = Vector2(300, 0)
-	_budget_label = Ui.label(col, "", 18, Ui.IVORY)
-	_dv = Gauge.new("DELTA-V  disponible / requerido", Ui.INFO)
+	Ui.legend(col, "Presupuesto libre / total")
+	_budget_label = Ui.label(col, "", Ui.SIZE_HEAD, Ui.IVORY)
+	_budget_label.add_theme_font_override("font", Ui.mono())
+	_dv = Gauge.new("Delta-v", Ui.INFO)
 	col.add_child(_dv)
 	_twr_label = Ui.label(col, "", 14)
-	_stages_label = Ui.label(col, "", 12, Ui.IVORY_DIM)
+	_stages_label = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	_req_box = Ui.vbox(col, 1)
 	_risk_label = Ui.label(col, "", 14)
 	var sep := HSeparator.new()
@@ -300,7 +318,7 @@ func _build_right(root: Control) -> void:
 	var spacer := Control.new()
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(spacer)
-	_launch = Ui.button(col, "DESPEGAR", _on_launch)
+	_launch = Ui.primary(Ui.button(col, "Despegar", _on_launch))
 	_launch.custom_minimum_size = Vector2(0, 48)
 	_launch.add_theme_font_size_override("font_size", 22)
 	Ui.button(col, "Volver al hangar", func() -> void:
@@ -426,8 +444,8 @@ func stats_text(def: PartDef) -> String:
 	if def.thrust > 0.0: bits.append("Empuje %d kN  Isp %d s" % [int(def.thrust), int(def.isp)])
 	if def.fuel > 0.0: bits.append("Propelente %.0f t" % def.fuel)
 	if def.solar > 0.0: bits.append("Solar %.1f" % def.solar)
-	if def.power > 0.0: bits.append("Energia %.1f" % def.power)
-	if def.battery > 0.0: bits.append("Bateria %.1f" % def.battery)
+	if def.power > 0.0: bits.append("Energía %.1f" % def.power)
+	if def.battery > 0.0: bits.append("Batería %.1f" % def.battery)
 	if def.cooling > 0.0: bits.append("Enfriamiento %.1f" % def.cooling)
 	if def.cold_resist > 0.0: bits.append("Aislamiento %d%%" % int(def.cold_resist * 100))
 	if def.heat_resist > 0.0: bits.append("Resist. calor %d%%" % int(def.heat_resist * 100))
@@ -443,23 +461,23 @@ func _refresh() -> void:
 	_view.fit()
 	var hazards: PackedStringArray = PackedStringArray()
 	for h: StringName in target.hazards:
-		hazards.append(String(h))
+		hazards.append(String(HAZARD_NAMES.get(h, h)))
 	if Run.contract.hidden_hazard != &"":
-		hazards.append("?")
-	_contract_label.text = "CONTRATO  %s\nPago %s (adelanto %s)  Peligros: %s" % [
+		hazards.append("rumores sin confirmar")
+	_contract_label.text = "%s\nPago %s, adelanto %s\nPeligros: %s" % [
 		Run.contract.title, Ui.money(Run.contract.payout), Ui.money(Run.contract.advance),
 		", ".join(hazards) if not hazards.is_empty() else "ninguno conocido"]
 	var remaining := _remaining()
-	_budget_label.text = "Presupuesto %s / %s" % [Ui.money(remaining), Ui.money(Profile.budget(Run.contract))]
+	_budget_label.text = "%s / %s" % [Ui.money(remaining), Ui.money(Profile.budget(Run.contract))]
 	_budget_label.add_theme_color_override("font_color", Ui.IVORY if remaining >= 0 else Ui.LAMP_WARNING)
 	var dv := ship.delta_v()
 	var need := Run.contract.dv_estimate
 	var top := maxf(need * 1.6, dv)
-	_dv.set_value(dv / top, "%d / ~%d m/s" % [int(dv), int(need)], dv < need * 0.85)
+	_dv.set_value(dv / top, "%d de %d m/s" % [int(dv), int(need)], dv < need * 0.85)
 	_dv.band = Vector2(need * 0.85 / top, need * 1.15 / top)
 	var home := Catalog.home()
 	var twr := ship.twr(home.surface_gravity)
-	_twr_label.text = "TWR al despegar  %.2f  %s" % [twr, "(no despega)" if twr < 1.0 else ""]
+	_twr_label.text = "TWR al despegar %.2f%s" % [twr, " (no despega)" if twr < 1.0 else ""]
 	_twr_label.add_theme_color_override("font_color", Ui.LAMP_GO if twr >= 1.2 else (Ui.LAMP_CAUTION if twr >= 1.0 else Ui.LAMP_WARNING))
 	var lines: PackedStringArray = PackedStringArray()
 	var dvs := ship.stage_dvs()
@@ -469,11 +487,15 @@ func _refresh() -> void:
 	_stages_label.text = "\n".join(lines)
 	for child: Node in _req_box.get_children():
 		child.queue_free()
-	Ui.label(_req_box, "ENTORNO DEL DESTINO (%s)" % target.display_name, 12, Ui.INFO)
+	Ui.legend(_req_box, "Entorno del destino (%s)" % target.display_name)
 	for req: Array in Thermal.requirements(ship, target):
-		Ui.label(_req_box, ("[ok] " if req[1] else "[!!] ") + str(req[0]), 12, Ui.LAMP_GO if req[1] else Ui.LAMP_WARNING)
+		var req_row := Ui.hbox(_req_box, 6)
+		var lamp := Lamp.new("OK" if req[1] else "Falta", Lamp.GO if req[1] else Lamp.WARNING)
+		lamp.custom_minimum_size.x = 64
+		req_row.add_child(lamp)
+		Ui.label(req_row, str(req[0]), Ui.SIZE_LEGEND, Ui.IVORY)
 	var rel := Odds.ship_reliability(ship)
-	_risk_label.text = "Fiabilidad estimada  %d-%d%%" % [int(rel.x * 100.0), int(rel.y * 100.0)]
+	_risk_label.text = "Fiabilidad estimada: %d a %d %%" % [int(rel.x * 100.0), int(rel.y * 100.0)]
 	_risk_label.add_theme_color_override("font_color", Odds.risk_color((rel.x + rel.y) * 0.5))
 	_refresh_part()
 	_launch.disabled = not ship.has_kind(&"capsule") or ship.thrust() <= 0.0 or remaining < 0
@@ -483,7 +505,7 @@ func _refresh_part() -> void:
 	for child: Node in _part_box.get_children():
 		child.queue_free()
 	if _selected < 0 or _selected >= Run.ship.parts.size():
-		Ui.label(_part_box, "Selecciona una pieza para ver su estado.", 12, Ui.IVORY_DIM)
+		Ui.label(_part_box, "Selecciona una pieza para ver su estado.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 		return
 	var part: ShipPart = Run.ship.parts[_selected]
 	Ui.label(_part_box, part.def.display_name, 17, Ui.IVORY)
@@ -491,8 +513,8 @@ func _refresh_part() -> void:
 	if part.def.radial:
 		var side := "ambos" if part.side == 0 else ("izq" if part.side < 0 else "der")
 		place = "montaje %s  altura %d%%" % [side, int(part.mount * 100.0)]
-	Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], 12)
-	var stats := Ui.label(_part_box, stats_text(part.def), 11, Ui.IVORY_DIM)
+	Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
+	var stats := Ui.label(_part_box, stats_text(part.def), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	stats.custom_minimum_size = Vector2(300, 0)
 	var row := Ui.hbox(_part_box, 6)

@@ -8,6 +8,7 @@ const POI_RADIUS := 40.0
 const BELT := Vector2(3950.0, 4750.0)
 const ELECTRONICS: Array[StringName] = [&"computer", &"sensor", &"antenna", &"battery", &"solar"]
 const POI_ICON := {&"asteroid": "A", &"derelict": "D", &"signal": "?", &"comet": "C", &"moon": "L"}
+const PLANET_MIN_PX := 14.0
 
 var bodies: Array[BodyDef] = []
 var st: Dictionary = {}
@@ -38,16 +39,25 @@ var _belt_rocks: PackedVector3Array = PackedVector3Array()
 var _cam: Camera2D
 var _stars: Starfield
 var _info: Label
-var _status: Label
+var _readouts: Dictionary = {}
 var _prompt: Label
 var _gauges: Dictionary = {}
 var _rescue_button: Button
+var _repair_button: Button
+var _salvage_button: Button
+var _planets: Dictionary = {} ## id de cuerpo -> Planet
 
 
 func _ready() -> void:
 	if Run.contract == null or Run.ship.parts.is_empty():
 		Run.debug_setup()
 	bodies = Catalog.body_list()
+	for body: BodyDef in bodies:
+		if not body.is_star:
+			var planet := Planet.make(body, body.radius * 2.0)
+			planet.show_behind_parent = true
+			add_child(planet)
+			_planets[body.id] = planet
 	_place_ship()
 	if Run.pois.is_empty():
 		_spawn_pois()
@@ -129,37 +139,34 @@ func _poi_known(poi: Dictionary) -> bool:
 
 func _build_hud() -> void:
 	var root := Ui.root(self)
-	var panel := Ui.panel(root)
-	Ui.place(panel, Rect2(12, 12, 280, 0))
-	var col := Ui.vbox(panel, 4)
-	Ui.label(col, Run.contract.title.to_upper(), 14, Ui.INFO)
-	_info = Ui.label(col, "", 13)
-	for key: Array in [["dv", "DELTA-V", Ui.IVORY], ["battery", "BATERIA", Ui.LAMP_GO], ["temp", "TEMPERATURA", Ui.LAMP_CAUTION], ["od", "SOBRECARGA MOTOR", Ui.LAMP_WARNING]]:
-		var g := Gauge.new(key[1], key[2])
-		col.add_child(g)
-		_gauges[key[0]] = g
-	_status = Ui.label(col, "", 12, Ui.IVORY_DIM)
-	var buttons := Ui.hbox(col, 6)
-	Ui.button(buttons, "Reparar [R]", _repair_card)
-	Ui.button(buttons, "Estado [C]", func() -> void: Ui.toggle_status(self))
-	Ui.button(buttons, "Instalar [I]", _salvage_card)
-	Ui.button(col, "Navegacion [N]", _toggle_nav)
-	_rescue_button = Ui.button(col, "Pedir rescate", _stranded_card)
+	var row := Ui.console(root)
+	for key: Array in [["distance", "Distancia", ""], ["relative", "Vel. relativa", "m/s"], ["deadline", "Plazo", "días"]]:
+		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 88.0)
+	var well := Ui.well(row)
+	well.custom_minimum_size = Vector2(270, 0)
+	well.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	well.clip_contents = true
+	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
+	_info.add_theme_constant_override("line_spacing", 0)
+	var gauges := Ui.console_gauges(row, 2)
+	for key: Array in [["dv", "Delta-v", Ui.IVORY], ["battery", "Batería", Ui.LAMP_GO], ["temp", "Temperatura", Ui.LAMP_CAUTION], ["od", "Sobrecarga", Ui.LAMP_WARNING]]:
+		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
+	var buttons := Ui.console_keys(row, 2)
+	_repair_button = Ui.compact(Ui.button(buttons, "Reparar (R)", _repair_card))
+	Ui.compact(Ui.button(buttons, "Estado (C)", func() -> void: Ui.toggle_status(self)))
+	_salvage_button = Ui.compact(Ui.button(buttons, "Instalar (I)", _salvage_card))
+	Ui.compact(Ui.button(buttons, "Navegación (N)", _toggle_nav))
+	_rescue_button = Ui.compact(Ui.button(buttons, "Pedir rescate", _stranded_card))
+	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(900, 12, 370, 300))
+	Ui.place(ticker, Rect2(12, 12, 380, 200))
 	root.add_child(ticker)
-	_prompt = Ui.label(root, "", 20, Ui.IVORY)
-	_prompt.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_prompt.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	_prompt.position.y -= 90
-	_prompt.position.x -= 300
-	_prompt.size.x = 600
-	_prompt.add_theme_color_override("font_outline_color", Color.BLACK)
-	_prompt.add_theme_constant_override("outline_size", 6)
-	var hint := Ui.label(root, "A/D girar  W empuje  SHIFT sobrecarga  CTRL fino  T/G pro/retro  N navegacion  1-6 tiempo  TAB objetivo  F escanear  C estado  rueda zoom", 12, Ui.IVORY_DIM)
-	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	hint.position.y -= 26
-	hint.position.x -= 480
+	_prompt = Ui.banner(root, Ui.SIZE_READOUT, 0)
+	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
+	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_prompt.offset_top = -Ui.CONSOLE_H - 70
+	_prompt.offset_bottom = -Ui.CONSOLE_H - 70
+	Ui.keys(root, "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom")
 
 
 # ---------------------------------------------------------------- input
@@ -313,7 +320,24 @@ func _process(delta: float) -> void:
 	_cam.position = st.pos
 	_cam.zoom = Vector2(zoom, zoom)
 	_stars.set_view((st.pos as Vector2) * 0.02)
+	_place_planets()
 	queue_redraw()
+
+
+## Los planetas son nodos con shader: se colocan aqui y _draw_body solo anade anillos y nombre.
+## Por debajo de PLANET_MIN_PX en pantalla no hay grano que mostrar y se dibuja un punto.
+func _place_planets() -> void:
+	for body: BodyDef in bodies:
+		if body.is_star:
+			continue
+		var planet: Planet = _planets[body.id]
+		var on_screen := body.radius * 2.0 * zoom
+		planet.visible = on_screen >= PLANET_MIN_PX
+		if planet.visible:
+			var pos := Gravity.body_pos(body, st.t)
+			planet.fit(body.radius * 2.0, on_screen)
+			planet.position = pos - planet.size * 0.5
+			planet.light_from(-pos)
 
 
 func _steer(delta: float) -> void:
@@ -721,29 +745,40 @@ func _update_hud() -> void:
 	var ship := Run.ship
 	var t: float = st.t
 	var lines := PackedStringArray()
-	lines.append("DIA %d   TIEMPO %s" % [int(t), Run.time_label(warp_i)])
+	lines.append("Día %d, tiempo %s, racha x%.2f" % [int(t), Run.time_label(warp_i), Run.streak_mult()])
 	if target != null:
 		var tp := _target_pos(t, target)
 		var tv := Gravity.body_vel(target, t) if target is BodyDef else Vector2.ZERO
-		var label: String = target.display_name if target is BodyDef else _poi_name(target).to_upper()
-		lines.append("OBJ  %s%s" % [label, "  [NAV]" if nav_assist else ""])
-		lines.append("DIST %d   VREL %d" % [int((st.pos as Vector2).distance_to(tp)), int(((st.vel as Vector2) - tv).length())])
+		var label: String = target.display_name if target is BodyDef else _poi_name(target)
+		lines.append("Objetivo: %s%s" % [label, " (guiado)" if nav_assist else ""])
+		(_readouts.distance as Label).text = "%d" % int((st.pos as Vector2).distance_to(tp))
+		(_readouts.relative as Label).text = "%d" % int(((st.vel as Vector2) - tv).length())
 		if not _nav.is_empty():
-			lines.append("Vobj %d   falta %d   cierre %d" % [int(_nav.v_want), int(_nav.need), int(_nav.closing)])
-			var phase_name := "COAST"
+			var phase_name := "inercia"
 			match _nav.phase:
-				&"boost": phase_name = "ACELERAR"
-				&"brake": phase_name = "FRENAR"
-				&"capture": phase_name = "CAPTURAR"
-			lines.append("NAV  %s" % phase_name)
+				&"boost": phase_name = "acelerar"
+				&"brake": phase_name = "frenar"
+				&"capture": phase_name = "capturar"
+			lines.append("Guiado: %s a %d, falta %d, cierre %d" % [phase_name, int(_nav.v_want), int(_nav.need), int(_nav.closing)])
 		if _pred.has("closest_dist") and is_finite(float(_pred.closest_dist)):
-			lines.append("MAS CERCA %d en %ds" % [int(_pred.closest_dist), int(_pred.closest_time)])
+			lines.append("Paso más cercano: %d en %d s" % [int(_pred.closest_dist), int(_pred.closest_time)])
 	var left := Run.contract.deadline - t
-	lines.append("PLAZO %d dias" % int(left) if left > 0.0 else "PLAZO VENCIDO")
+	(_readouts.deadline as Label).text = "%d" % maxi(int(left), 0)
+	if left <= 0.0:
+		lines.append("Plazo vencido: el pago baja")
 	if left < 0.0 and not _deadline_warned:
 		_deadline_warned = true
-		Events.toast.emit("Plazo vencido: el pago bajara", Ui.LAMP_WARNING)
+		Events.toast.emit("Plazo vencido: el pago bajará", Ui.LAMP_WARNING)
+	var degraded := PackedStringArray()
+	for ch: StringName in [&"map", &"vision", &"comms"]:
+		if Run.channel(ch) < 0.8:
+			degraded.append("%s %d %%" % [{&"map": "mapa", &"vision": "visión", &"comms": "comunicaciones"}[ch], int(Run.channel(ch) * 100.0)])
+	if not degraded.is_empty():
+		lines.append("Degradado: " + ", ".join(degraded))
 	_info.text = "\n".join(lines)
+	if target == null:
+		(_readouts.distance as Label).text = "-"
+		(_readouts.relative as Label).text = "-"
 	var dv := ship.delta_v()
 	(_gauges.dv as Gauge).set_value(dv / float(st.get("dv0", 1.0)), "%d m/s" % int(dv), dv < 300.0)
 	var cap := Thermal.battery_capacity(ship)
@@ -751,20 +786,9 @@ func _update_hud() -> void:
 	var temp_text := "CALIENTE" if Run.temp > Thermal.HOT else ("HELADO" if Run.temp < Thermal.COLD else "%d%%" % int(Run.temp * 100.0))
 	(_gauges.temp as Gauge).set_value(Run.temp / 1.2, temp_text, Run.temp > Thermal.HOT or Run.temp < Thermal.COLD)
 	(_gauges.od as Gauge).set_value(overdrive, "%d%%" % int(overdrive * 100.0), overdrive > 0.5)
-	var status := "RACHA x%.2f   KITS %d   CHATARRA %d" % [Run.streak_mult(), Run.kits, Run.salvage.size()]
-	var counts := [0, 0, 0, 0]
-	for part: ShipPart in ship.parts:
-		counts[part.health()] += 1
-	var tally: PackedStringArray = PackedStringArray()
-	var labels: Array[String] = ["SANAS", "GASTADAS", "DEFECTUOSAS", "ROTAS"]
-	for i: int in 4:
-		if i > 0 and counts[i] > 0:
-			tally.append("%d %s" % [counts[i], labels[i]])
-	status += "\n" + ("NAVE SANA" if tally.is_empty() else "   ".join(tally))
-	for ch: StringName in [&"map", &"vision", &"comms"]:
-		if Run.channel(ch) < 0.8:
-			status += "   %s %d%%" % [String(ch).to_upper(), int(Run.channel(ch) * 100.0)]
-	_status.text = status
+	# Kits y chatarra van en su tecla; el desgaste por pieza lo dice la matriz de lamparas.
+	_repair_button.text = "Reparar (R): %d kits" % Run.kits
+	_salvage_button.text = "Instalar (I): %d" % Run.salvage.size()
 	var empty := dv < 5.0 and approach == null
 	_rescue_button.visible = empty
 	if empty and not _stranded_offered:
@@ -772,7 +796,7 @@ func _update_hud() -> void:
 		_stranded_card()
 	if approach != null:
 		var rel := ((st.vel as Vector2) - Gravity.body_vel(approach, t)).length() / RocketMath.SPACE_SCALE
-		_prompt.text = "[L] ENTRAR A %s   (%d m/s relativa)" % [approach.display_name.to_upper(), int(rel)]
+		_prompt.text = "Entrar a %s (L), %d m/s relativa" % [approach.display_name, int(rel)]
 		_prompt.add_theme_color_override("font_color", Ui.LAMP_GO if approach == Run.target() else Ui.IVORY)
 	elif flare_warn >= 0.0:
 		_prompt.text = "LLAMARADA EN %d" % maxi(int(flare_timer), 0)
@@ -819,19 +843,14 @@ func _draw() -> void:
 func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 	var r := maxf(body.radius, 3.0 * px)
 	if body.atmosphere > 0.0:
-		draw_circle(pos, r * 1.3, Color(body.atmo_color, body.atmo_color.a * 0.5))
-	draw_circle(pos, r, body.color)
-	var sun := (-pos).angle()
-	var night := PackedVector2Array()
-	for i: int in 17:
-		var a := sun + PI * 0.5 + PI * i / 16.0
-		night.append(pos + Vector2(cos(a), sin(a)) * r)
-	draw_colored_polygon(night, Color(0, 0, 0, 0.55))
+		draw_arc(pos, r * 1.15, 0.0, TAU, 48, Color(body.atmo_color, 0.35), r * 0.12)
+	if body.radius * 2.0 * zoom < PLANET_MIN_PX:
+		draw_circle(pos, r, body.color)
 	if body.hazards.has(&"radiation"):
 		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.25), 2.0 * px)
 	if body.landable:
 		draw_arc(pos, body.radius * 2.6, 0.0, TAU, 48, Color(1, 1, 1, 0.12), px)
-	_text(pos + Vector2(r + 6.0 * px, -4.0 * px), body.display_name, Ui.IVORY if body == Run.target() else Ui.IVORY_DIM, px)
+	_text(pos + Vector2(r * 1.25 + 6.0 * px, -4.0 * px), body.display_name, Ui.IVORY if body == Run.target() else Ui.IVORY_DIM, px)
 
 
 func _draw_poi(poi: Dictionary, px: float) -> void:

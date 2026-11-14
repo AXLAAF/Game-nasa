@@ -40,6 +40,8 @@ var _clouds: Array = []
 var _banner: Label
 var _gauges: Dictionary = {}
 var _info: Label
+var _readouts: Dictionary = {}
+var _pad_drop: float = 0.0
 var _dial: Control
 var _over_timer: float = -1.0
 var _maxq_warned: bool = false
@@ -67,42 +69,43 @@ func _ready() -> void:
 	add_child(_smoke)
 	_rebuild_exhausts()
 	_build_hud()
+	_pad_drop = Run.ship.height_px() * 0.5
 	Run.ship.auto_stage()
 
 
 func _build_hud() -> void:
 	var root := Ui.root(self)
-	var panel := Ui.panel(root)
-	Ui.place(panel, Rect2(12, 12, 260, 0))
-	var col := Ui.vbox(panel, 4)
-	Ui.label(col, "DESPEGUE  %s" % body.display_name.to_upper(), 16, Ui.INFO)
-	_info = Ui.label(col, "", 13)
-	for key: Array in [["orbit", "VELOCIDAD ORBITAL", Ui.LAMP_GO], ["q", "PRESION DINAMICA (Q)", Ui.LAMP_CAUTION], ["stress", "ESTRES ESTRUCTURAL", Ui.LAMP_WARNING], ["throttle", "ACELERADOR", Ui.INFO], ["fuel", "COMBUSTIBLE ETAPA", Ui.IVORY]]:
-		var g := Gauge.new(key[1], key[2])
-		col.add_child(g)
-		_gauges[key[0]] = g
-	Ui.button(col, "Estado [C]", func() -> void: Ui.toggle_status(self))
-	Ui.label(col, "1-4 velocidad de tiempo", 12, Ui.IVORY_DIM)
+	var row := Ui.console(root)
+	for key: Array in [["alt", "Altitud", "km"], ["speed", "Velocidad", "m/s"], ["dv_readout", "Delta-v", "m/s"]]:
+		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 100.0)
+	var well := Ui.well(row)
+	well.custom_minimum_size = Vector2(170, 0)
+	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
+	var gauges := Ui.console_gauges(row, 3)
+	for key: Array in [["orbit", "Vel. orbital", Ui.LAMP_GO], ["q", "Presión (Q)", Ui.LAMP_CAUTION], ["stress", "Estrés", Ui.LAMP_WARNING], ["throttle", "Acelerador (W/S)", Ui.INFO], ["fuel", "Combustible", Ui.IVORY]]:
+		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
+	var actions := Ui.console_keys(row, 1)
+	Ui.compact(Ui.button(actions, "Estado (C)", func() -> void: Ui.toggle_status(self)))
+	Ui.compact(Ui.button(actions, "Ignición o etapa (espacio)", func() -> void:
+		if state == State.COUNTDOWN: _ignite()
+		elif state == State.ASCENT: _try_stage()))
+	Ui.compact(Ui.button(actions, "Abortar (retroceso)", _abort))
+	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(900, 12, 370, 300))
+	Ui.place(ticker, Rect2(12, 12, 380, 200))
 	root.add_child(ticker)
-	_banner = Ui.label(root, "", 34, Ui.IVORY)
-	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_banner.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
-	_banner.position.y = 80
-	_banner.add_theme_color_override("font_outline_color", Color.BLACK)
-	_banner.add_theme_constant_override("outline_size", 8)
+	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
+	# El dial del corredor va abajo a la derecha, fuera de la vertical del cohete.
 	_dial = Control.new()
-	_dial.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	_dial.position += Vector2(-90, -200)
-	_dial.size = Vector2(180, 180)
+	_dial.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	_dial.offset_left = -200
+	_dial.offset_right = -20
+	_dial.offset_top = -Ui.CONSOLE_H - 210
+	_dial.offset_bottom = -Ui.CONSOLE_H - 30
 	_dial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dial.draw.connect(_draw_dial)
 	root.add_child(_dial)
-	var hint := Ui.label(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   ESPACIO ignicion / etapa   C estado   BACKSPACE abortar", 13, Ui.IVORY_DIM)
-	hint.set_anchors_and_offsets_preset(Control.PRESET_CENTER_BOTTOM)
-	hint.position.y -= 28
-	hint.position.x -= 330
+	Ui.keys(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   Espacio ignición o etapa   C estado   Retroceso abortar")
 
 
 func _rebuild_exhausts() -> void:
@@ -453,20 +456,22 @@ func _ship_xf() -> Transform2D:
 	return Transform2D(deg_to_rad(pitch), Vector2.ZERO) * Transform2D(0.0, Vector2(0, height * 0.5))
 
 
+## La nave se dibuja centrada en la camara: el suelo queda media nave por debajo.
 func _world(wx: float, wh: float) -> Vector2:
-	return Vector2((wx - x) * S, -(wh - h) * S)
+	return Vector2((wx - x) * S, -(wh - h) * S + _pad_drop)
 
 
 func _draw() -> void:
 	var view := get_viewport_rect().size / _cam.zoom
 	if h * S < view.y:
 		var ground := _world(x, 0.0).y
-		draw_rect(Rect2(-view.x, ground, view.x * 2.0, view.y), Color(0.12, 0.16, 0.12))
+		draw_rect(Rect2(-view.x, ground, view.x * 2.0, view.y), Color("2b3d30"))
+		draw_rect(Rect2(-view.x, ground, view.x * 2.0, 6.0), Color("486b4c"))
 		for k: int in 40:
 			var hx := -view.x + k * view.x / 20.0
 			var wx := x + hx / S
 			var hill := 40.0 + 30.0 * sin(wx * 0.004) + 20.0 * sin(wx * 0.011 + 1.0)
-			draw_rect(Rect2(hx, ground - hill, view.x / 20.0 + 1.0, hill), Color(0.09, 0.13, 0.12))
+			draw_rect(Rect2(hx, ground - hill, view.x / 20.0 + 1.0, hill), Color("22332c"))
 		var pad := _world(0.0, 0.0)
 		draw_rect(Rect2(pad.x - 90, pad.y - 10, 180, 10), Color(0.35, 0.35, 0.38))
 		draw_rect(Rect2(pad.x - 70, pad.y - 260, 14, 250), Color(0.55, 0.25, 0.15))
@@ -508,9 +513,10 @@ func _update_hud() -> void:
 	var ship := Run.ship
 	var ap := h + (vy * vy / (2.0 * maxf(RocketMath.effective_gravity(body, vx), 0.5)) if vy > 0.0 else 0.0)
 	var warp_txt := "x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])
-	_info.text = "ALT  %6.1f km   Ap %5.1f km\nVEL  %5d m/s  (H %d  V %d)\nDV   %5d m/s   TWR %.2f\nPITCH %3d  objetivo %3d   TIEMPO %s" % [
-		h / 1000.0, ap / 1000.0, int(Vector2(vx, vy).length()), int(vx), int(vy),
-		int(ship.delta_v()), ship.twr(body.surface_gravity), int(pitch), int(target_pitch()), warp_txt]
+	(_readouts.alt as Label).text = "%.1f" % (h / 1000.0)
+	(_readouts.speed as Label).text = "%d" % int(Vector2(vx, vy).length())
+	(_readouts.dv_readout as Label).text = "%d" % int(ship.delta_v())
+	_info.text = "Apoapsis %.1f km\nTWR %.2f\nCabeceo %d, objetivo %d\nTiempo %s" % [ap / 1000.0, ship.twr(body.surface_gravity), int(pitch), int(target_pitch()), warp_txt]
 	(_gauges.orbit as Gauge).set_value(vx / v_orb, "%d%%" % int(vx / v_orb * 100.0))
 	(_gauges.q as Gauge).set_value(q / (Q_SAFE * 1.6), "%.0f kPa" % (q / 1000.0), q > Q_SAFE)
 	(_gauges.stress as Gauge).set_value(stress, "%d%%" % int(stress * 100.0), stress > 0.7)
@@ -542,4 +548,4 @@ func _draw_dial() -> void:
 	_dial.draw_arc(c, r - 6, target - deg_to_rad(8), target + deg_to_rad(8), 12, Color(0.4, 1.0, 0.55, 0.7), 10.0)
 	var a2 := deg_to_rad(pitch) - PI * 0.5
 	_dial.draw_line(c, c + Vector2(cos(a2), sin(a2)) * r, Ui.IVORY, 4.0)
-	_dial.draw_string(Ui.mono(), c + Vector2(-40, r + 22), "CORREDOR", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Ui.IVORY_DIM)
+	_dial.draw_string(Ui.sans(), c + Vector2(-40, r + 22), "Corredor", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)

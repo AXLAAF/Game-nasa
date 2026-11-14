@@ -136,7 +136,7 @@ func _tick_asteroids(delta: float) -> void:
 				Synth.play(&"thud")
 				Juice.hit(0.5)
 				if _lives <= 0:
-					_finish(false, "El casco no aguanto mas golpes")
+					_finish(false, "El casco no aguantó más golpes")
 					return
 	if _time >= 15.0:
 		_finish(true, "Cruzaste el campo. Cristales: %d (+%s)" % [_crystals, Ui.money(_crystals * 40)])
@@ -162,7 +162,7 @@ func _tick_dock(delta: float) -> void:
 			Juice.hit(0.6)
 			_finish(false, "Choque contra el puerto" if not soft else "Desalineado: rebotaste")
 	elif _ship.x < 0.0 or _time > 25.0:
-		_finish(false, "Se acabo el tiempo de acople")
+		_finish(false, "Se acabó el tiempo de acople")
 
 
 func _finish(success: bool, message: String) -> void:
@@ -181,9 +181,9 @@ func _draw_view() -> void:
 	_view.draw_rect(Rect2(Vector2.ZERO, _view.size), Color(0, 0, 0, 0.75))
 	_view.draw_rect(Rect2(o, AREA), Color(0.02, 0.04, 0.09))
 	_view.draw_rect(Rect2(o, AREA), Ui.INFO, false, 2.0)
-	var font := Ui.mono()
-	var title := {&"asteroids": "CAMPO DE ASTEROIDES  W/A/S/D", &"drill": "PERFORACION  ESPACIO en la zona verde", &"dock": "ACOPLE  W/S alinear, D avanzar, A frenar"}
-	_view.draw_string(font, o + Vector2(0, -12), str(title.get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.IVORY)
+	var font := Ui.sans()
+	var title := {&"asteroids": "Campo de asteroides, W/A/S/D", &"drill": "Perforación, espacio en la zona verde", &"dock": "Acople, W/S alinear, D avanzar, A frenar"}
+	_view.draw_string(font, o + Vector2(0, -12), str(title.get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_HEAD, Ui.IVORY)
 	match mode:
 		&"asteroids":
 			_draw_asteroids(o, font)
@@ -192,7 +192,7 @@ func _draw_view() -> void:
 		&"dock":
 			_draw_dock(o, font)
 	if _done:
-		_view.draw_string(font, o + Vector2(0, AREA.y + 34), _msg, HORIZONTAL_ALIGNMENT_LEFT, -1, 20, Ui.IVORY)
+		_view.draw_string(font, o + Vector2(0, AREA.y + 34), _msg, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY)
 
 
 func _draw_asteroids(o: Vector2, font: Font) -> void:
@@ -211,7 +211,7 @@ func _draw_asteroids(o: Vector2, font: Font) -> void:
 	if _invuln <= 0.0 or int(_time * 12.0) % 2 == 0:
 		_view.draw_colored_polygon(PackedVector2Array([ship + Vector2(16, 0), ship + Vector2(-10, -9), ship + Vector2(-10, 9)]), Ui.INFO)
 		_view.draw_circle(ship + Vector2(-14, 0), 4.0 + randf() * 3.0, Color(2.5, 1.2, 0.3))
-	_view.draw_string(font, o + Vector2(12, 24), "Casco %s   Tiempo %d" % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.IVORY)
+	_view.draw_string(font, o + Vector2(12, 24), "Casco %s   Tiempo %d" % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY)
 
 
 func _draw_drill(o: Vector2, font: Font) -> void:
@@ -220,7 +220,7 @@ func _draw_drill(o: Vector2, font: Font) -> void:
 	_view.draw_rect(Rect2(bar.position.x + bar.size.x * _zone.x, bar.position.y, bar.size.x * (_zone.y - _zone.x), bar.size.y), Color(0.2, 0.9 + _flash, 0.4))
 	var x := bar.position.x + bar.size.x * _needle
 	_view.draw_line(Vector2(x, bar.position.y - 20), Vector2(x, bar.end.y + 20), Color(2.0, 1.8, 1.0), 4.0)
-	_view.draw_string(font, o + Vector2(60, 60), "Ronda %d/3   Limpias %d" % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, 18, Ui.IVORY)
+	_view.draw_string(font, o + Vector2(60, 60), "Ronda %d/3   Limpias %d" % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_HEAD, Ui.IVORY)
 
 
 func _draw_dock(o: Vector2, font: Font) -> void:
@@ -232,4 +232,4 @@ func _draw_dock(o: Vector2, font: Font) -> void:
 	_view.draw_rect(Rect2(ship + Vector2(-24, -10), Vector2(40, 20)), Color(0.8, 0.85, 0.9))
 	_view.draw_rect(Rect2(ship + Vector2(16, -5), Vector2(6, 10)), Ui.INFO)
 	var speed := _vel.length()
-	_view.draw_string(font, o + Vector2(12, 24), "Velocidad %d  (max 70)   Desvio %d" % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, 16, Ui.LAMP_WARNING if speed > 70 else Ui.IVORY)
+	_view.draw_string(font, o + Vector2(12, 24), "Velocidad %d (máx. 70)   Desvío %d" % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.LAMP_WARNING if speed > 70 else Ui.IVORY)

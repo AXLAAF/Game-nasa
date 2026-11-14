@@ -17,13 +17,13 @@ func run(scene_tree: SceneTree) -> void:
 	await _shot("1_hangar")
 	Run.debug_setup()
 	for phase: StringName in [&"assembly", &"launch", &"space"]:
-		Router.go(phase)
+		await _go(phase)
 		await _wait(2.5)
 		await _shot("%d_%s" % [Tutorial.ORDER.find(phase) + 1, phase])
 	Card.malfunction(Run.ship.parts[0])
 	await _wait(0.6)
 	await _shot("7_carta")
-	Router.go(&"descent")
+	await _go(&"descent")
 	await _wait(2.0)
 	await _shot("5_descent_entrada")
 	tree.get_first_node_in_group("phase")._commit()
@@ -33,15 +33,22 @@ func run(scene_tree: SceneTree) -> void:
 	await _shot("5_descent_vuelo")
 	Run.outcome = &"delivered"
 	Run.grade = "A"
-	Router.go(&"debrief")
+	await _go(&"debrief")
 	await _wait(5.0)
 	await _shot("6_debrief")
-	Router.go(&"hangar")
+	await _go(&"hangar")
 	await _wait(1.0)
 	Tutorial.replay()
 	await _wait(0.5)
 	await _shot("8_tutorial")
 	print("SHOTS ", ProjectSettings.globalize_path(_dir))
+
+
+## Router ignora go() mientras dura un fundido: se espera a que termine.
+func _go(phase: StringName) -> void:
+	while Router._busy:
+		await tree.process_frame
+	Router.go(phase)
 
 
 func _shot(name: String) -> void:
