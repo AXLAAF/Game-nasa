@@ -12,6 +12,7 @@ Diriges una agencia espacial privada al borde de la quiebra con tripulacion robo
 - **Interfaz 2.5D, Naves Modulares y Vista Orbital KSP:** `docs/DISEÑO-UI-NAVES-25D.md`
 - **Mockups visuales 1280x720:** `docs/mockups/mockup_1_dique_modular_25d.png` y `docs/mockups/mockup_2_hud_ftl_ksp_orbital.png`
 - **Especificacion Fisica y Catalogo NASA:** `docs/MECANICAS-REFERENCIA.md`
+- **Investigacion Tecnica de Naves e Incidentes NASA/NOAA:** `docs/INVESTIGACION-NAVES-INCIDENTES-NASA.md`
 - **Arte:** `assets/` inicia vacio para producir recursos propios pixel art 2.5D sin dependencias externas.
 
 ## Fuentes Oficiales de Datos Abiertos (NASA & Partner Data)

@@ -157,6 +157,7 @@ Space/
 │   ├── GDD-REMAKE-MASTER.md    # Copia canonica del documento maestro
 │   ├── DISEÑO-UI-NAVES-25D.md  # Interfaz 2.5D, nave base evolucionable LVL 1..5 y vista KSP + FTL
 │   ├── MECANICAS-REFERENCIA.md # Formulas, matriz de daño, perks NASA y guia de refs visuales (sin codigo heredado)
+│   ├── INVESTIGACION-NAVES-INCIDENTES-NASA.md # Respaldo tecnico NASA/NOAA sobre subsistemas e incidentes reales
 │   └── mockups/                # Mockups SVG/PNG 1280x720 (Dique Modular 2.5D + HUD FTL/KSP)
 ├── assets/
 │   └── README.md               # Directorio limpio para arte propio (Directorio limpio para arte 2.5D propio)
