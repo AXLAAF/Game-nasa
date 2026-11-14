@@ -37,8 +37,8 @@ func _draw() -> void:
 	var ink := Ui.BAKELITE if on_enamel else Ui.IVORY
 	draw_string(Ui.legend_font(), Vector2(0, 13), title, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE if on_enamel else Ui.IVORY_DIM)
 	draw_string(Ui.mono(), Vector2(0, 13), ("! " if danger else "") + text, HORIZONTAL_ALIGNMENT_RIGHT, size.x, Ui.SIZE_LEGEND, ink)
-	draw_rect(bar, Ui.BAKELITE)
-	draw_rect(Rect2(bar.position, Vector2(bar.size.x, 3)), Color("0b0c0d"))
+	draw_rect(bar, Color("0b0c0d"))
+	draw_rect(bar, Ui.BAKELITE_EDGE, false, 1.0)
 	var c := color
 	if danger and (Profile.reduced_motion or int(Time.get_ticks_msec() / 180.0) % 2 == 0):
 		c = Ui.LAMP_WARNING

@@ -46,7 +46,11 @@ func run(scene_tree: SceneTree) -> void:
 
 func _shot(name: String) -> void:
 	await RenderingServer.frame_post_draw
-	tree.root.get_texture().get_image().save_png(_dir.path_join(name + ".png"))
+	var image := tree.root.get_texture().get_image()
+	if tree.root.use_hdr_2d:
+		image.convert(Image.FORMAT_RGBA8)
+		image.linear_to_srgb() # con HDR 2D la textura del viewport es lineal; la pantalla no
+	image.save_png(_dir.path_join(name + ".png"))
 
 
 func _wait(seconds: float) -> void:

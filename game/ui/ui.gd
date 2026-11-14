@@ -33,6 +33,7 @@ const SIZE_HERO := 36
 
 static var _theme: Theme
 static var _legend: FontVariation
+static var _mono: FontVariation
 
 
 static func sans() -> Font:
@@ -44,8 +45,12 @@ static func bold() -> Font:
 
 
 ## Solo para cifras en ventanas de lectura.
+## FontVariation: un FontFile crudo sale como bloques con draw_string en este motor.
 static func mono() -> Font:
-	return load("res://assets/fonts/B612Mono-Regular.ttf")
+	if _mono == null:
+		_mono = FontVariation.new()
+		_mono.base_font = load("res://assets/fonts/B612Mono-Regular.ttf")
+	return _mono
 
 
 ## Leyenda grabada: negrita con un punto de espaciado. Unico uso de mayusculas.
@@ -149,6 +154,18 @@ static func primary(b: Button) -> Button:
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
 		b.add_theme_color_override(state, BAKELITE)
 	b.add_theme_font_override("font", bold())
+	return b
+
+
+## Opcion elegida en un selector (seguro, calidad): borde marfil y negrita.
+static func mark_selected(b: Button, on: bool) -> Button:
+	if on:
+		var style := _key(BAKELITE_RAISED, IVORY)
+		style.set_border_width_all(2)
+		style.border_width_bottom = 4
+		b.add_theme_stylebox_override("normal", style)
+		b.add_theme_font_override("font", bold())
+	b.add_theme_color_override("font_color", IVORY if on else IVORY_DIM)
 	return b
 
 
