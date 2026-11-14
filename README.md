@@ -8,6 +8,13 @@ Diriges una agencia espacial privada al borde de la quiebra con tripulacion robo
 
 ## Documentacion
 
+- **Planificacion Numerada del Hackathon (`docs/00` a `docs/05`):**
+  - `docs/00-INDICE-Y-PLAN-MAESTRO-HACKATHON.md` (indice maestro, horarios, roles, Go/No-Go y riesgos)
+  - `docs/01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md` (`Orbital Mule Mk-I`, 7 hardpoints y tablas `LVL 1..5`)
+  - `docs/02-SISTEMA-ORBITAL-KSP-25D-Y-FISICA.md` (orbita `AP/PE`, nodos $\Delta v$, NavBall, corredor atmosferico y Radar 3D)
+  - `docs/03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md` (6 salas, esclusas, *Manning Bonus*, controles 1P/2-4P y 10 crisis de 5 s)
+  - `docs/04-GUION-MISIONES-Y-CONTRATOS-NASA.md` (4 contratos NASA/JPL, economia de deuda y *Debrief Causal*)
+  - `docs/05-ARQUITECTURA-GODOT-ESCENAS-Y-SHADERS.md` (escenas `.tscn`, shaders WebGL2 y guion video pitch <= 30 s)
 - **GDD Maestro:** `docs/GDD-REMAKE-MASTER.md`
 - **Interfaz 2.5D, Naves Modulares y Vista Orbital KSP:** `docs/DISEÑO-UI-NAVES-25D.md`
 - **Mockups visuales 1280x720:** `docs/mockups/mockup_1_dique_modular_25d.png` y `docs/mockups/mockup_2_hud_ftl_ksp_orbital.png`

@@ -154,6 +154,12 @@ Space/
 ├── project.godot               # Godot 4.7, gl_compatibility, 1280x720, zero Jolt
 ├── AGENTS.md                   # Reglas del proyecto (Godot 4.7 Web, cero JetBrains Mono, cero emojis)
 ├── docs/
+│   ├── 00-INDICE-Y-PLAN-MAESTRO-HACKATHON.md # Indice maestro, horarios, roles, Go/No-Go y trampas
+│   ├── 01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md # Chasis Orbital Mule Mk-I, 7 sockets y evolucion LVL 1..5
+│   ├── 02-SISTEMA-ORBITAL-KSP-25D-Y-FISICA.md # Conicas AP/PE, nodos Delta-V, NavBall 2.5D y Radar 3D
+│   ├── 03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md # 6 salas, esclusas, controles 1P/2-4P y 10 tarjetas de 5 s
+│   ├── 04-GUION-MISIONES-Y-CONTRATOS-NASA.md # Guion de los 4 contratos NASA, deuda y Debrief Causal
+│   ├── 05-ARQUITECTURA-GODOT-ESCENAS-Y-SHADERS.md # Escenas .tscn, shaders WebGL2 y guion video pitch <=30 s
 │   ├── GDD-REMAKE-MASTER.md    # Copia canonica del documento maestro
 │   ├── DISEÑO-UI-NAVES-25D.md  # Interfaz 2.5D, nave base evolucionable LVL 1..5 y vista KSP + FTL
 │   ├── MECANICAS-REFERENCIA.md # Formulas, matriz de daño, perks NASA y guia de refs visuales (sin codigo heredado)
