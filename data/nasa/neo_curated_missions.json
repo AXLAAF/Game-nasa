@@ -1,0 +1,54 @@
+{
+  "source": "NASA/JPL Solar System Dynamics - Small-Body Database (SBDB) & Close-Approach Data (CAD)",
+  "source_url": "https://ssd-api.jpl.nasa.gov/doc/sbdb.html",
+  "asteroids": [
+    {
+      "id": "101955_bennu",
+      "name": "101955 Bennu",
+      "mission_reference": "OSIRIS-REx",
+      "diameter_km": 0.492,
+      "semi_major_axis_au": 1.126,
+      "taxonomy": "B-type (carbonaceous)",
+      "relative_velocity_km_s": 5.9,
+      "is_pha": true,
+      "science_bonus": 140,
+      "hazard_energy_j": 6500.0
+    },
+    {
+      "id": "65803_didymos",
+      "name": "65803 Didymos / Dimorphos",
+      "mission_reference": "DART Planetary Defense",
+      "diameter_km": 0.780,
+      "semi_major_axis_au": 1.643,
+      "taxonomy": "S-type (silicate)",
+      "relative_velocity_km_s": 6.6,
+      "is_pha": true,
+      "science_bonus": 180,
+      "hazard_energy_j": 11500.0
+    },
+    {
+      "id": "433_eros",
+      "name": "433 Eros",
+      "mission_reference": "NEAR Shoemaker",
+      "diameter_km": 16.84,
+      "semi_major_axis_au": 1.458,
+      "taxonomy": "S-type",
+      "relative_velocity_km_s": 5.1,
+      "is_pha": false,
+      "science_bonus": 120,
+      "hazard_energy_j": 5200.0
+    },
+    {
+      "id": "16_psyche",
+      "name": "16 Psyche",
+      "mission_reference": "NASA Psyche Mission",
+      "diameter_km": 222.0,
+      "semi_major_axis_au": 2.92,
+      "taxonomy": "M-type (metallic)",
+      "relative_velocity_km_s": 12.4,
+      "is_pha": false,
+      "science_bonus": 260,
+      "hazard_energy_j": 18000.0
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "source": "NASA Orbital Debris Program Office (ODPO) & CelesTrak GP Catalog",
+  "source_url": "https://orbitaldebris.jsc.nasa.gov/",
+  "regimes": [
+    {
+      "id": "leo_iss_420",
+      "name": "Orbita ISS (420 km)",
+      "altitude_km": 420,
+      "inclination_deg": 51.6,
+      "relative_speed_km_s": 7.66,
+      "debris_density": "low",
+      "radar_lead_time_s": 12.0,
+      "impact_energy_j": 3200.0
+    },
+    {
+      "id": "leo_cosmos_iridium_790",
+      "name": "Cinturon Cosmos-Iridium (790 km)",
+      "altitude_km": 790,
+      "inclination_deg": 74.0,
+      "relative_speed_km_s": 11.7,
+      "debris_density": "medium",
+      "radar_lead_time_s": 10.0,
+      "impact_energy_j": 8800.0
+    },
+    {
+      "id": "leo_fengyun_850",
+      "name": "Nube de Fragmentos Fengyun-1C (850 km)",
+      "altitude_km": 850,
+      "inclination_deg": 98.9,
+      "relative_speed_km_s": 14.2,
+      "debris_density": "high",
+      "radar_lead_time_s": 8.0,
+      "impact_energy_j": 16500.0
+    }
+  ]
+}

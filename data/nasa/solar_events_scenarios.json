@@ -1,0 +1,54 @@
+{
+  "source": "NASA DONKI (Space Weather Database Of Notifications, Knowledge, Information)",
+  "source_url": "https://api.nasa.gov/",
+  "events": [
+    {
+      "id": "donki_moderate_m5",
+      "title": "Fulguracion Solar Clase M5.4",
+      "date_ref": "2024-03-28",
+      "class_type": "M5.4",
+      "cme_speed_km_s": 720,
+      "kp_index": 5,
+      "warning_s": 10.0,
+      "effect": "Interferencia parcial en Comms y subida termica en flancos",
+      "target_zone": "radial",
+      "impact_energy_j": 3500.0
+    },
+    {
+      "id": "donki_sep_2017_x9",
+      "title": "Evento SEP Solar Septiembre 2017 (X9.3)",
+      "date_ref": "2017-09-06",
+      "class_type": "X9.3",
+      "cme_speed_km_s": 1570,
+      "kp_index": 8,
+      "warning_s": 12.0,
+      "effect": "Reinicio de avionica (SEU) en Centro y perdida temporal de Radar si no activan Storm Safe Mode",
+      "target_zone": "middle",
+      "impact_energy_j": 9200.0
+    },
+    {
+      "id": "donki_may_2024_g5",
+      "title": "Tormenta Geomagnética Extrema G5 (Mayo 2024)",
+      "date_ref": "2024-05-11",
+      "class_type": "X8.7",
+      "cme_speed_km_s": 1800,
+      "kp_index": 9,
+      "warning_s": 14.0,
+      "effect": "Sobrecarga electrica en paneles solares y riesgo de incendio en Reactor",
+      "target_zone": "middle",
+      "impact_energy_j": 14500.0
+    },
+    {
+      "id": "donki_halloween_2003",
+      "title": "Tormenta de Halloween 2003 (X17+)",
+      "date_ref": "2003-10-28",
+      "class_type": "X17.2",
+      "cme_speed_km_s": 2459,
+      "kp_index": 9,
+      "warning_s": 14.0,
+      "effect": "Daño critico en sensores de Proa y degradacion severa de paneles sin escudo/telemetria analogica",
+      "target_zone": "top",
+      "impact_energy_j": 21000.0
+    }
+  ]
+}
