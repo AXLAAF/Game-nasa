@@ -20,6 +20,7 @@
 | `BRAND` | [BRANDING-MARGIN-ZERO.md](BRANDING-MARGIN-ZERO.md) | Identidad `Margin Zero: Deuda Orbital`, nave `MZ-1 LIBERTY` y programa de vuelos `LIBERTY-1` a `LIBERTY-N` | Referencia |
 | `SIM` | [MECANICAS-REFERENCIA.md](MECANICAS-REFERENCIA.md) | Ecuaciones matemáticas de propulsión, balance térmico, `TakeoffRisk`, `DamageMatrix` y 12 Perks NASA | Referencia |
 | `NASA` | [INVESTIGACION-NAVES-INCIDENTES-NASA.md](INVESTIGACION-NAVES-INCIDENTES-NASA.md) | Respaldo institucional NASA/NOAA/ODPO/JPL sobre los 7 subsistemas, 10 incidentes históricos y física real | Referencia |
+| `PARTES` | [CATALOGO-PARTES-NAVES-REALES.md](CATALOGO-PARTES-NAVES-REALES.md) | Equivalentes reales NASA/aeroespaciales de los 12 perks, 9 módulos, 14 piezas de lanzador y hardware de las 6 salas | Referencia |
 
 ## 2. Cronograma Operativo del Hackathon y Puertas de Salida (Go/No-Go)
 
