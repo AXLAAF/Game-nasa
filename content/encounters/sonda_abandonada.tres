@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_xf3dp"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_c5vin"]
+
+[sub_resource type="Resource" id="Resource_wx63r"]
+script = ExtResource("1_xf3dp")
+label = "Acoplar y saquear"
+odds = 0.0
+win = {
+"credits": 150,
+"salvage": 1
+}
+lose = {
+"rand_break": true
+}
+win_text = "Te llevas piezas."
+lose_text = "Golpeaste la sonda."
+minigame = &"dock"
+
+[sub_resource type="Resource" id="Resource_ex0hf"]
+script = ExtResource("1_xf3dp")
+label = "Arrancar paneles con el brazo"
+odds = 0.65
+win = {
+"battery": 0.5,
+"salvage": 1
+}
+lose = {
+"vision": -0.2
+}
+win_text = "Bateria y chatarra."
+lose_text = "Un panel rayo las camaras."
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_xf3dp")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_c5vin")
+id = &"sonda_abandonada"
+title = "Sonda abandonada"
+text = "Una sonda vieja de otra mision. Paneles intactos y una caja negra."
+poi = &"derelict"
+choices = Array[ExtResource("1_xf3dp")]([SubResource("Resource_wx63r"), SubResource("Resource_ex0hf"), SubResource("Resource_3tbei")])

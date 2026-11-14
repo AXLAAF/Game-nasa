@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_ekvq6"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_rvtil"]
+
+[sub_resource type="Resource" id="Resource_u1moo"]
+script = ExtResource("1_ekvq6")
+label = "Abordar a lo loco"
+odds = 0.55
+win = {
+"fuel": 0.3,
+"kits": 1,
+"salvage": 2
+}
+lose = {
+"rand_break": true,
+"vision": -0.3
+}
+win_text = "Botin completo."
+lose_text = "Algo exploto dentro."
+
+[sub_resource type="Resource" id="Resource_f2k4f"]
+script = ExtResource("1_ekvq6")
+label = "Acoplar con cuidado"
+odds = 0.0
+win = {
+"fuel": 0.4,
+"kits": 1
+}
+lose = {
+"rand_break": true
+}
+win_text = "Combustible y un kit."
+lose_text = "Mal acople."
+minigame = &"dock"
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_ekvq6")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_rvtil")
+id = &"estacion_fantasma"
+title = "Estacion fantasma"
+text = "Una estacion apagada gira lentamente. Las luces de emergencia parpadean."
+poi = &"derelict"
+rarity = 1
+choices = Array[ExtResource("1_ekvq6")]([SubResource("Resource_u1moo"), SubResource("Resource_f2k4f"), SubResource("Resource_3tbei")])

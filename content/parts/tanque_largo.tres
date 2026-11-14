@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_052rs"]
+
+[resource]
+script = ExtResource("1_052rs")
+id = &"tanque_largo"
+display_name = "Tanque largo"
+description = "9 t de propelente."
+cost = 210
+fuel = 9.0
+size = Vector2(40, 80)
+color = Color(0.9, 0.9, 0.92, 1)

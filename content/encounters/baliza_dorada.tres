@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_v3im6"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_a73sj"]
+
+[sub_resource type="Resource" id="Resource_jaaqc"]
+script = ExtResource("1_v3im6")
+label = "TODO O NADA"
+odds = 0.35
+win = {
+"boxes": 3,
+"credits": 2500
+}
+lose = {
+"explode": true
+}
+win_text = "PREMIO MAYOR."
+lose_text = "La baliza era una mina."
+
+[sub_resource type="Resource" id="Resource_2lj15"]
+script = ExtResource("1_v3im6")
+label = "Tomar lo seguro"
+win = {
+"credits": 400
+}
+
+[resource]
+script = ExtResource("2_a73sj")
+id = &"baliza_dorada"
+title = "Baliza dorada"
+text = "Una baliza brilla en dorado. Nadie sabe quien la puso. Todo o nada."
+rarity = 2
+choices = Array[ExtResource("1_v3im6")]([SubResource("Resource_jaaqc"), SubResource("Resource_2lj15")])

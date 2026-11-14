@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_xvex0"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_bylel"]
+
+[sub_resource type="Resource" id="Resource_j502e"]
+script = ExtResource("1_xvex0")
+label = "Ignorarlo"
+odds = 0.7
+lose = {
+"rand_break": true
+}
+win_text = "Era nada."
+lose_text = "Era algo."
+
+[sub_resource type="Resource" id="Resource_p5wh4"]
+script = ExtResource("1_xvex0")
+label = "Revisar a fondo"
+cost = {
+"battery": -0.1
+}
+win = {
+"wear": 0.05
+}
+win_text = "Ajustado."
+
+[resource]
+script = ExtResource("2_bylel")
+id = &"falla_misteriosa"
+title = "Falla misteriosa"
+text = "Algo en %part% hace un ruido que no deberia."
+choices = Array[ExtResource("1_xvex0")]([SubResource("Resource_j502e"), SubResource("Resource_p5wh4")])

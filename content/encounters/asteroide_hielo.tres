@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_gfrrs"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_gsg5o"]
+
+[sub_resource type="Resource" id="Resource_uk3tq"]
+script = ExtResource("1_gfrrs")
+label = "Perforar"
+odds = 0.0
+win = {
+"fuel": 0.25,
+"science": 1
+}
+lose = {
+"rand_break": true
+}
+win_text = "Tanques un poco mas llenos."
+lose_text = "El taladro reboto contra la nave."
+minigame = &"drill"
+
+[sub_resource type="Resource" id="Resource_th48e"]
+script = ExtResource("1_gfrrs")
+label = "Escanear al pasar"
+win = {
+"science": 1
+}
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_gfrrs")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_gsg5o")
+id = &"asteroide_hielo"
+title = "Asteroide de hielo"
+text = "Una roca cubierta de hielo sucio. Hielo = combustible, si sabes perforar."
+poi = &"asteroid"
+choices = Array[ExtResource("1_gfrrs")]([SubResource("Resource_uk3tq"), SubResource("Resource_th48e"), SubResource("Resource_3tbei")])

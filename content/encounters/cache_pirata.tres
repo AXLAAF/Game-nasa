@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_ch"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_ch"]
+
+[sub_resource type="Resource" id="Resource_a"]
+script = ExtResource("1_ch")
+label = "Forzar la esclusa"
+odds = 0.55
+win = {
+"credits": 700,
+"kits": 1
+}
+lose = {
+"rand_break": true,
+"battery": -0.3
+}
+win_text = "Caja fuerte: creditos y un kit."
+lose_text = "Una trampa de gas corto los circuitos."
+
+[sub_resource type="Resource" id="Resource_b"]
+script = ExtResource("1_ch")
+label = "Remolcar el casco"
+odds = 0.75
+win = {
+"salvage": 1,
+"credits": 180
+}
+lose = {
+"wear": 0.2
+}
+win_text = "Arrancaste un modulo util."
+lose_text = "El casco se deshizo al remolcar."
+
+[sub_resource type="Resource" id="Resource_c"]
+script = ExtResource("1_ch")
+label = "Dejarlo"
+
+[resource]
+script = ExtResource("2_ch")
+id = &"cache_pirata"
+title = "Cache pirata"
+text = "Una nave sin marcas flota a la deriva. Alguien escondio botin aqui."
+poi = &"derelict"
+rarity = 1
+choices = Array[ExtResource("1_ch")]([SubResource("Resource_a"), SubResource("Resource_b"), SubResource("Resource_c")])

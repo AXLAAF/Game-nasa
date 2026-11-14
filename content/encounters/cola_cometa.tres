@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_5khg8"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_c3qw3"]
+
+[sub_resource type="Resource" id="Resource_0pdck"]
+script = ExtResource("1_5khg8")
+label = "Recoger hielo"
+odds = 0.6
+win = {
+"fuel": 0.35,
+"science": 2
+}
+lose = {
+"rand_break": true,
+"vision": -0.2
+}
+win_text = "Tanques cargados."
+lose_text = "Granizo contra el casco."
+
+[sub_resource type="Resource" id="Resource_xis50"]
+script = ExtResource("1_5khg8")
+label = "Fotografiar"
+win = {
+"science": 1
+}
+
+[resource]
+script = ExtResource("2_c3qw3")
+id = &"cola_cometa"
+title = "Cola de cometa"
+text = "Hielo y polvo brillante. Combustible gratis y peligro gratis."
+poi = &"comet"
+choices = Array[ExtResource("1_5khg8")]([SubResource("Resource_0pdck"), SubResource("Resource_xis50")])

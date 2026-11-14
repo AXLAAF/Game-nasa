@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_cc"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_cc"]
+
+[sub_resource type="Resource" id="Resource_a"]
+script = ExtResource("1_cc")
+label = "Recoger hielo"
+odds = 0.6
+win = {
+"fuel": 0.25,
+"science": 2
+}
+lose = {
+"heat": -0.35,
+"wear": 0.2
+}
+win_text = "Propelente gratis y muestras."
+lose_text = "El frio agarroto las lineas."
+
+[sub_resource type="Resource" id="Resource_b"]
+script = ExtResource("1_cc")
+label = "Vender coordenadas"
+odds = 1.0
+win = {
+"credits": 320
+}
+win_text = "La agencia pago por la ruta."
+
+[sub_resource type="Resource" id="Resource_c"]
+script = ExtResource("1_cc")
+label = "Ignorar"
+
+[resource]
+script = ExtResource("2_cc")
+id = &"cometa_cristal"
+title = "Cometa de cristal"
+text = "Un nucleo brillante arrastra una cola de hielo puro."
+poi = &"comet"
+rarity = 1
+choices = Array[ExtResource("1_cc")]([SubResource("Resource_a"), SubResource("Resource_b"), SubResource("Resource_c")])

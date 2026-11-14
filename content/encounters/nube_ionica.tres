@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_ni"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_ni"]
+
+[sub_resource type="Resource" id="Resource_a"]
+script = ExtResource("1_ni")
+label = "Cargar baterias"
+odds = 0.65
+win = {
+"battery": 0.8,
+"science": 1
+}
+lose = {
+"heat": 0.25,
+"rand_break": true
+}
+win_text = "La nube te cargo las celdas."
+lose_text = "Una descarga frio la electronica."
+
+[sub_resource type="Resource" id="Resource_b"]
+script = ExtResource("1_ni")
+label = "Tomar lecturas"
+odds = 0.85
+win = {
+"science": 2,
+"credits": 120
+}
+lose = {
+"map": -0.15
+}
+win_text = "Datos limpios para la agencia."
+lose_text = "El sensor se saturo."
+
+[sub_resource type="Resource" id="Resource_c"]
+script = ExtResource("1_ni")
+label = "Esquivar"
+
+[resource]
+script = ExtResource("2_ni")
+id = &"nube_ionica"
+title = "Nube ionica"
+text = "Una mancha brillante de plasma se mueve sola. Carga y quema por igual."
+poi = &"signal"
+rarity = 0
+choices = Array[ExtResource("1_ni")]([SubResource("Resource_a"), SubResource("Resource_b"), SubResource("Resource_c")])

@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_gota"]
+
+[resource]
+script = ExtResource("1_gota")
+id = &"tanque_gota"
+display_name = "Tanque gota"
+description = "Tanque barato y fragil. 6 t de propelente si no se raja."
+cost = 95
+mass = 0.55
+fuel = 6.0
+size = Vector2(36, 48)
+color = Color(0.78, 0.82, 0.88, 1)
+fragility = 1.35

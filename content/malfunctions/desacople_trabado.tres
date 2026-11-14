@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_bxcbw"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_lqbhn"]
+
+[sub_resource type="Resource" id="Resource_jloha"]
+script = ExtResource("1_bxcbw")
+label = "Pernos de respaldo"
+odds = 0.75
+lose = {
+"wear": 0.3
+}
+win_text = "La etapa se solto."
+lose_text = "Siguen trabados."
+
+[sub_resource type="Resource" id="Resource_c8c3r"]
+script = ExtResource("1_bxcbw")
+label = "Sacudir con los motores"
+odds = 0.55
+lose = {
+"rand_break": true
+}
+win_text = "Se solto de un tiron."
+lose_text = "Algo mas se rompio."
+
+[resource]
+script = ExtResource("2_lqbhn")
+id = &"desacople_trabado"
+title = "Desacoplador trabado"
+text = "%part% no suelta la etapa. Peso muerto colgando."
+kinds = Array[StringName]([&"decoupler"])
+choices = Array[ExtResource("1_bxcbw")]([SubResource("Resource_jloha"), SubResource("Resource_c8c3r")])

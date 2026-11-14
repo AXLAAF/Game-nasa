@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_1fjug"]
+
+[resource]
+script = ExtResource("1_1fjug")
+id = &"sol"
+display_name = "Sol"
+description = "No te acerques."
+color = Color(3, 2.2, 1, 1)
+is_star = true
+radius = 70.0
+mu = 28800000.0
+atmosphere = 0.0
+landable = false

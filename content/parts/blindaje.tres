@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_n8mty"]
+
+[resource]
+script = ExtResource("1_n8mty")
+id = &"blindaje"
+display_name = "Blindaje anti radiacion"
+description = "Protege electronica de llamaradas y cinturones de radiacion."
+kind = &"shielding"
+cost = 200
+mass = 0.6
+size = Vector2(40, 12)
+color = Color(0.55, 0.55, 0.6, 1)
+rad_resist = 0.6

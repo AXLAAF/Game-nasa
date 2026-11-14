@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_h84lu"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_i7jen"]
+
+[sub_resource type="Resource" id="Resource_qond2"]
+script = ExtResource("1_h84lu")
+label = "Pasada rasante"
+odds = 0.7
+win = {
+"fuel": 0.08,
+"science": 2
+}
+lose = {
+"heat": 0.2,
+"rand_break": true
+}
+win_text = "Fotos espectaculares."
+lose_text = "Rozaste un pico."
+
+[sub_resource type="Resource" id="Resource_1u1vs"]
+script = ExtResource("1_h84lu")
+label = "Escanear crateres"
+cost = {
+"battery": -0.2
+}
+win = {
+"science": 1
+}
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_h84lu")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_i7jen")
+id = &"sobrevuelo_lunar"
+title = "Sobrevuelo"
+text = "Pasas rozando una luna. Los crateres guardan secretos."
+poi = &"moon"
+choices = Array[ExtResource("1_h84lu")]([SubResource("Resource_qond2"), SubResource("Resource_1u1vs"), SubResource("Resource_3tbei")])

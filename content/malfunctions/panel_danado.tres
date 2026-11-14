@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_2pw54"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_jwf0d"]
+
+[sub_resource type="Resource" id="Resource_joos0"]
+script = ExtResource("1_2pw54")
+label = "Recalibrar el mecanismo"
+odds = 0.6
+lose = {
+"break": true
+}
+win_text = "Vuelve a su sitio."
+lose_text = "Se partio."
+
+[sub_resource type="Resource" id="Resource_0sj28"]
+script = ExtResource("1_2pw54")
+label = "Replegarlo"
+win = {
+"wear": 0.3
+}
+
+[resource]
+script = ExtResource("2_jwf0d")
+id = &"panel_danado"
+title = "Panel danado"
+text = "%part% se dobla y pierde rendimiento."
+kinds = Array[StringName]([&"solar", &"radiator"])
+choices = Array[ExtResource("1_2pw54")]([SubResource("Resource_joos0"), SubResource("Resource_0sj28")])

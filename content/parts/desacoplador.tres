@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_cdru7"]
+
+[resource]
+script = ExtResource("1_cdru7")
+id = &"desacoplador"
+display_name = "Desacoplador"
+description = "Separa la etapa de abajo. Lo de abajo se tira con el."
+kind = &"decoupler"
+cost = 60
+mass = 0.1
+size = Vector2(40, 8)
+color = Color(0.2, 0.2, 0.2, 1)
+fragility = 1.3

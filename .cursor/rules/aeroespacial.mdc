@@ -1,0 +1,19 @@
+---
+description: Ingeniería aeroespacial y diseño de misiones (delta-v, órbitas, masa, energía, datos, presupuesto, instrumentos, balance de contenido) para el reto NASA
+globs: content/**,game/sim/**,game/data/**
+alwaysApply: false
+---
+
+# Ingeniería aeroespacial (reto NASA Space Mission Design)
+
+Sigue [SKILL.md](.claude/skills/aerospace-mission-design/SKILL.md) y sus referencias
+[physics.md](.claude/skills/aerospace-mission-design/references/physics.md) y
+[game-mapping.md](.claude/skills/aerospace-mission-design/references/game-mapping.md).
+
+## Resumen
+
+- Toda decisión cuesta en otro subsistema (masa, energía, Δv, datos, dinero, tiempo, fiabilidad): dilo siempre.
+- Física real primero, escala de juego después; etiqueta cada número `[real]` o `[juego]`.
+- Cada escenario debe admitir al menos 2 diseños viables distintos.
+- El feedback al jugador explica la causa física en lenguaje sencillo, no solo "bien/mal".
+- Valida con `godot --headless --path . --script res://tests/test_runner.gd` y `smoke_runner.gd`.

@@ -1,0 +1,21 @@
+---
+description: Diseño obligatorio de multijugador (coop misma nave, no varias naves en tiempo real)
+alwaysApply: true
+---
+
+# Multijugador (obligatorio)
+
+Fuente completa: [docs/multijugador.md](docs/multijugador.md). Sigue ese documento; no improvises otro modelo.
+
+## No negociable
+
+- No implementar varias naves en el mismo sistema en tiempo real (choca con warp x0.5–x50 y con cartas que pausan).
+- Dirección correcta: cooperativa 2–4 en **una sola nave** con puestos (Piloto, Navegante, Ingeniero, Comandante). Asíncrono entre agencias es secundario.
+- Host con autoridad. RNG (`Run.roll_stress`, `Card`) solo en el host.
+- Separar input de simulación: intenciones por puesto, no `Input.is_physical_key_pressed` directo en fases de vuelo.
+- En multi, `Card` / `Tutorial` no deben usar `get_tree().paused = true`.
+- Orden: prototipo local 2 teclados → red solo en espacio → launch/descent → asíncrono.
+
+## Al tocar red o coop
+
+Lee `docs/multijugador.md` y respeta puestos, warp por consenso y sync mínima (`st.t` + estado de la nave).

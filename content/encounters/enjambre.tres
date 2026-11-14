@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_ohk75"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_prawq"]
+
+[sub_resource type="Resource" id="Resource_xkjfl"]
+script = ExtResource("1_ohk75")
+label = "Atravesarlo"
+odds = 0.0
+win = {
+"credits": 100,
+"science": 1
+}
+lose = {
+"rand_break": true
+}
+win_text = "Saliste del otro lado."
+lose_text = "El casco quedo como colador."
+minigame = &"asteroids"
+
+[sub_resource type="Resource" id="Resource_i6icp"]
+script = ExtResource("1_ohk75")
+label = "Rodearlo"
+cost = {
+"leak": 0.06
+}
+win_text = "Rodeo seguro."
+
+[resource]
+script = ExtResource("2_prawq")
+id = &"enjambre"
+title = "Enjambre de rocas"
+text = "Un cumulo de escombros en tu ruta. Dentro hay cristales."
+poi = &"asteroid"
+choices = Array[ExtResource("1_ohk75")]([SubResource("Resource_xkjfl"), SubResource("Resource_i6icp")])

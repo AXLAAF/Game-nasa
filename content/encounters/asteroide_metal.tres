@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_54q5x"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_d23fg"]
+
+[sub_resource type="Resource" id="Resource_xsjmn"]
+script = ExtResource("1_54q5x")
+label = "Minar"
+odds = 0.0
+win = {
+"credits": 350
+}
+lose = {
+"rand_break": true
+}
+win_text = "Bodega llena de metal."
+lose_text = "Un fragmento golpeo la nave."
+minigame = &"drill"
+
+[sub_resource type="Resource" id="Resource_llelv"]
+script = ExtResource("1_54q5x")
+label = "Aterrizaje relampago"
+odds = 0.5
+win = {
+"boxes": 1,
+"credits": 600
+}
+lose = {
+"leak": 0.1,
+"rand_break": true
+}
+win_text = "Muestras y una caja rara."
+lose_text = "Rebotaste contra la roca."
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_54q5x")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_d23fg")
+id = &"asteroide_metal"
+title = "Asteroide metalico"
+text = "Hierro y niquel puro. Vale una fortuna... si no te parte el casco."
+poi = &"asteroid"
+rarity = 1
+choices = Array[ExtResource("1_54q5x")]([SubResource("Resource_xsjmn"), SubResource("Resource_llelv"), SubResource("Resource_3tbei")])

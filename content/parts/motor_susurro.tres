@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_hyjhq"]
+
+[resource]
+script = ExtResource("1_hyjhq")
+id = &"motor_susurro"
+display_name = "Motor Susurro"
+description = "Motor de vacio: casi no empuja pero estira cada gota."
+kind = &"engine"
+cost = 300
+mass = 0.6
+thrust = 70.0
+isp = 360.0
+size = Vector2(28, 26)
+color = Color(0.8, 0.7, 0.55, 1)
+fragility = 0.9

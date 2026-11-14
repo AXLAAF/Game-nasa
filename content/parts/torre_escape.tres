@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_thms5"]
+
+[resource]
+script = ExtResource("1_thms5")
+id = &"torre_escape"
+display_name = "Torre de escape"
+description = "Aborta el despegue y salva la capsula (BACKSPACE)."
+kind = &"escape"
+cost = 180
+mass = 0.8
+size = Vector2(12, 40)
+color = Color(0.8, 0.8, 0.82, 1)

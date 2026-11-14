@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_7feu2"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_7fymw"]
+
+[sub_resource type="Resource" id="Resource_y80f7"]
+script = ExtResource("1_7feu2")
+label = "Forzar el piston"
+odds = 0.6
+lose = {
+"break": true
+}
+win_text = "Clack. Desplegada."
+lose_text = "Se doblo."
+
+[sub_resource type="Resource" id="Resource_br7ut"]
+script = ExtResource("1_7feu2")
+label = "Dejarla asi"
+win = {
+"break": true
+}
+
+[resource]
+script = ExtResource("2_7fymw")
+id = &"pata_atascada"
+title = "Pata atascada"
+text = "%part% no termina de desplegarse."
+kinds = Array[StringName]([&"legs"])
+choices = Array[ExtResource("1_7feu2")]([SubResource("Resource_y80f7"), SubResource("Resource_br7ut")])

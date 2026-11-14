@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_j041m"]
+
+[resource]
+script = ExtResource("1_j041m")
+id = &"panel_solar"
+display_name = "Panel solar"
+description = "Energia gratis cerca del sol. Inutil lejos. Se sobrecalienta muy cerca."
+kind = &"solar"
+radial = true
+cost = 110
+mass = 0.1
+size = Vector2(12, 40)
+color = Color(0.2, 0.3, 0.7, 1)
+fragility = 1.2
+solar = 1.0

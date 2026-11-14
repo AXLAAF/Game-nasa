@@ -1,0 +1,48 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_qjh80"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_6f3kh"]
+
+[sub_resource type="Resource" id="Resource_ii5mj"]
+script = ExtResource("1_qjh80")
+label = "Acoplar"
+odds = 0.0
+win = {
+"boxes": 2,
+"credits": 800,
+"salvage": 3
+}
+lose = {
+"leak": 0.2,
+"rand_break": true
+}
+win_text = "Jackpot de chatarra."
+lose_text = "Choque feo."
+minigame = &"dock"
+
+[sub_resource type="Resource" id="Resource_nkelg"]
+script = ExtResource("1_qjh80")
+label = "Hackear su computadora"
+odds = 0.4
+win = {
+"credits": 1500
+}
+lose = {
+"comms": -0.5,
+"map": -0.5
+}
+win_text = "Transferencia completa."
+lose_text = "Virus en tu sistema."
+
+[sub_resource type="Resource" id="Resource_3tbei"]
+script = ExtResource("1_qjh80")
+label = "Seguir de largo"
+
+[resource]
+script = ExtResource("2_6f3kh")
+id = &"nave_rival"
+title = "Nave de otra agencia"
+text = "Una nave rival a la deriva. Su bodega esta llena."
+poi = &"derelict"
+rarity = 2
+choices = Array[ExtResource("1_qjh80")]([SubResource("Resource_ii5mj"), SubResource("Resource_nkelg"), SubResource("Resource_3tbei")])

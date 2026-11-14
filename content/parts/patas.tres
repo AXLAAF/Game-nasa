@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_vldkr"]
+
+[resource]
+script = ExtResource("1_vldkr")
+id = &"patas"
+display_name = "Patas de aterrizaje"
+description = "Aguantan aterrizajes mas duros."
+kind = &"legs"
+radial = true
+mass = 0.3
+size = Vector2(12, 30)
+color = Color(0.7, 0.7, 0.72, 1)

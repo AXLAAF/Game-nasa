@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_r6iws"]
+
+[resource]
+script = ExtResource("1_r6iws")
+id = &"tanque_ancho"
+display_name = "Tanque gordo"
+description = "16 t de propelente. Pesa, pero rinde."
+cost = 330
+mass = 1.8
+fuel = 16.0
+size = Vector2(56, 92)
+color = Color(0.85, 0.6, 0.35, 1)

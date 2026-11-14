@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_7a2ls"]
+
+[resource]
+script = ExtResource("1_7a2ls")
+id = &"escudo_termico"
+display_name = "Escudo termico"
+description = "Ablativo: se consume en la reentrada."
+kind = &"heatshield"
+cost = 230
+mass = 0.7
+size = Vector2(48, 10)
+color = Color(0.45, 0.3, 0.2, 1)
+heat_resist = 0.5
+ablative = 30.0

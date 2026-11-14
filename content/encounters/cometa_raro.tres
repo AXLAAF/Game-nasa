@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="EncounterDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_p3ytt"]
+[ext_resource type="Script" path="res://game/data/encounter_def.gd" id="2_1ajke"]
+
+[sub_resource type="Resource" id="Resource_434w5"]
+script = ExtResource("1_p3ytt")
+label = "Tomar muestra del nucleo"
+odds = 0.45
+win = {
+"boxes": 1,
+"science": 4
+}
+lose = {
+"leak": 0.15,
+"rand_break": true
+}
+win_text = "Ciencia de primera."
+lose_text = "Un chorro de gas te golpeo."
+
+[sub_resource type="Resource" id="Resource_0llrn"]
+script = ExtResource("1_p3ytt")
+label = "Fotografiar"
+win = {
+"science": 1
+}
+
+[resource]
+script = ExtResource("2_1ajke")
+id = &"cometa_raro"
+title = "Nucleo de cometa"
+text = "Puedes ver el nucleo: compuestos organicos rarisimos."
+poi = &"comet"
+rarity = 1
+choices = Array[ExtResource("1_p3ytt")]([SubResource("Resource_434w5"), SubResource("Resource_0llrn")])

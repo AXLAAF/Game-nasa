@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_wa6am"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_6vsql"]
+
+[sub_resource type="Resource" id="Resource_hxvng"]
+script = ExtResource("1_wa6am")
+label = "Sellar con kit"
+cost = {
+"kits": -1
+}
+win = {
+"leak": 0.03
+}
+win_text = "Sellado."
+
+[sub_resource type="Resource" id="Resource_nn5j5"]
+script = ExtResource("1_wa6am")
+label = "Soldadura improvisada"
+odds = 0.55
+win = {
+"leak": 0.05
+}
+lose = {
+"leak": 0.35
+}
+win_text = "Aguanta la soldadura."
+lose_text = "La grieta se abrio mas."
+
+[sub_resource type="Resource" id="Resource_ln5gc"]
+script = ExtResource("1_wa6am")
+label = "Dejar que se vacie"
+win = {
+"leak": 0.18
+}
+
+[resource]
+script = ExtResource("2_6vsql")
+id = &"fuga_combustible"
+title = "Fuga de combustible"
+text = "%part% pierde propelente. Cada segundo cuenta."
+kinds = Array[StringName]([&"tank"])
+choices = Array[ExtResource("1_wa6am")]([SubResource("Resource_hxvng"), SubResource("Resource_nn5j5"), SubResource("Resource_ln5gc")])

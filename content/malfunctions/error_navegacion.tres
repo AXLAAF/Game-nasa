@@ -1,0 +1,29 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_rdsfn"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_tedg8"]
+
+[sub_resource type="Resource" id="Resource_t1jvk"]
+script = ExtResource("1_rdsfn")
+label = "Recalibrar"
+odds = 0.75
+lose = {
+"map": -0.4
+}
+win_text = "Calculos limpios."
+lose_text = "La prediccion quedo corta."
+
+[sub_resource type="Resource" id="Resource_njwlo"]
+script = ExtResource("1_rdsfn")
+label = "Navegar a ojo"
+win = {
+"map": -0.3
+}
+
+[resource]
+script = ExtResource("2_tedg8")
+id = &"error_navegacion"
+title = "Error de navegacion"
+text = "%part% calcula trayectorias imposibles."
+kinds = Array[StringName]([&"computer"])
+choices = Array[ExtResource("1_rdsfn")]([SubResource("Resource_t1jvk"), SubResource("Resource_njwlo")])

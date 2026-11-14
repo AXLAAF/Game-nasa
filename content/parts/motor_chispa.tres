@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_wt7on"]
+
+[resource]
+script = ExtResource("1_wt7on")
+id = &"motor_chispa"
+display_name = "Motor Chispa"
+description = "Motor pequeno y eficiente. Poco empuje: no levanta naves pesadas."
+kind = &"engine"
+cost = 220
+thrust = 140.0
+isp = 295.0
+size = Vector2(34, 30)
+color = Color(0.72, 0.74, 0.8, 1)

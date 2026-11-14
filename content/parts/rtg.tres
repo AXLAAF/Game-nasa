@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_8obke"]
+
+[resource]
+script = ExtResource("1_8obke")
+id = &"rtg"
+display_name = "RTG nuclear"
+description = "Energia constante en cualquier sitio. Tambien calienta."
+kind = &"rtg"
+radial = true
+cost = 380
+mass = 0.4
+size = Vector2(14, 22)
+color = Color(0.3, 0.3, 0.32, 1)
+cold_resist = 0.25
+power = 0.9

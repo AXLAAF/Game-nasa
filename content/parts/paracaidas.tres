@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_p8cyg"]
+
+[resource]
+script = ExtResource("1_p8cyg")
+id = &"paracaidas"
+display_name = "Paracaidas"
+description = "Freno (P) y principal (P otra vez). Respeta las ventanas de velocidad."
+kind = &"parachute"
+cost = 120
+mass = 0.2
+size = Vector2(22, 12)
+color = Color(1, 0.55, 0.25, 1)
+drag = 300.0

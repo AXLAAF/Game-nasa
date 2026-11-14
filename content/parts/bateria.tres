@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_1fvx4"]
+
+[resource]
+script = ExtResource("1_1fvx4")
+id = &"bateria"
+display_name = "Bateria"
+description = "Guarda energia para la sombra."
+kind = &"battery"
+cost = 70
+mass = 0.1
+size = Vector2(30, 10)
+color = Color(0.95, 0.75, 0.2, 1)
+battery = 2.0

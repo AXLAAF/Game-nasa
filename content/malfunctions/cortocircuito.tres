@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_legsv"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_hcnxg"]
+
+[sub_resource type="Resource" id="Resource_s4r63"]
+script = ExtResource("1_legsv")
+label = "Reiniciar sistema"
+odds = 0.7
+lose = {
+"break": true
+}
+win_text = "Reinicio limpio."
+lose_text = "Frito."
+
+[sub_resource type="Resource" id="Resource_qfe3t"]
+script = ExtResource("1_legsv")
+label = "Desviar energia"
+win = {
+"battery": -0.3
+}
+win_text = "Funciona, pero chupa bateria."
+
+[sub_resource type="Resource" id="Resource_goscn"]
+script = ExtResource("1_legsv")
+label = "Aislar la pieza"
+win = {
+"break": true
+}
+win_text = "Desconectada para siempre."
+
+[resource]
+script = ExtResource("2_hcnxg")
+id = &"cortocircuito"
+title = "Cortocircuito"
+text = "Chispas en %part%. Huele a quemado."
+kinds = Array[StringName]([&"computer", &"sensor", &"antenna", &"battery"])
+choices = Array[ExtResource("1_legsv")]([SubResource("Resource_s4r63"), SubResource("Resource_qfe3t"), SubResource("Resource_goscn")])

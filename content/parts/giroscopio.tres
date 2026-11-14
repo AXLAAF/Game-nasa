@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_giro"]
+
+[resource]
+script = ExtResource("1_giro")
+id = &"giroscopio"
+display_name = "Giroscopio"
+description = "Estabiliza la nave. Mejora la movilidad sin gastar propelente."
+kind = &"rcs"
+radial = true
+cost = 160
+mass = 0.2
+size = Vector2(16, 16)
+color = Color(0.55, 0.75, 0.95, 1)
+channels = Array[StringName]([&"mobility"])

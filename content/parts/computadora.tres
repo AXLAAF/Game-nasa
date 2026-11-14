@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_bcmia"]
+
+[resource]
+script = ExtResource("1_bcmia")
+id = &"computadora"
+display_name = "Computadora de vuelo"
+description = "Prediccion de trayectoria completa."
+kind = &"computer"
+cost = 150
+mass = 0.1
+size = Vector2(32, 10)
+color = Color(0.25, 0.3, 0.35, 1)
+channels = Array[StringName]([&"map"])

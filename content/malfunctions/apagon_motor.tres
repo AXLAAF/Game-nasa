@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="MalfunctionDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/choice_def.gd" id="1_5p5pw"]
+[ext_resource type="Script" path="res://game/data/malfunction_def.gd" id="2_uo627"]
+
+[sub_resource type="Resource" id="Resource_q3icb"]
+script = ExtResource("1_5p5pw")
+label = "Reencender ya"
+odds = 0.6
+lose = {
+"thrust": -0.5
+}
+win_text = "Ruge otra vez."
+lose_text = "Encendio a medias."
+
+[sub_resource type="Resource" id="Resource_ah38p"]
+script = ExtResource("1_5p5pw")
+label = "Purgar y reencender"
+odds = 0.9
+cost = {
+"leak": 0.08
+}
+lose = {
+"break": true
+}
+win_text = "Limpio y estable."
+lose_text = "Murio del todo."
+
+[sub_resource type="Resource" id="Resource_s53j2"]
+script = ExtResource("1_5p5pw")
+label = "Darlo por perdido"
+win = {
+"break": true
+}
+win_text = "Un motor menos."
+
+[resource]
+script = ExtResource("2_uo627")
+id = &"apagon_motor"
+title = "Apagon de motor"
+text = "%part% se apago en pleno encendido."
+kinds = Array[StringName]([&"engine"])
+choices = Array[ExtResource("1_5p5pw")]([SubResource("Resource_q3icb"), SubResource("Resource_ah38p"), SubResource("Resource_s53j2")])

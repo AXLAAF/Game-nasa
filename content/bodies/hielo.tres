@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_nc52s"]
+
+[resource]
+script = ExtResource("1_nc52s")
+id = &"hielo"
+display_name = "Hielo"
+description = "Luna congelada. El contrato mas caro del sistema."
+color = Color(0.85, 0.95, 1, 1)
+parent_id = &"glacia"
+orbit_radius = 260.0
+orbit_phase = 0.5
+radius = 10.0
+mu = 2500.0
+surface_gravity = 1.3
+atmosphere = 0.0
+hazards = Array[StringName]([&"cold", &"radiation"])
+payout = 2.4

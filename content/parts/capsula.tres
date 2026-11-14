@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PartDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/part_def.gd" id="1_p3is1"]
+
+[resource]
+script = ExtResource("1_p3is1")
+id = &"capsula"
+display_name = "Capsula Mk1"
+description = "La tripulacion. Sin ella no hay mision."
+kind = &"capsule"
+cost = 260
+mass = 2.2
+size = Vector2(40, 36)
+color = Color(0.85, 0.87, 0.9, 1)
+fragility = 0.6
+heat_resist = 0.1
+battery = 1.0
+channels = Array[StringName]([&"vision", &"light"])
