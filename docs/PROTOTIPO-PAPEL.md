@@ -8,7 +8,7 @@ si cambian allí, cambian aquí.
 
 - 1 d6 y 1 d20. Monedas o fichas de 100 cr.
 - Hoja de compañía: deuda (empieza en **12 000 cr**), caja (**1 200 cr**), faltas (0/3), reputación (0–5), suerte (0).
-- Hoja de nave MZ-1 LIBERTY (chasis Orbital Mule Mk-I, vuelos LIBERTY-1 a LIBERTY-N): 6 salas (Timón, Sensores, Reactor, Soporte vital, Motores, Bodega), 7 barras de energía, casco 10/10, carga 10/10.
+- Hoja de nave MZ-1 BALLAST (chasis Orbital Mule Mk-I, vuelos BALLAST-1 a BALLAST-N): 6 salas (Timón, Sensores, Reactor, Soporte vital, Motores, Bodega), 7 barras de energía, casco 10/10, carga 10/10.
 - Mazos: contratos (16), piezas (12 perks + 9 módulos), eventos (27). Recortables al final.
 
 ## Turno de misión

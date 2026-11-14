@@ -1,6 +1,6 @@
 # Documentacion de Mecanicas de Referencia (Rescatadas del prototipo v1)
 
-Este documento define las **especificaciones matematicas, matriz de danos y catalogo de tecnologias NASA** que gobiernan la simulacion de *Margin Zero: Deuda Orbital* (nave `MZ-1 LIBERTY`, programa `LIBERTY-1` a `LIBERTY-N`) en Godot 4.7.
+Este documento define las **especificaciones matematicas, matriz de danos y catalogo de tecnologias NASA** que gobiernan la simulacion de *Margin Zero: Deuda Orbital* (nave `MZ-1 BALLAST`, programa `BALLAST-1` a `BALLAST-N`) en Godot 4.7.
 
 ---
 

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Margin Zero: Deuda Orbital (`Margin Zero: Orbital Debt`). Roguelite cooperativo local de 1 a 4 robots (nave `MZ-1 LIBERTY`, chasis `Orbital Mule Mk-I`, misiones `LIBERTY-1` a `LIBERTY-N`) en Godot 4.7 (GDScript, renderer `gl_compatibility`) para NASA Space Apps Challenge ("Space Mission Design Game").
+Margin Zero: Deuda Orbital (`Margin Zero: Orbital Debt`). Roguelite cooperativo local de 1 a 4 robots (nave `MZ-1 BALLAST`, chasis `Orbital Mule Mk-I`, misiones `BALLAST-1` a `BALLAST-N`) en Godot 4.7 (GDScript, renderer `gl_compatibility`) para NASA Space Apps Challenge ("Space Mission Design Game").
 
 ## Reglas obligatorias
 

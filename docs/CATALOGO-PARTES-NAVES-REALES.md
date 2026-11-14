@@ -1,8 +1,8 @@
 # Catálogo Técnico de Partes y Hardware de Naves Espaciales Reales
 
 **Proyecto:** `Margin Zero: Deuda Orbital` (*Margin Zero: Orbital Debt*)  
-**Nave Insignia:** `MZ-1 LIBERTY` (Chasis `Orbital Mule Mk-I`)  
-**Programa de Misiones:** `LIBERTY-1` a `LIBERTY-N`  
+**Nave Insignia:** `MZ-1 BALLAST` (Chasis `Orbital Mule Mk-I`)  
+**Programa de Misiones:** `BALLAST-1` a `BALLAST-N`  
 **Fuentes de Datos del Juego:** [data/design/parts.json](../data/design/parts.json), [data/design/modules.json](../data/design/modules.json), [data/design/stack_parts.json](../data/design/stack_parts.json)
 
 Este documento mapea cada componente jugable de **Margin Zero: Deuda Orbital** con su equivalente físico en ingeniería aeroespacial real (NASA, JPL, ESA y vehículos comerciales certificados), explicando los parámetros que gobiernan la simulación y el porqué técnico de cada ventaja y contrapartida. Las cifras institucionales verificables se marcan `[NASA]` y los parámetros escalados de balance del juego se marcan `[DIS]`.
@@ -11,7 +11,7 @@ Este documento mapea cada componente jugable de **Margin Zero: Deuda Orbital** c
 
 ## 1. Los 12 Perks y Subsistemas Especializados (`data/design/parts.json`)
 
-Cada perk se acopla a uno de los 7 *hardpoints* tipados de `MZ-1 LIBERTY` definidos en [01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md](01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md).
+Cada perk se acopla a uno de los 7 *hardpoints* tipados de `MZ-1 BALLAST` definidos en [01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md](01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md).
 
 | ID en juego | Nombre | Hardpoint | Masa / Costo `[DIS]` | Fragilidad `[DIS]` | Efectos clave en simulación `[DIS]` |
 | :--- | :--- | :--- | :---: | :---: | :--- |
@@ -88,7 +88,7 @@ Cada perk se acopla a uno de los 7 *hardpoints* tipados de `MZ-1 LIBERTY` defini
 
 ## 2. Los 9 Módulos Base del Vehículo Orbital y EDL (`data/design/modules.json`)
 
-Además de los 12 perks, el taller equipa subsistemas fundamentales de potencia, propulsión auxiliar y descenso planetario sobre `MZ-1 LIBERTY` (chasis base `Orbital Mule Mk-I`: `11.0 t` en seco, `17.0 t` de propelente hipergólico a $I_{sp} = 316\text{ s}$ y `420 kN` de empuje).
+Además de los 12 perks, el taller equipa subsistemas fundamentales de potencia, propulsión auxiliar y descenso planetario sobre `MZ-1 BALLAST` (chasis base `Orbital Mule Mk-I`: `11.0 t` en seco, `17.0 t` de propelente hipergólico a $I_{sp} = 316\text{ s}$ y `420 kN` de empuje).
 
 | ID en juego | Nombre | Masa / Costo `[DIS]` | Efecto en juego `[DIS]` | Hardware real equivalente y regla física NASA |
 | :--- | :--- | :---: | :--- | :--- |
@@ -102,7 +102,7 @@ Además de los 12 perks, el taller equipa subsistemas fundamentales de potencia,
 | `cargo_bay` | Bodega ampliada | `0.8 t` / `100 cr` | `cargo_t: +2.0 t` | **Módulo de carga paletizada (herencia MPLM / Spacehab):** Estructuras modulares presurizadas o palés externos con pernos pirotécnicos frangibles que permiten ejecutar `jettison_cargo` en emergencias de despegue. |
 | `backup_system` | Sistema de respaldo | `1.2 t` / `260 cr` | `redundancy: 1.0` | **Computación endurecida contra radiación (BAE RAD750 + EDAC + TMR):** Procesadores resistentes a dosis totales de $200\text{--}1000\text{ krad}$ (`Juno`, `Curiosity`, `JWST` `[NASA]`) con memoria correctora de errores (EDAC) y votación triple modular (TMR) para aislar fallos lógicos tras tormentas solares. |
 
-**Variantes estructurales de chasis en `modules.json`:** Además de `Orbital Mule Mk-I` (casco base de `MZ-1 LIBERTY`), existen dos variantes de campaña: `Barcaza Ceres` (`dry_mass_t: 12.5`, `propellant_t: 19.0`, `cargo_capacity_t: 4.0`, `thrust_kn: 450.0`) inspirada en cargueros pesados de reabastecimiento (ATV/Cygnus/HTV) y `Saltamontes` (`dry_mass_t: 9.0`, `propellant_t: 15.0`, `cargo_capacity_t: 1.5`, `isp_s: 330.0`) inspirada en demostradores ligeros VTVL de alta eficiencia en vacío.
+**Variantes estructurales de chasis en `modules.json`:** Además de `Orbital Mule Mk-I` (casco base de `MZ-1 BALLAST`), existen dos variantes de campaña: `Barcaza Ceres` (`dry_mass_t: 12.5`, `propellant_t: 19.0`, `cargo_capacity_t: 4.0`, `thrust_kn: 450.0`) inspirada en cargueros pesados de reabastecimiento (ATV/Cygnus/HTV) y `Saltamontes` (`dry_mass_t: 9.0`, `propellant_t: 15.0`, `cargo_capacity_t: 1.5`, `isp_s: 330.0`) inspirada en demostradores ligeros VTVL de alta eficiencia en vacío.
 
 ---
 
@@ -129,9 +129,9 @@ Para la fase de ensamblaje de cohete en rampa (masa máxima nominal en plataform
 
 ---
 
-## 4. Hardware Real dentro de las 6 Salas Interiores de `MZ-1 LIBERTY`
+## 4. Hardware Real dentro de las 6 Salas Interiores de `MZ-1 BALLAST`
 
-El interior caminable de `MZ-1 LIBERTY` (`160 x 224 px` / `12 x 8` celdas lógicas en [data/design/modules.json](../data/design/modules.json) y [03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md](03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md)) distribuye los 7 subsistemas del *NASA Systems Engineering Handbook* (`NASA/SP-2016-6105`) en 6 compartimentos presurizados más el pasillo central:
+El interior caminable de `MZ-1 BALLAST` (`160 x 224 px` / `12 x 8` celdas lógicas en [data/design/modules.json](../data/design/modules.json) y [03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md](03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md)) distribuye los 7 subsistemas del *NASA Systems Engineering Handbook* (`NASA/SP-2016-6105`) en 6 compartimentos presurizados más el pasillo central:
 
 | Sala (`id`) | Cuadrante `DamageMatrix` | Hardware real representado en cabina | Consecuencia física del daño en la sala |
 | :--- | :---: | :--- | :--- |
@@ -162,7 +162,7 @@ En una naviera en quiebra (*Margen Cero Astrologística*), la condición `cond` 
 1. **`gravimetric_injector` (Propulsión):** $+65\%$ empuje y $-30\%$ consumo, a cambio de $8\%$ de probabilidad de inversión transitoria de empuje en encendidos prolongados.
 2. **`crystalline_alloy` (Estructura):** autorreparación estructural pasiva ($0.04/\text{min}$), pero triplica la fragilidad ante radiación ionizante (fragilización por desplazamiento atómico en red cristalina).
 3. **`entropic_sensor` (Sensores):** revela puntos de interés y suma $+45\text{ s}$ de aviso ante eventos solares, drenando $0.05\text{ energía/s}$ constantes e inyectando estática.
-4. **`quantum_tether` (Captura / Salvamento):** cable irrompible, con riesgo real de mecánica clásica de cuerpos acoplados: transfiere el momento lineal completo a `MZ-1 LIBERTY` si la masa capturada supera la de la propia nave.
+4. **`quantum_tether` (Captura / Salvamento):** cable irrompible, con riesgo real de mecánica clásica de cuerpos acoplados: transfiere el momento lineal completo a `MZ-1 BALLAST` si la masa capturada supera la de la propia nave.
 
 ---
 

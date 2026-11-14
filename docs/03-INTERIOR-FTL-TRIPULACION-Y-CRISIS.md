@@ -1,6 +1,6 @@
 # 03. Interior FTL 2.5D, Tripulación y Catálogo de Crisis de 5 Segundos
 
-**Objeto:** Especificar el mapa interior caminable de las 6 salas de la nave `MZ-1 LIBERTY` (chasis `Orbital Mule Mk-I`), el grafo de compuertas y esclusas, los bonos de estación (`Manning Bonus`), los controles 1P y 2–4P sin pausa global y las 10 tarjetas de incidentes de 5 segundos respaldadas por [INVESTIGACION-NAVES-INCIDENTES-NASA.md](INVESTIGACION-NAVES-INCIDENTES-NASA.md).
+**Objeto:** Especificar el mapa interior caminable de las 6 salas de la nave `MZ-1 BALLAST` (chasis `Orbital Mule Mk-I`), el grafo de compuertas y esclusas, los bonos de estación (`Manning Bonus`), los controles 1P y 2–4P sin pausa global y las 10 tarjetas de incidentes de 5 segundos respaldadas por [INVESTIGACION-NAVES-INCIDENTES-NASA.md](INVESTIGACION-NAVES-INCIDENTES-NASA.md).
 
 ## 1. Plano de las 6 Salas, Compuertas y Esclusas (`160 x 224 px` = `5 x 7` celdas)
 

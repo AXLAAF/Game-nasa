@@ -64,7 +64,7 @@ Etiquetas usadas: **[NASA]** = dato real de los anexos; **[DIS]** = licencia de 
 ## 3. Diseño por fase
 
 ### Fase 1 — Planeación (tablero de misiones)
-- **Objetivo:** elegir 1 de 4 contratos (designación de vuelo `LIBERTY-1` a `LIBERTY-4`; en reintentos de campaña el contador correlativo asciende a `LIBERTY-5 .. LIBERTY-N`) y, opcionalmente, apuestas previas.
+- **Objetivo:** elegir 1 de 4 contratos (designación de vuelo `BALLAST-1` a `BALLAST-4`; en reintentos de campaña el contador correlativo asciende a `BALLAST-5 .. BALLAST-N`) y, opcionalmente, apuestas previas.
 - **Vista:** hub cenital (oficina en quiebra) con consolas; el tablero abre un panel UI.
 - **Roles:** Comandante firma el contrato (los demás votan con *ping*; sin unanimidad en 60 s decide el Comandante). Comunicaciones ve el parte de clima espacial y conjunción. Navegación ve Δv requerido. Sistemas ve la irradiancia `f(r)` en destino.
 - **Controles:** moverse, `A` interactuar con consola, cruceta para recorrer contratos.
@@ -81,7 +81,7 @@ Etiquetas usadas: **[NASA]** = dato real de los anexos; **[DIS]** = licencia de 
 - **Roles:** cualquiera compra; el Comandante confirma el lanzamiento. Cada rol ve su medidor en vivo: Navegación Δv (Tsiolkovsky) y TWR; Sistemas balance de barras y `temp_norm` previsto; Comunicaciones aviso y cobertura; Comandante Ω y `P_explosion`.
 - **Controles:** cursor por jugador (color propio), `A` colocar, `X` quitar/vender (50 % del valor), `Y` abrir caja.
 - **Mecánicas:**
-  - Nave insignia **MZ-1 LIBERTY** (chasis **Orbital Mule Mk-I**) [DIS]: 12×8 celdas, 6 salas (`helm`, `sensors`, `reactor`, `life_support`, `engines`, `science_bay`), seco 11 t, propelente 17 t, bodega 2 t, empuje 420 kN, Isp 316 s (hipergólico [NASA]). `M_rated = 420 000 / (1.25·9.80665) = 34.3 t`.
+  - Nave insignia **MZ-1 BALLAST** (chasis **Orbital Mule Mk-I**) [DIS]: 12×8 celdas, 6 salas (`helm`, `sensors`, `reactor`, `life_support`, `engines`, `science_bay`), seco 11 t, propelente 17 t, bodega 2 t, empuje 420 kN, Isp 316 s (hipergólico [NASA]). `M_rated = 420 000 / (1.25·9.80665) = 34.3 t`.
   - Los 12 perks y 4 calidades del Anexo B, sin cambios.
   - Módulos base [DIS]: panel solar (120 cr, 0.4 t, 2.0 u a 1 AU), RTG (700 cr, 1.0 t, 1.5 u constantes, +calor), batería, antena de alta ganancia (220, 0.3 t), paracaídas (160, 0.3 t), patas (140, 0.5 t), tanque extra (180, 0.6 t seco + 4 t), bodega (+2 t, 100, 0.8 t), sala de respaldo (redundancia R).
   - Adaptación forzada por datos: solar en Júpiter rinde 3.7 % [NASA]; paracaídas en Luna inútil (`P_bar = 0`) [NASA]; MLI se desgarra si `q > 12 000 Pa`.

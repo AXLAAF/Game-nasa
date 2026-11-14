@@ -4,14 +4,14 @@ Juego cooperativo caotico en tiempo real (1 jugador o 2-4 jugadores locales) des
 
 ## Premisa y Mecanicas
 
-Diriges a **Margen Cero Astrologistica**, una naviera espacial privada en sindico de quiebra con tripulacion robotica/antropomorfica. Evolucionas tu nave insignia **`MZ-1 LIBERTY`** (chasis modular `Orbital Mule Mk-I`, `LVL 1..5`) acoplando piezas coherentes por hardpoints, vuelas el programa de misiones **`LIBERTY-1` a `LIBERTY-N`**, navegas en **Vista Orbital 2.5D estilo KSP / Rhine Lab** (`AP`/`PE`, nodos $\Delta v$, NavBall 2.5D) y gestionas el caos interno en tiempo real con salas **FTL** y datos abiertos de la NASA/JPL.
+Diriges a **Margen Cero Astrologistica**, una naviera espacial privada en sindico de quiebra con tripulacion robotica/antropomorfica. Evolucionas tu nave insignia **`MZ-1 BALLAST`** (chasis modular `Orbital Mule Mk-I`, `LVL 1..5`) acoplando piezas coherentes por hardpoints, vuelas el programa de misiones **`BALLAST-1` a `BALLAST-N`**, navegas en **Vista Orbital 2.5D estilo KSP / Rhine Lab** (`AP`/`PE`, nodos $\Delta v$, NavBall 2.5D) y gestionas el caos interno en tiempo real con salas **FTL** y datos abiertos de la NASA/JPL.
 
 ## Documentacion
 
-- **Identidad de Marca y Nomenclatura:** `docs/BRANDING-MARGIN-ZERO.md` (`Margin Zero: Deuda Orbital`, nave `MZ-1 LIBERTY`, programa `LIBERTY-1..N`)
+- **Identidad de Marca y Nomenclatura:** `docs/BRANDING-MARGIN-ZERO.md` (`Margin Zero: Deuda Orbital`, nave `MZ-1 BALLAST`, programa `BALLAST-1..N`)
 - **Planificacion Numerada del Hackathon (`docs/00` a `docs/05`):**
   - `docs/00-INDICE-Y-PLAN-MAESTRO-HACKATHON.md` (indice maestro, horarios, roles, Go/No-Go y riesgos)
-  - `docs/01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md` (`MZ-1 LIBERTY` / chasis `Orbital Mule Mk-I`, 7 hardpoints y tablas `LVL 1..5`)
+  - `docs/01-CATALOGO-MODULOS-Y-EVOLUCION-NAVE.md` (`MZ-1 BALLAST` / chasis `Orbital Mule Mk-I`, 7 hardpoints y tablas `LVL 1..5`)
   - `docs/02-SISTEMA-ORBITAL-KSP-25D-Y-FISICA.md` (orbita `AP/PE`, nodos $\Delta v$, NavBall, corredor atmosferico y Radar 3D)
   - `docs/03-INTERIOR-FTL-TRIPULACION-Y-CRISIS.md` (6 salas, esclusas, *Manning Bonus*, controles 1P/2-4P y 10 crisis de 5 s)
   - `docs/04-GUION-MISIONES-Y-CONTRATOS-NASA.md` (4 contratos NASA/JPL, economia de deuda y *Debrief Causal*)
