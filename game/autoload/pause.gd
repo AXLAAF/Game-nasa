@@ -16,7 +16,7 @@ func _ready() -> void:
 	_gear.custom_minimum_size = GEAR_RECT.size
 	_gear.position = GEAR_RECT.position
 	_gear.focus_mode = Control.FOCUS_NONE
-	_gear.tooltip_text = "Ajustes"
+	_gear.tooltip_text = tr("Ajustes")
 	_gear.visible = false
 	_gear.draw.connect(_draw_gear)
 	Events.phase_changed.connect(_on_phase)
@@ -43,14 +43,14 @@ func open() -> void:
 	if not can_open():
 		return
 	_freeze()
-	var modal := Modal.new("Pausa")
-	Ui.primary(Ui.button(modal.col, "Continuar", modal.close))
-	Ui.button(modal.col, "Ajustes", func() -> void: SettingsPanel.show_panel())
-	Ui.button(modal.col, "Volver al menú principal", func() -> void:
-		Modal.confirm("¿Volver al menú principal? Se pierde el contrato en curso.", "Volver al menú", func() -> void: Router.go(&"title")))
+	var modal := Modal.new(tr("Pausa"))
+	Ui.primary(Ui.button(modal.col, tr("Continuar"), modal.close))
+	Ui.button(modal.col, tr("Ajustes"), func() -> void: SettingsPanel.show_panel())
+	Ui.button(modal.col, tr("Volver al menú principal"), func() -> void:
+		Modal.confirm(tr("¿Volver al menú principal? Se pierde el contrato en curso."), tr("Volver al menú"), func() -> void: Router.go(&"title")))
 	if not OS.has_feature("web"):
-		Ui.button(modal.col, "Salir", func() -> void:
-			Modal.confirm("¿Salir del juego?", "Salir", func() -> void: get_tree().quit()))
+		Ui.button(modal.col, tr("Salir"), func() -> void:
+			Modal.confirm(tr("¿Salir del juego?"), tr("Salir"), func() -> void: get_tree().quit()))
 	modal.closed.connect(_thaw)
 	modal.open()
 

@@ -79,16 +79,16 @@ func _build_header(page: Node) -> Control:
 	var brand := Ui.vbox(row, 0)
 	brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	brand.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var title := Ui.label(brand, "Margin Zero", Ui.SIZE_HERO, Ui.IVORY)
+	var title := Ui.label(brand, tr("Margin Zero"), Ui.SIZE_HERO, Ui.IVORY)
 	title.add_theme_font_override("font", Ui.title_font())
-	Ui.legend(brand, "Deuda orbital")
+	Ui.legend(brand, tr("Deuda orbital"))
 	var stats := Ui.hbox(row, 16)
 	stats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	_credit_label = Ui.readout(stats, "Créditos", "", 130.0)
-	_runs_label = Ui.readout(stats, "Partidas", "", 90.0)
-	_deliveries_label = Ui.readout(stats, "Entregas", "", 90.0)
-	_best_label = Ui.readout(stats, "Mejor pago", "", 130.0)
-	_players_label = Ui.readout(stats, "Jugadores", "", 90.0)
+	_credit_label = Ui.readout(stats, tr("Créditos"), "", 130.0)
+	_runs_label = Ui.readout(stats, tr("Partidas"), "", 90.0)
+	_deliveries_label = Ui.readout(stats, tr("Entregas"), "", 90.0)
+	_best_label = Ui.readout(stats, tr("Mejor pago"), "", 130.0)
+	_players_label = Ui.readout(stats, tr("Jugadores"), "", 90.0)
 	return band
 
 
@@ -97,9 +97,9 @@ func _build_crew(body: Node) -> Control:
 	var panel := Ui.panel(body)
 	panel.custom_minimum_size.x = 336
 	var col := Ui.vbox(panel, 8)
-	Ui.legend(col, "Tripulación")
+	Ui.legend(col, tr("Tripulación"))
 	_build_player_slots(col)
-	Ui.legend(col, "Seguro de la nave")
+	Ui.legend(col, tr("Seguro de la nave"))
 	_insurance_box = Ui.hbox(col, 4)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -107,22 +107,22 @@ func _build_crew(body: Node) -> Control:
 	col.add_child(scroll)
 	var lessons := Ui.vbox(scroll, 8)
 	lessons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.legend(lessons, "Lecciones")
+	Ui.legend(lessons, tr("Lecciones"))
 	if Profile.lessons.is_empty():
-		_wrapped(lessons, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
+		_wrapped(lessons, tr("Ninguna todavía. Se aprenden perdiendo naves."), Ui.SIZE_TEXT, Ui.IVORY_DIM)
 	for id: String in Profile.lessons:
 		_wrapped(lessons, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
-	Ui.label(col, "Inventario: %d piezas guardadas" % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
-	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
-	Ui.button(col, "Práctica: armar la nave", func() -> void: Router.go(&"training"))
-	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
+	Ui.label(col, tr("Inventario: %d piezas guardadas") % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
+	Ui.button(col, tr("Manual de vuelo"), func() -> void: Tutorial.replay())
+	Ui.button(col, tr("Práctica: armar la nave"), func() -> void: Router.go(&"training"))
+	var reset := Ui.button(col, tr("Reiniciar perfil"), func() -> void: pass)
 	reset.pressed.connect(func() -> void:
 		if _reset_armed:
 			Profile.reset()
 			Router.go(&"hangar")
 		else:
 			_reset_armed = true
-			reset.text = "Pulsa otra vez para borrar todo")
+			reset.text = tr("Pulsa otra vez para borrar todo"))
 	return panel
 
 
@@ -132,10 +132,10 @@ func _build_board(body: Node) -> Control:
 	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var board_col := Ui.vbox(panel, 10)
 	var head := Ui.hbox(board_col)
-	var heading := Ui.label(head, "Contratos", Ui.SIZE_HEAD, Ui.IVORY)
+	var heading := Ui.label(head, tr("Contratos"), Ui.SIZE_HEAD, Ui.IVORY)
 	heading.add_theme_font_override("font", Ui.bold())
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
+	Ui.button(head, tr("Pedir contratos nuevos (%s)") % Ui.money(REROLL_COST), _reroll)
 	var board_scroll := ScrollContainer.new()
 	board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -155,18 +155,18 @@ func _wrapped(parent: Node, text: String, size: int, color: Color) -> Label:
 
 
 func _build_player_slots(col: Node) -> void:
-	_p1_lamp = _player_row(col, "P1 Comandante")
-	_p2_lamp = _player_row(col, "P2 Tripulante")
+	_p1_lamp = _player_row(col, tr("P1 Comandante"))
+	_p2_lamp = _player_row(col, tr("P2 Tripulante"))
 	_p2_hint = _wrapped(col, "", Ui.SIZE_LEGEND, Ui.INFO)
-	_join_button = Ui.button(col, "Unirse (jugador 2)", _toggle_join_button)
-	_join_button.tooltip_text = "El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado."
+	_join_button = Ui.button(col, tr("Unirse (jugador 2)"), _toggle_join_button)
+	_join_button.tooltip_text = tr("El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado.")
 
 
 ## Nombre a la izquierda y lampara de estado alineada a la derecha.
 func _player_row(col: Node, text: String) -> Lamp:
 	var row := Ui.hbox(col, 8)
 	Ui.label(row, text, Ui.SIZE_TEXT, Ui.IVORY).size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var lamp := Lamp.new("Ausente", Lamp.OFF)
+	var lamp := Lamp.new(tr("Ausente"), Lamp.OFF)
 	lamp.custom_minimum_size = Vector2(118, 26)
 	lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(lamp)
@@ -183,7 +183,7 @@ func _refresh() -> void:
 	for i: int in Profile.INSURANCE_NAMES.size():
 		var b := Ui.button(_insurance_box, Profile.INSURANCE_NAMES[i], _set_insurance.bind(i))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.tooltip_text = "Prima %d %% del valor de la nave, cubre %d %% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
+		b.tooltip_text = tr("Prima %d %% del valor de la nave, cubre %d %% si la pierdes.") % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
 		child.queue_free()
@@ -199,20 +199,20 @@ func _update_players_ui() -> void:
 	var duo := Run.crew >= 2
 	_players_label.text = str(Run.crew)
 	_players_label.add_theme_color_override("font_color", Ui.LAMP_GO if duo else Ui.IVORY)
-	_p1_lamp.text = "Conectado".to_upper()
+	_p1_lamp.text = tr("Conectado").to_upper()
 	_p1_lamp.state = Lamp.GO
 	if duo:
-		_p2_lamp.text = "Conectado".to_upper()
+		_p2_lamp.text = tr("Conectado").to_upper()
 		_p2_lamp.state = Lamp.GO
-		_p2_hint.text = "Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir."
+		_p2_hint.text = tr("Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir.")
 		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_GO)
-		_join_button.text = "Desconectar jugador 2"
+		_join_button.text = tr("Desconectar jugador 2")
 	else:
-		_p2_lamp.text = "Esperando".to_upper()
+		_p2_lamp.text = tr("Esperando").to_upper()
 		_p2_lamp.state = Lamp.CAUTION
-		_p2_hint.text = "Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador."
+		_p2_hint.text = tr("Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador.")
 		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
-		_join_button.text = "Unirse (jugador 2)"
+		_join_button.text = tr("Unirse (jugador 2)")
 
 
 ## Ficha de contrato: filo de estado, destino, texto y, a la derecha, el dinero y la tecla.
@@ -250,10 +250,10 @@ func _contract_card(contract: Contract) -> PanelContainer:
 	if body != null:
 		_wrapped(info, body.description, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 		var facts := Ui.hbox(info, 18)
-		_fact(facts, "Delta-v", "%d m/s" % int(contract.dv_estimate))
-		_fact(facts, "Plazo", "%d días" % int(contract.deadline))
+		_fact(facts, tr("Delta-v"), tr("%d m/s") % int(contract.dv_estimate))
+		_fact(facts, tr("Plazo"), tr("%d días") % int(contract.deadline))
 	if risky:
-		var rumor := Lamp.new("Rumores de peligro", Lamp.CAUTION)
+		var rumor := Lamp.new(tr("Rumores de peligro"), Lamp.CAUTION)
 		rumor.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		info.add_child(rumor)
 	var money := Ui.vbox(row, 2)
@@ -262,12 +262,12 @@ func _contract_card(contract: Contract) -> PanelContainer:
 	var payout := Ui.label(money, Ui.money(contract.payout), 28, Ui.IVORY)
 	payout.add_theme_font_override("font", Ui.mono())
 	payout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	for line: Array in [["Adelanto %s" % Ui.money(contract.advance), Ui.IVORY_DIM], ["Presupuesto %s" % Ui.money(Profile.budget(contract)), Ui.LAMP_GO]]:
+	for line: Array in [[tr("Adelanto %s") % Ui.money(contract.advance), Ui.IVORY_DIM], [tr("Presupuesto %s") % Ui.money(Profile.budget(contract)), Ui.LAMP_GO]]:
 		Ui.label(money, line[0], Ui.SIZE_LEGEND, line[1]).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var gap := Control.new()
 	gap.custom_minimum_size.y = 6
 	money.add_child(gap)
-	var accept := Ui.primary(Ui.button(money, "Aceptar contrato", _accept.bind(contract)))
+	var accept := Ui.primary(Ui.button(money, tr("Aceptar contrato"), _accept.bind(contract)))
 	accept.custom_minimum_size.y = 44
 	if _first_focus == null:
 		_first_focus = accept
@@ -318,7 +318,7 @@ func _set_crew(count: int) -> void:
 	Profile.crew = next
 	Profile.save_profile()
 	Synth.play(&"chime" if next >= 2 else &"beep")
-	Events.toast.emit("2 jugadores conectados" if next >= 2 else "1 jugador conectado", Ui.LAMP_GO if next >= 2 else Ui.IVORY_DIM)
+	Events.toast.emit(tr("2 jugadores conectados") if next >= 2 else tr("1 jugador conectado"), Ui.LAMP_GO if next >= 2 else Ui.IVORY_DIM)
 	Juice.flash(Ui.LAMP_GO if next >= 2 else Ui.IVORY, 0.25)
 	_update_players_ui()
 

@@ -1,4 +1,5 @@
 shader_type canvas_item;
+render_mode unshaded;
 
 uniform int planet_type : hint_range(0, 4) = 0;
 uniform float pixels = 96.0;
@@ -13,6 +14,8 @@ uniform vec4 col_atmo : source_color = vec4(0.22, 0.74, 0.97, 0.45);
 uniform vec4 col_night : source_color = vec4(0.031, 0.047, 0.086, 1.0);
 uniform float ring = 0.0; // 1.0 dibuja anillos; el rectangulo debe cubrir 2.27 radios (halo_scale)
 uniform vec4 col_ring : source_color = vec4(0.93, 0.84, 0.62, 1.0);
+uniform float eclipse : hint_range(0.0, 1.0) = 0.0; // 1 aplasta el dia a la noche
+uniform float sun_energy : hint_range(0.0, 3.0) = 1.0; // sube en llamarada para que el glow HDR florezca
 
 float hash21(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21) + seed);
@@ -64,12 +67,111 @@ float bayer4(vec2 px) {
 	return 5.0 / 16.0;
 }
 
+// Anillo: giro de 15 grados y coseno de inclinacion 0.3, el mismo que aplasta la elipse al dibujarla.
+const float RING_C = 0.9659258;
+const float RING_S = 0.2588190;
+const float RING_TAN = 3.179797;
+const vec3 RING_N = vec3(0.0, 0.9539392, 0.3);
+const float ATMO_R = 1.24;
+const vec3 VIEW_DIR = vec3(0.0, 0.0, 1.0);
+
+// t mas cercano con t > 0. La esfera esta en el origen.
+float ray_sphere(vec3 ro, vec3 rd, float radius) {
+	float b = dot(ro, rd);
+	float c = dot(ro, ro) - radius * radius;
+	float h = b * b - c;
+	if (h < 0.0) {
+		return -1.0;
+	}
+	float s = sqrt(h);
+	float t0 = -b - s;
+	if (t0 > 0.02) {
+		return t0;
+	}
+	float t1 = -b + s;
+	return t1 > 0.02 ? t1 : -1.0;
+}
+
+// Entrada y salida. x < 0 si el rayo no toca.
+vec2 ray_sphere_span(vec3 ro, vec3 rd, float radius) {
+	float b = dot(ro, rd);
+	float c = dot(ro, ro) - radius * radius;
+	float h = b * b - c;
+	if (h < 0.0) {
+		return vec2(-1.0, -1.0);
+	}
+	float s = sqrt(h);
+	return vec2(-b - s, -b + s);
+}
+
+vec3 to_ring(vec3 p) {
+	return vec3(p.x * RING_C - p.y * RING_S, p.x * RING_S + p.y * RING_C, p.z);
+}
+
+float ring_band(float rad, float dither) {
+	if (pixels / halo_scale < 18.0) {
+		return rad > 1.3 && rad < 2.27 ? 1.0 : 0.0;
+	}
+	if (rad > 1.53 && rad < 1.95) {
+		return 1.0;
+	}
+	if (rad > 2.03 && rad < 2.27) {
+		return 0.74;
+	}
+	if (rad > 1.24 && rad <= 1.53 && dither < 0.5) {
+		return 0.5;
+	}
+	return 0.0;
+}
+
+// Rayo hacia el sol contra el plano del anillo. 0 fuera, hasta 1 en la banda B.
+float ring_occlusion(vec3 p, vec3 L, float dither) {
+	if (ring < 0.5) {
+		return 0.0;
+	}
+	vec3 pr = to_ring(p);
+	vec3 lr = to_ring(L);
+	float denom = dot(RING_N, lr);
+	if (abs(denom) < 0.001) {
+		return 0.0;
+	}
+	float t = -dot(RING_N, pr) / denom;
+	if (t < 0.04) {
+		return 0.0;
+	}
+	return ring_band(length(pr + lr * t), dither);
+}
+
+// Seis muestras entre t0 y t1. rd es (0,0,-1): la camara ortografica mira desde +Z.
+vec4 march_air(vec3 ro, float t0, float t1, vec3 L, float dither) {
+	vec4 result = vec4(0.0);
+	if (t1 <= t0 + 0.0001 || col_atmo.a <= 0.02) {
+		return result;
+	}
+	float scatter = 0.0;
+	float dt = (t1 - t0) / 6.0;
+	for (int i = 0; i < 6; i++) {
+		float t = t0 + (float(i) + 0.5) * dt;
+		vec3 p = vec3(ro.xy, ro.z - t);
+		float dens = exp(-max(length(p) - 1.0, 0.0) * 18.0);
+		float blocked = ray_sphere(p, L, 1.0) > 0.0 ? 1.0 : 0.0;
+		float occ = max(blocked, ring_occlusion(p, L, dither));
+		float sun = max((1.0 - occ) * (1.0 - eclipse), 0.07);
+		float mu = clamp(dot(normalize(p), L), 0.0, 1.0);
+		scatter += dens * dt * sun * (0.3 + 0.7 * mu);
+	}
+	result.rgb = col_atmo.rgb * scatter * 3.6 * sun_energy;
+	result.a = col_atmo.a * clamp(scatter * 2.0, 0.0, 1.0);
+	return result;
+}
+
 void fragment() {
 	vec2 px = floor(UV * pixels);
 	vec2 uv = (px + 0.5) / pixels;
 	vec2 d = (uv - 0.5) * 2.0 * halo_scale;
 	float r2 = dot(d, d);
 	float r_lim = 1.0;
+	vec2 sun_dir = normalize(light_dir + vec2(0.0001, 0.0));
 
 	if (planet_type == 4) {
 		float ang = atan(d.y, d.x);
@@ -81,19 +183,21 @@ void fragment() {
 		if (planet_type == 4) {
 			COLOR = vec4(0.0);
 		} else {
-			float dist = sqrt(r2);
 			float dither = bayer4(px);
-			float rim = smoothstep(min(halo_scale, 1.28) - 0.03, 0.96, dist);
-			float quant = rim > 0.001 ? step(dither * 0.56, rim) : 0.0;
-			float sun_side = smoothstep(-0.35, 0.72, dot(normalize(d + vec2(0.0001)), normalize(light_dir)));
-			vec3 halo_col = col_atmo.rgb * mix(0.8, 1.85, sun_side);
-			float halo_alpha = col_atmo.a * quant * mix(0.28, 0.72, sun_side);
-			COLOR = vec4(halo_col, halo_alpha);
+			vec3 L = normalize(vec3(sun_dir, 0.55));
+			vec3 ro = vec3(d, 4.0);
+			vec2 span = ray_sphere_span(ro, vec3(0.0, 0.0, -1.0), ATMO_R);
+			if (span.x < 0.0) {
+				COLOR = vec4(0.0);
+			} else {
+				vec4 air = march_air(ro, span.x, span.y, L, dither);
+				float quant = air.a > 0.001 ? step(dither * 0.5, air.a) : 0.0;
+				COLOR = vec4(air.rgb, clamp(air.a, 0.0, 1.0) * quant);
+			}
 		}
 	} else {
 		float nr2 = clamp(r2 / max(r_lim, 0.001), 0.0, 1.0);
 		float z = sqrt(max(1.0 - nr2, 0.0));
-		vec3 normal = normalize(vec3(d.x, d.y, z));
 		float lon = atan(d.x, z) + TIME * spin_speed;
 		float lat = asin(clamp(d.y, -1.0, 1.0));
 		vec2 sphere_uv = vec2(lon * 1.4, lat * 2.2);
@@ -142,15 +246,28 @@ void fragment() {
 			surf = col_b.rgb;
 		}
 
-		vec3 l3 = normalize(vec3(light_dir.x, light_dir.y, 0.55));
-		float ndl = clamp(dot(normal, l3), 0.0, 1.0);
+		vec3 L = normalize(vec3(sun_dir, 0.55));
 		float dither = bayer4(px);
+		vec3 hit = vec3(d, sqrt(max(r_lim * r_lim - r2, 0.0)));
+		vec3 normal = normalize(hit);
+		// Rayo de sombra: la esfera se tapa sola; el anillo se cruza con el plano inclinado.
+		float ndl_raw = clamp(dot(normal, L), 0.0, 1.0);
+		if (ray_sphere(hit + normal * 0.04, L, max(r_lim, 0.2)) > 0.0) {
+			ndl_raw = 0.0;
+		}
+		vec3 side = normalize(cross(L, normal) + vec3(0.0001, 0.0, 0.0));
+		float occ = ring_occlusion(hit + normal * 0.05, L, dither);
+		occ += ring_occlusion(hit + side * 0.07 + normal * 0.05, L, dither);
+		occ += ring_occlusion(hit - side * 0.07 + normal * 0.05, L, dither);
+		occ /= 3.0;
+		ndl_raw *= 1.0 - occ * 0.85;
+		float ndl = ndl_raw * (1.0 - eclipse);
 
 		vec3 lit = col_night.rgb;
 		if (ndl > 0.68 + dither * 0.14) {
-			lit = surf * 1.12;
+			lit = surf * 1.12 * sun_energy;
 		} else if (ndl > 0.36 + dither * 0.16) {
-			lit = surf * 0.88;
+			lit = surf * 0.88 * mix(1.0, sun_energy, 0.65);
 		} else if (ndl > 0.15 + dither * 0.16) {
 			lit = mix(col_night.rgb, surf * 0.54, 0.85);
 		} else {
@@ -163,22 +280,25 @@ void fragment() {
 			lit = max(lit, col_c.rgb * 1.65);
 		}
 
-		// Reflejo solar especular sobre oceanos (planet_type 0)
-		vec3 view_dir = normalize(l3 + vec3(0.0, 0.0, 1.0));
-		float spec = pow(max(dot(normal, view_dir), 0.0), 16.0);
+		// Reflejo solar. El medio vector usa la camara en +Z, no una luz inventada.
+		vec3 half_dir = normalize(L + VIEW_DIR);
+		float spec = pow(max(dot(normal, half_dir), 0.0), 24.0);
 		if (planet_type == 0 && n <= 0.46) {
-			lit += vec3(0.65, 0.95, 1.25) * spec * smoothstep(0.2, 0.8, ndl);
+			lit += vec3(1.45, 1.85, 2.35) * spec * smoothstep(0.2, 0.8, ndl) * sun_energy;
 		}
 
-		// Limbo luminoso HDR (atmosferico en planetas con aire; mineral tenue en lunas sin aire)
-		if (planet_type != 4) {
-			float fresnel = pow(1.0 - z, 2.2) * smoothstep(-0.08, 0.55, ndl);
-			if (col_atmo.a > 0.02) {
-				float glow_amt = clamp(fresnel * max(col_atmo.a, 0.35) * 1.65, 0.0, 0.85);
-				lit = mix(lit, col_atmo.rgb * 1.75, glow_amt);
-			} else {
-				lit = mix(lit, col_c.rgb * 1.35, clamp(fresnel * 0.55, 0.0, 0.45));
+		// Aire entre la camara y el suelo: el limbo es el tramo largo del mismo rayo.
+		if (planet_type != 4 && col_atmo.a > 0.02) {
+			vec3 ro = vec3(d, 4.0);
+			vec2 span = ray_sphere_span(ro, vec3(0.0, 0.0, -1.0), ATMO_R);
+			float t_hit = 4.0 - hit.z;
+			if (span.x > 0.0 && t_hit > span.x) {
+				vec4 air = march_air(ro, span.x, t_hit, L, dither);
+				lit = mix(lit, max(lit, air.rgb), clamp(air.a, 0.0, 0.82));
 			}
+		} else if (planet_type != 4) {
+			float fresnel = pow(1.0 - z, 2.2) * smoothstep(-0.08, 0.55, ndl_raw) * (1.0 - eclipse);
+			lit = mix(lit, col_c.rgb * 1.65 * sun_energy, clamp(fresnel * 0.55, 0.0, 0.45));
 		}
 
 		COLOR = vec4(lit, 1.0);
@@ -201,7 +321,16 @@ void fragment() {
 			shade = 0.5;
 		}
 		if (shade > 0.0 && (r2 > 1.0 || q.y > 0.0)) {
-			COLOR = vec4(col_ring.rgb * shade, 1.0);
+			vec3 Lr = to_ring(normalize(vec3(sun_dir, 0.55)));
+			vec3 pr = vec3(q, -q.y * RING_TAN);
+			if (ray_sphere(pr + Lr * 0.04, Lr, 1.0) > 0.0) {
+				shade *= 0.22;
+			}
+			shade *= mix(1.0, 0.22, eclipse);
+			float face = clamp(dot(normalize(pr + vec3(0.0001)), Lr) * 0.5 + 0.5, 0.0, 1.0);
+			vec3 ring_col = col_ring.rgb * shade * mix(0.28, 1.5, face);
+			ring_col *= mix(1.0, sun_energy, face);
+			COLOR = vec4(ring_col, 1.0);
 		}
 	}
 }

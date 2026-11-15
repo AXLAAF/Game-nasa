@@ -379,6 +379,59 @@ func test_black_walk_interior_then_airlock() -> void:
 	capsule.broken = false
 
 
+func test_experiment_boosts_or_breaks() -> void:
+	if not _require_runtime():
+		return
+	var tree := Engine.get_main_loop() as SceneTree
+	tree.paused = false
+	Run.crew = 2
+	Run.ship = ShipModel.new()
+	var engine := _part(&"motor_trueno")
+	var tank := _part(&"tanque_largo")
+	var capsule := _part(&"capsula")
+	assert_true(engine != null and tank != null and capsule != null, "piezas de prueba")
+	if _failed:
+		return
+	engine.condition = 0.95
+	engine.wear = 0.0
+	tank.condition = 0.95
+	tank.wear = 0.0
+	var fuel := tank.fuel
+	Run.ship.parts = [engine, tank, capsule]
+	var interior := ShipInterior.new()
+	tree.root.add_child(interior)
+	track(interior)
+	interior.interact(interior._center(2))
+	assert_true(interior.on_hull, "la cápsula sigue siendo la puerta")
+	assert_false(interior.busy, "la cápsula no se prueba")
+	interior.interact(interior.stick_to_hull(interior._center(2)))
+	assert_false(interior.on_hull, "vuelve")
+	interior.interact(interior._center(0))
+	assert_true(interior.busy, "motor sano abre la prueba")
+	var games := _minigames()
+	assert_gt(games.size(), 0, "hay minijuego de prueba")
+	if not games.is_empty():
+		assert_true(bool(games[0].get("experimental")), "marcada como prueba")
+		assert_true(bool(games[0].get("for_crew")), "la juega el segundo")
+	_drop_minigames()
+	interior._trial_done(true, engine)
+	assert_false(engine.broken, "el acierto no rompe")
+	assert_true(engine.tuned, "una sola prueba")
+	assert_eq(engine.boost, 1.2, "el acierto sube el rendimiento")
+	assert_gt(engine.wear, 0.0, "la prueba la deja más justa")
+	interior.busy = false
+	interior.interact(interior._center(0))
+	assert_false(interior.busy, "no se repite")
+	interior.interact(interior._center(1))
+	assert_true(interior.busy, "tanque sano abre la prueba")
+	_drop_minigames()
+	interior._trial_done(false, tank)
+	assert_true(tank.broken and tank.tuned, "el fallo rompe el tanque")
+	assert_eq(tank.boost, 1.0, "el fallo no sube el rendimiento")
+	assert_eq(tank.fuel, fuel, "la prueba no crea combustible")
+	assert_false(tree.paused, "la prueba no pausa")
+
+
 # --- helpers ---
 
 func _view_layer(game: Node) -> int:

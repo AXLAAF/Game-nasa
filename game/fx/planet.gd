@@ -83,4 +83,14 @@ func fit(diameter: float, on_screen: float) -> void:
 
 
 func light_from(direction: Vector2) -> void:
+	if direction.length_squared() < 0.0001:
+		return
 	(material as ShaderMaterial).set_shader_parameter("light_dir", direction.normalized())
+
+
+func set_eclipse(amount: float) -> void:
+	(material as ShaderMaterial).set_shader_parameter("eclipse", clampf(amount, 0.0, 1.0))
+
+
+func set_sun_energy(energy: float) -> void:
+	(material as ShaderMaterial).set_shader_parameter("sun_energy", maxf(energy, 0.0))

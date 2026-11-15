@@ -86,7 +86,7 @@ func _ready() -> void:
 	_rooms = Node2D.new()
 	_panel.add_child(_rooms)
 	_rebuild(false)
-	Kinetic.enter_deferred(_panel, 0.02, {"slide": true, "slide_offset": Vector2(34.0, -8.0), "scale": Vector2(0.95, 0.94), "tilt": -0.02, "beam": true, "beam_color": Color(0.45, 0.92, 1.0, 0.24), "duration": 0.30})
+	_lock_panel()
 
 
 func _process(_delta: float) -> void:
@@ -271,33 +271,38 @@ func _interact_inside(at: Vector2) -> void:
 			_begin(hatch_part)
 			return
 		_rebuild(true)
-		Events.toast.emit("Saliste al casco", Ui.INFO)
+		Events.toast.emit(tr("Saliste al casco"), Ui.INFO)
 		return
 	if index < 0 and _hatch_rect().grow(6.0).has_point(at):
 		_rebuild(true)
-		Events.toast.emit("Saliste al casco", Ui.INFO)
+		Events.toast.emit(tr("Saliste al casco"), Ui.INFO)
 		return
 	if index < 0:
 		return
 	var part: ShipPart = Run.ship.parts[index]
 	if _serviceable(part) and (can_repair(part.def.kind, false, true, false) or is_exterior(part.def.kind)):
 		_begin(part)
+		return
+	if _offer(part):
+		_begin_trial(part)
 
 
 func _interact_hull(at: Vector2) -> void:
 	var part := _exterior_at(at)
-	var repair := part != null and _serviceable(part)
-	if repair and _near_hatch(at) and _station_distance(at, part) > at.distance_to(hatch_point()):
-		repair = false
-	if repair:
-		_begin(part)
-		return
+	var hatch_closer := part != null and _near_hatch(at) and _station_distance(at, part) > at.distance_to(hatch_point())
+	if part != null and not hatch_closer:
+		if _serviceable(part):
+			_begin(part)
+			return
+		if _offer(part):
+			_begin_trial(part)
+			return
 	if _near_hatch(at):
 		_rebuild(false)
-		Events.toast.emit("Volviste a la cabina", Ui.INFO)
+		Events.toast.emit(tr("Volviste a la cabina"), Ui.INFO)
 		return
 	if part != null:
-		Events.toast.emit("%s en orden" % part.def.display_name, Ui.IVORY_DIM)
+		Events.toast.emit(tr("%s en orden") % part.def.display_name, Ui.IVORY_DIM)
 
 
 func _station_distance(at: Vector2, part: ShipPart) -> float:
@@ -311,9 +316,32 @@ func _station_distance(at: Vector2, part: ShipPart) -> float:
 	return best
 
 
+func _offer(part: ShipPart) -> bool:
+	return Run.crew >= 2 and part.can_experiment() and part.def.kind != &"capsule"
+
+
 func _begin(part: ShipPart) -> void:
 	busy = true
 	Minigame.start(Minigame.for_part(part.def.kind), _finished.bind(part), true)
+
+
+func _begin_trial(part: ShipPart) -> void:
+	busy = true
+	Minigame.start(Minigame.for_part(part.def.kind), _trial_done.bind(part), true, true)
+
+
+func _trial_done(success: bool, part: ShipPart) -> void:
+	busy = false
+	if not is_instance_valid(self):
+		return
+	part.apply_experiment(success)
+	if success:
+		var extra := int(round(part.boost * 100.0))
+		Events.toast.emit(tr("%s queda al %d %%. Quedó más justa.") % [part.def.display_name, extra], Ui.LAMP_GO)
+	else:
+		Events.toast.emit(tr("La prueba rompió %s.") % part.def.display_name, Ui.LAMP_WARNING)
+	if _map != null:
+		_map.queue_redraw()
 
 
 func _serviceable(part: ShipPart) -> bool:
@@ -326,18 +354,18 @@ func _finished(success: bool, part: ShipPart) -> void:
 		return
 	if not success:
 		part.wear = minf(part.wear + 0.2, 1.0)
-		Events.toast.emit("La reparación falló", Ui.LAMP_WARNING)
+		Events.toast.emit(tr("La reparación falló"), Ui.LAMP_WARNING)
 		return
 	var was_broken := part.broken
 	if was_broken and Run.kits > 0:
 		Run.kits -= 1
 		Run.apply({"fix": true}, part)
-		Events.toast.emit("%s reparada" % part.def.display_name, Ui.LAMP_GO)
+		Events.toast.emit(tr("%s reparada") % part.def.display_name, Ui.LAMP_GO)
 	elif was_broken:
 		Run.apply({"fix": true, "wear": 0.15}, part)
-		Events.toast.emit("Improvisada, sin kits", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Improvisada, sin kits"), Ui.LAMP_CAUTION)
 	else:
-		Events.toast.emit("%s revisada" % part.def.display_name, Ui.LAMP_GO)
+		Events.toast.emit(tr("%s revisada") % part.def.display_name, Ui.LAMP_GO)
 	_settle(part)
 	Card.release_fault(part, true)
 
@@ -373,6 +401,14 @@ func paint_map(canvas: Node2D) -> void:
 				if _crew.position.distance_to(other) < _crew.position.distance_to(target):
 					target = other
 			canvas.draw_line(_crew.position, target, Ui.LAMP_WARNING, 2.0)
+	if Run.crew >= 2:
+		for i: int in Run.ship.parts.size():
+			var trial: ShipPart = Run.ship.parts[i]
+			if not _offer(trial) or _serviceable(trial):
+				continue
+			_paint_trial(canvas, rects[i])
+			if trial.def.radial and trial.side == 0:
+				_paint_trial(canvas, ShipRenderer.mirror(rects[i]))
 	var hatch := _hatch_rect()
 	canvas.draw_rect(hatch, Color(0.45, 1.3, 1.5, 0.9), false, 2.0)
 	if on_hull:
@@ -397,6 +433,14 @@ func _paint_route(canvas: Node2D) -> void:
 		prev = nxt
 
 
+func _paint_trial(canvas: Node2D, rect: Rect2) -> void:
+	var c := rect.get_center()
+	var radius := maxf(minf(rect.size.x, rect.size.y) * 0.42, 7.0)
+	var color := Color(0.72, 0.48, 1.0)
+	canvas.draw_arc(c, radius, 0.0, TAU, 16, color, 1.5)
+	canvas.draw_string(Ui.sans(), c + Vector2(-22, -radius - 2.0), tr("Prueba"), HORIZONTAL_ALIGNMENT_LEFT, 48, 12, color)
+
+
 func _paint_damage(canvas: Node2D, part: ShipPart, rect: Rect2, pulse: float, urgent: bool) -> void:
 	var color := Ui.LAMP_WARNING if part.broken or urgent else Ui.LAMP_CAUTION
 	var c := rect.get_center()
@@ -405,7 +449,7 @@ func _paint_damage(canvas: Node2D, part: ShipPart, rect: Rect2, pulse: float, ur
 		radius *= 1.35
 	canvas.draw_circle(c, radius * (0.85 + pulse * 0.35), Color(color, 0.28 + pulse * 0.25))
 	canvas.draw_arc(c, radius, 0.0, TAU, 20, color, 2.0 if not urgent else 3.0)
-	var note := "Aquí" if urgent else ("Roto" if part.broken else "Falla")
+	var note := tr("Aquí") if urgent else (tr("Roto") if part.broken else tr("Falla"))
 	canvas.draw_string(Ui.sans(), c + Vector2(-18, -radius - 2.0), note, HORIZONTAL_ALIGNMENT_LEFT, 48, 12, color)
 
 
@@ -431,18 +475,15 @@ func _rebuild(hull: bool) -> void:
 	_crew.add_child(shape)
 	var hatch := _center(_airlock())
 	if on_hull:
-		_title.text = "Casco"
+		_title.text = tr("Casco")
 		_crew.position = stick_to_hull(hatch)
 	else:
-		_title.text = "Cabina"
+		_title.text = tr("Cabina")
 		_crew.position = hatch
 		_wall_frame(_stack_bounds())
 	_refresh_hint()
 	_rooms.add_child(_crew)
 	_fit()
-	if is_node_ready():
-		Kinetic.pop(_panel, Vector2(1.03, 0.97), 0.22)
-		Kinetic.sweep(_panel, Color(0.45, 0.95, 1.0, 0.26), 0.28)
 
 
 func _refresh_hint() -> void:
@@ -457,30 +498,49 @@ func _refresh_hint() -> void:
 			inside = true
 	if on_hull:
 		if inside:
-			_hint.text = "Falla en cabina. Enter en el anillo cian para entrar."
+			_hint.text = tr("Falla en cabina. Enter en el anillo cian para entrar.")
 		elif _has_fault(true):
-			_hint.text = "Rodea el casco hasta el aro y pulsa Enter."
+			_hint.text = tr("Rodea el casco hasta el aro y pulsa Enter.")
+		elif Run.crew >= 2:
+			_hint.text = tr("Enter sobre una pieza del casco para probarla. El anillo cian vuelve adentro.")
 		else:
-			_hint.text = "Enter en el anillo cian para volver a la cabina."
+			_hint.text = tr("Enter en el anillo cian para volver a la cabina.")
 	elif outside:
-		_hint.text = "Enter sobre el aro naranja. Si no llegas, sal por el marco cian."
+		_hint.text = tr("Enter sobre el aro naranja. Si no llegas, sal por el marco cian.")
 	else:
 		var hatch := _airlock()
 		if hatch >= 0 and hatch < Run.ship.parts.size() and Run.ship.parts[hatch].broken:
-			_hint.text = "Cápsula rota: Enter sobre ella repara. El marco cian es la salida."
+			_hint.text = tr("Cápsula rota: Enter sobre ella repara. El marco cian es la salida.")
 		elif _has_fault(false):
-			_hint.text = "Falla naranja: Enter sobre el aro para repararla."
+			_hint.text = tr("Falla naranja: Enter sobre el aro para repararla.")
+		elif Run.crew >= 2:
+			_hint.text = tr("Enter sobre una pieza sana para probarla. Si fallas, se rompe. La cápsula sale al casco.")
 		else:
-			_hint.text = "Enter en la cápsula (marco cian) para salir al casco."
+			_hint.text = tr("Enter en la cápsula (marco cian) para salir al casco.")
+
+
+## La animacion de entrada reescribia los offsets del panel anclado y, al recortar, la nave se veia mas chica.
+func _lock_panel() -> void:
+	if _panel == null:
+		return
+	_panel.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
+	_panel.offset_left = -PANEL_W
+	_panel.offset_top = 64.0
+	_panel.offset_right = 0.0
+	_panel.offset_bottom = -(Ui.CONSOLE_H + 8.0) # encima de la consola de vuelo, no sobre sus teclas
+	_panel.scale = Vector2.ONE
+	_panel.rotation = 0.0
 
 
 func _fit() -> void:
 	if _rooms == null or _panel == null or Run.ship.parts.is_empty():
 		return
-	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 96.0)
-	var avail := _panel.size - Vector2(16.0, 78.0)
-	if avail.x < 40.0 or avail.y < 40.0:
-		avail = Vector2(PANEL_W - 16.0, 420.0)
+	_lock_panel()
+	var view_h := get_viewport().get_visible_rect().size.y
+	var avail := Vector2(PANEL_W - 16.0, view_h - 64.0 - 64.0 - 78.0)
+	if avail.y < 40.0:
+		return
+	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 36.0)
 	var fit := minf(avail.x / maxf(box.size.x, 1.0), avail.y / maxf(box.size.y, 1.0)) * 0.92
 	_rooms.scale = Vector2(fit, fit)
 	var area_center := Vector2(8.0, 66.0) + avail * 0.5

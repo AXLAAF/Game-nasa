@@ -130,7 +130,7 @@ func win_streak() -> void:
 
 func lose_streak() -> void:
 	if streak > 0:
-		Events.toast.emit("Racha perdida (x%.2f)" % streak_mult(), Color(1, 0.4, 0.3))
+		Events.toast.emit(tr("Racha perdida (x%.2f)") % streak_mult(), Color(1, 0.4, 0.3))
 	streak = 0
 	Events.streak_changed.emit(streak)
 
@@ -147,7 +147,7 @@ func roll_stress(stress: float, kinds: Array = [], pool: Array = []) -> Array[Sh
 		if not kinds.is_empty() and not kinds.has(part.def.kind):
 			continue
 		if part.reveal():
-			Events.toast.emit("%s era %s" % [part.def.display_name, part.quality_text()], Color(0.8, 0.55, 1.0))
+			Events.toast.emit(tr("%s era %s") % [part.def.display_name, part.quality_text()], Color(0.8, 0.55, 1.0))
 		if rng.randf() < part.fail_chance(stress):
 			hit.append(part)
 	if hit.is_empty():
@@ -166,9 +166,9 @@ func roll_stress(stress: float, kinds: Array = [], pool: Array = []) -> Array[Sh
 	if not spared.is_empty() or not worn.is_empty():
 		var msg := ""
 		if not spared.is_empty():
-			msg = "Suerte, aguantaron: %s." % ", ".join(spared)
+			msg = tr("Suerte, aguantaron: %s.") % ", ".join(spared)
 		if not worn.is_empty():
-			msg += (" " if not msg.is_empty() else "") + "Se gastaron: %s." % ", ".join(worn)
+			msg += (" " if not msg.is_empty() else "") + tr("Se gastaron: %s.") % ", ".join(worn)
 		Events.toast.emit(msg, Color(1.0, 0.82, 0.3))
 	if not admit(hit[0]):
 		return []
@@ -213,7 +213,7 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 		var value: Variant = effects[key]
 		match str(key):
 			"explode":
-				destroy("%s explotó." % (part.def.display_name if part != null else "La nave"))
+				destroy(tr("%s explotó.") % (part.def.display_name if part != null else tr("La nave")))
 			"break":
 				if part != null:
 					part.broken = true
@@ -257,9 +257,9 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 					var victim: ShipPart = intact[rng.randi_range(0, intact.size() - 1)]
 					if admit(victim):
 						victim.broken = true
-						Events.toast.emit("%s se rompió" % victim.def.display_name, Color(1, 0.35, 0.3))
+						Events.toast.emit(tr("%s se rompió") % victim.def.display_name, Color(1, 0.35, 0.3))
 					else:
-						Events.toast.emit("La suerte salvó %s" % victim.def.display_name, Color(1.0, 0.82, 0.3))
+						Events.toast.emit(tr("La suerte salvó %s") % victim.def.display_name, Color(1.0, 0.82, 0.3))
 			"restore":
 				for mod_name: Variant in mods.keys():
 					mods[mod_name] = maxf(float(mods[mod_name]), 0.0)
@@ -273,7 +273,7 @@ func apply(effects: Dictionary, part: ShipPart = null) -> void:
 				salvage.erase(part)
 			"rescue":
 				outcome = &"stranded"
-				outcome_text = "Rescate pagado por la agencia. La carga se perdió."
+				outcome_text = tr("Rescate pagado por la agencia. La carga se perdió.")
 			"stake":
 				Profile.credits -= int(value)
 			"bet":
@@ -289,27 +289,27 @@ func describe(effects: Dictionary) -> String:
 	for key: Variant in effects:
 		var value: Variant = effects[key]
 		match str(key):
-			"explode": bits.append("explota")
-			"break": bits.append("se rompe")
-			"fix": bits.append("reparada")
-			"wear": bits.append("desgaste %+d %%" % int(float(value) * 100.0))
-			"thrust": bits.append("empuje %+d %%" % int(float(value) * 100.0))
-			"leak": bits.append("pierdes %d %% combustible" % int(float(value) * 100.0))
-			"fuel": bits.append("+%d %% combustible" % int(float(value) * 100.0))
+			"explode": bits.append(tr("explota"))
+			"break": bits.append(tr("se rompe"))
+			"fix": bits.append(tr("reparada"))
+			"wear": bits.append(tr("desgaste %+d %%") % int(float(value) * 100.0))
+			"thrust": bits.append(tr("empuje %+d %%") % int(float(value) * 100.0))
+			"leak": bits.append(tr("pierdes %d %% combustible") % int(float(value) * 100.0))
+			"fuel": bits.append(tr("+%d %% combustible") % int(float(value) * 100.0))
 			"credits": bits.append("%+d $" % int(value))
-			"science": bits.append("+%d ciencia" % int(value))
-			"kits": bits.append("%+d kit" % int(value))
-			"battery": bits.append("batería %+d %%" % int(float(value) * 100.0))
-			"heat": bits.append("calor %+d" % int(float(value) * 100.0))
-			"salvage": bits.append("+%d pieza misteriosa" % int(value))
-			"boxes": bits.append("+%d caja" % int(value))
-			"rand_break": bits.append("rompe una pieza al azar")
-			"restore": bits.append("sistemas restaurados")
-			"install": bits.append("pieza instalada")
-			"discard": bits.append("pieza perdida")
-			"rescue": bits.append("fin de la misión")
-			"stake": bits.append("apuestas %d $" % int(value))
-			"bet": bits.append("apuesta registrada")
+			"science": bits.append(tr("+%d ciencia") % int(value))
+			"kits": bits.append(tr("%+d kit") % int(value))
+			"battery": bits.append(tr("batería %+d %%") % int(float(value) * 100.0))
+			"heat": bits.append(tr("calor %+d") % int(float(value) * 100.0))
+			"salvage": bits.append(tr("+%d pieza misteriosa") % int(value))
+			"boxes": bits.append(tr("+%d caja") % int(value))
+			"rand_break": bits.append(tr("rompe una pieza al azar"))
+			"restore": bits.append(tr("sistemas restaurados"))
+			"install": bits.append(tr("pieza instalada"))
+			"discard": bits.append(tr("pieza perdida"))
+			"rescue": bits.append(tr("fin de la misión"))
+			"stake": bits.append(tr("apuestas %d $") % int(value))
+			"bet": bits.append(tr("apuesta registrada"))
 			"mult", "amount": pass
 			_: bits.append("%s %+d %%" % [str(key), int(float(value) * 100.0)])
 	return ", ".join(bits)

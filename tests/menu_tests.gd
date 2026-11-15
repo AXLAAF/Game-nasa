@@ -6,6 +6,7 @@ var failed := 0
 
 func run() -> int:
 	_test_settings()
+	_test_language()
 	_test_pause_single_player()
 	_test_pause_coop()
 	_test_title()
@@ -37,6 +38,48 @@ func _test_settings() -> void:
 	Settings.music = original_music
 	Settings.sfx = original_sfx
 	Settings.save()
+
+
+func _test_language() -> void:
+	var original := Settings.language
+	var original_locale := TranslationServer.get_locale()
+	check(Settings.DEFAULT_LANGUAGE == "en", "el idioma por defecto es ingles")
+	check(Settings.LANGUAGES == ["en", "es"], "idiomas disponibles: en y es")
+	# El cambio se aplica, se guarda y se recupera al volver a cargar.
+	Settings.language = "en"
+	check(Settings.set_language("es"), "set_language cambia a espanol")
+	check(TranslationServer.get_locale() == "es", "el idioma se aplica al TranslationServer")
+	Settings.save()
+	Settings.language = "en"
+	Settings.load_settings()
+	check(Settings.language == "es", "el idioma se guarda y se recarga")
+	check(not Settings.set_language("fr"), "un idioma desconocido se rechaza")
+	check(not Settings.set_language("es"), "elegir el idioma activo no hace nada")
+	# El catalogo: espanol es el texto original, ingles la traduccion.
+	check(TranslationServer.translate("Contratos") == "Contratos", "en espanol se ve el texto original")
+	Settings.set_language("en")
+	check(TranslationServer.translate("Contratos") == "Contracts", "en ingles se ve la traduccion")
+	var part: PartDef = load("res://content/parts/motor_trueno.tres")
+	check(part.display_name == "H-1 engine", "los recursos de content/ se traducen al leerlos")
+	# El selector solo se puede usar en el titulo y el hangar.
+	var router_before := Router.current
+	for screen: StringName in [&"launch", &"title", &"hangar", &"space"]:
+		Router.current = screen
+		var panel := SettingsPanel.new()
+		var buttons: Array[Node] = panel.find_children("*", "Button", true, false)
+		var language_buttons: Array[Button] = []
+		for node: Node in buttons:
+			var b := node as Button
+			if b.text == "English" or b.text == "Español":
+				language_buttons.append(b)
+		var allowed := screen == &"title" or screen == &"hangar"
+		check(language_buttons.size() == 2, "el panel muestra los dos idiomas en %s" % screen)
+		check(language_buttons.all(func(b: Button) -> bool: return b.disabled != allowed), "selector %s en %s" % ["activo" if allowed else "desactivado", screen])
+		panel.free()
+	Router.current = router_before
+	Settings.language = original
+	Settings.save()
+	TranslationServer.set_locale(original_locale)
 
 
 func _test_pause_single_player() -> void:

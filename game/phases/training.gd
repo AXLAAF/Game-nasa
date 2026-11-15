@@ -54,10 +54,10 @@ func _build_ui() -> void:
 	var header := Ui.hbox(page, 16)
 	var heading := Ui.vbox(header, 4)
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.label(heading, "BALLAST-1: Primera misión", 24, Ui.IVORY)
+	Ui.label(heading, tr("BALLAST-1: Primera misión"), 24, Ui.IVORY)
 	_progress = Ui.label(heading, "", 13, Ui.INFO)
-	Ui.button(header, "Reiniciar montaje", func() -> void: _send(&"retry"))
-	Ui.button(header, "Salir de práctica", func() -> void: Router.go(&"hangar"))
+	Ui.button(header, tr("Reiniciar montaje"), func() -> void: _send(&"retry"))
+	Ui.button(header, tr("Salir de práctica"), func() -> void: Router.go(&"hangar"))
 	var columns := Ui.hbox(page, 14)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var left := Ui.panel(columns)
@@ -79,7 +79,7 @@ func _build_ui() -> void:
 		var def: PartDef = session.definitions[id]
 		var button := Ui.button(_catalog, def.display_name, func() -> void: _pending.append(PlayerCommand.new(&"add", 0, StringName(id))))
 		button.custom_minimum_size.y = 34
-		button.tooltip_text = "%s\nMasa %.1f t; coste %d cr [DIS]." % [def.description, def.mass, def.cost]
+		button.tooltip_text = tr("%s\nMasa %.1f t; coste %d cr [DIS].") % [def.description, def.mass, def.cost]
 		_part_buttons[id] = button
 	var middle := Ui.vbox(columns, 8)
 	middle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -94,15 +94,15 @@ func _build_ui() -> void:
 	_stack.item_selected.connect(func(index: int) -> void: _selected = index)
 	middle.add_child(_stack)
 	_stack_controls = Ui.hbox(middle, 4)
-	Ui.button(_stack_controls, "Hacia la base", func() -> void: _move(-1))
-	Ui.button(_stack_controls, "Hacia la cima", func() -> void: _move(1))
-	Ui.button(_stack_controls, "Retirar", func() -> void:
+	Ui.button(_stack_controls, tr("Hacia la base"), func() -> void: _move(-1))
+	Ui.button(_stack_controls, tr("Hacia la cima"), func() -> void: _move(1))
+	Ui.button(_stack_controls, tr("Retirar"), func() -> void:
 		if _selected >= 0:
 			_pending.append(PlayerCommand.new(&"remove", 0, &"", _selected)))
 	var right := Ui.panel(columns)
 	right.custom_minimum_size.x = 260
 	var readouts := Ui.vbox(right, 10)
-	Ui.label(readouts, "Telemetría de práctica [DIS]", 14, Ui.INFO)
+	Ui.label(readouts, tr("Telemetría de práctica [DIS]"), 14, Ui.INFO)
 	_telemetry = Ui.label(readouts, "", 13, Ui.IVORY)
 	_telemetry.add_theme_font_override("font", Ui.mono())
 	_report_scroll = ScrollContainer.new()
@@ -114,16 +114,16 @@ func _build_ui() -> void:
 	_report.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var footer := Ui.vbox(page, 6)
 	_flight_controls = Ui.hbox(footer, 6)
-	_axis_down = _hold_button(_flight_controls, "Menos potencia", -1, false)
-	_axis_up = _hold_button(_flight_controls, "Más potencia", 1, false)
-	_hold_button(_flight_controls, "Girar izquierda (%s)" % _binding(&"cmd_steer_left"), -1, true)
-	_hold_button(_flight_controls, "Girar derecha (%s)" % _binding(&"cmd_steer_right"), 1, true)
+	_axis_down = _hold_button(_flight_controls, tr("Menos potencia"), -1, false)
+	_axis_up = _hold_button(_flight_controls, tr("Más potencia"), 1, false)
+	_hold_button(_flight_controls, tr("Girar izquierda (%s)") % _binding(&"cmd_steer_left"), -1, true)
+	_hold_button(_flight_controls, tr("Girar derecha (%s)") % _binding(&"cmd_steer_right"), 1, true)
 	var actions := Ui.hbox(footer, 8)
 	_confirm = Ui.primary(Ui.button(actions, "", _on_confirm))
 	_confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_repair = Ui.button(actions, "Reparar", func() -> void: _send(&"repair"))
-	_chute = Ui.button(actions, "Paracaídas", func() -> void: _send(&"parachute"))
-	Ui.label(footer, "Solo se arma la nave. No gasta créditos ni piezas del perfil.", 12, Ui.IVORY_DIM)
+	_repair = Ui.button(actions, tr("Reparar"), func() -> void: _send(&"repair"))
+	_chute = Ui.button(actions, tr("Paracaídas"), func() -> void: _send(&"parachute"))
+	Ui.label(footer, tr("Solo se arma la nave. No gasta créditos ni piezas del perfil."), 12, Ui.IVORY_DIM)
 
 func _hold_button(parent: Node, text: String, direction: float, steering: bool) -> Button:
 	var button := Ui.button(parent, text, func() -> void: pass)
@@ -193,12 +193,12 @@ func _refresh() -> void:
 	_instructions.text = lesson.text
 	var guide := session.assembly()
 	if assembling and guide.ready:
-		_title.text = "Nave lista"
-		_instructions.text = "El montaje cumple. A la derecha está, en corto, la ignición, el arco verde, la separación y la órbita del modo realista."
+		_title.text = tr("Nave lista")
+		_instructions.text = tr("El montaje cumple. A la derecha está, en corto, la ignición, el arco verde, la separación y la órbita del modo realista.")
 		_feedback.text = ""
 	elif assembling:
 		_title.text = "%d. %s" % [mini(int(guide.index) + 1, session.design.recipe.size()), guide.title]
-		_instructions.text = "%s\n\nPosiciones desde la base hacia la cima." % guide.why
+		_instructions.text = tr("%s\n\nPosiciones desde la base hacia la cima.") % guide.why
 		_feedback.text = guide.error
 	else:
 		_feedback.text = session.state.message
@@ -207,18 +207,18 @@ func _refresh() -> void:
 			for part: ShipPart in session.ship.active_stage():
 				capacity += part.def.fuel * part.boost
 			if session.ship.stage_fuel(session.ship.active_stage()) <= capacity * float(session.design.low_fuel_fraction):
-				_feedback.text = "Queda poco combustible ACTIVO. Prepara la separación; espera a que se agote."
+				_feedback.text = tr("Queda poco combustible ACTIVO. Prepara la separación; espera a que se agote.")
 	_catalog_scroll.visible = assembling
 	_stack.visible = assembling
 	_stack_controls.visible = assembling
 	_flight_controls.visible = not assembling and phase not in ["complete", "failed"]
-	_axis_down.text = "%s (%s)" % ["Entrada más inclinada" if phase == "entry" else "Menos potencia", _binding(&"cmd_throttle_down")]
-	_axis_up.text = "%s (%s)" % ["Entrada más plana" if phase == "entry" else "Más potencia", _binding(&"cmd_throttle_up")]
-	_progress.text = "Práctica de montaje | %s" % ("Completada" if Profile.training_completed else "Arma la nave sin arriesgar la campaña")
+	_axis_down.text = "%s (%s)" % [tr("Entrada más inclinada") if phase == "entry" else tr("Menos potencia"), _binding(&"cmd_throttle_down")]
+	_axis_up.text = "%s (%s)" % [tr("Entrada más plana") if phase == "entry" else tr("Más potencia"), _binding(&"cmd_throttle_up")]
+	_progress.text = tr("Práctica de montaje | %s") % (tr("Completada") if Profile.training_completed else tr("Arma la nave sin arriesgar la campaña"))
 	for id: String in _part_buttons:
 		var button: Button = _part_buttons[id]
 		Ui.mark_selected(button, id == guide.part)
-		button.text = ("Siguiente: " if id == guide.part else "") + session.definitions[id].display_name
+		button.text = (tr("Siguiente: ") if id == guide.part else "") + session.definitions[id].display_name
 	if assembling and guide.part != _suggested:
 		_suggested = guide.part
 		if _part_buttons.has(_suggested):
@@ -232,17 +232,17 @@ func _refresh() -> void:
 		for i: int in session.ship.parts.size():
 			_stack.add_item("%d. %s" % [i + 1, session.ship.parts[i].def.display_name])
 		_selected = -1
-	var actions := {"countdown": "Ignición", "ascent": "Separar etapa", "stage_ready": "Separar etapa", "stage_repaired": "Reintentar separación", "orbit": "Iniciar regreso", "entry": "Entrar en atmósfera"}
-	var label := "Terminar práctica" if guide.ready else "Completa el montaje"
+	var actions := {"countdown": tr("Ignición"), "ascent": tr("Separar etapa"), "stage_ready": tr("Separar etapa"), "stage_repaired": tr("Reintentar separación"), "orbit": tr("Iniciar regreso"), "entry": tr("Entrar en atmósfera")}
+	var label := tr("Terminar práctica") if guide.ready else tr("Completa el montaje")
 	if not assembling:
-		label = String(actions.get(phase, "Completa la acción indicada"))
+		label = String(actions.get(phase, tr("Completa la acción indicada")))
 	_confirm.text = "%s (%s)" % [label, _binding(&"cmd_confirm")]
 	_confirm.disabled = (assembling and not guide.ready) or (not assembling and not actions.has(phase))
 	_confirm.visible = phase not in ["complete", "failed"]
-	_repair.text = "Reparar (%s)" % _binding(&"cmd_repair")
+	_repair.text = tr("Reparar (%s)") % _binding(&"cmd_repair")
 	_repair.disabled = phase != "jammed"
 	_repair.visible = not assembling and phase not in ["complete", "failed"]
-	_chute.text = "Paracaídas (%s)" % _binding(&"cmd_parachute")
+	_chute.text = tr("Paracaídas (%s)") % _binding(&"cmd_parachute")
 	_chute.disabled = phase not in ["descent", "drogue_ready", "main_ready"]
 	_chute.visible = not assembling and phase not in ["complete", "failed"]
 	var ship := session.ship
@@ -252,12 +252,12 @@ func _refresh() -> void:
 	for part: ShipPart in ship.parts:
 		cost += part.def.cost
 		shield += part.ablative
-	_telemetry.text = "Etapas: %d\nMasa: %.1f t\nTWR: %.2f\nDelta-v: %d m/s\nCoste de diseño: %d cr\n\nCombustible ACTIVO: %.2f t\nCombustible TOTAL: %.2f t\n\nAltitud: %.1f km\nVelocidad: %.0f m/s\nPresión: %.1f kPa\nPotencia: %d %%\nCabeceo: %.0f°\nObjetivo: %.0f°\nBatería: %.1f\nEscudo: %.1f\nT-%.1f" % [ship.stages().size(), ship.mass(), ship.twr(session.body.surface_gravity), int(ship.delta_v()), cost, ship.stage_fuel(ship.active_stage()), ship.fuel_total(), float(flight.h) / 1000.0, Vector2(flight.vx, flight.vy).length(), float(flight.q) / 1000.0, int(session.state.throttle * 100), session.state.pitch, -90.0 if phase in ["retrograde", "deorbit"] else session.target_pitch(), session.state.battery, shield, session.state.countdown]
+	_telemetry.text = tr("Etapas: %d\nMasa: %.1f t\nTWR: %.2f\nDelta-v: %d m/s\nCoste de diseño: %d cr\n\nCombustible ACTIVO: %.2f t\nCombustible TOTAL: %.2f t\n\nAltitud: %.1f km\nVelocidad: %.0f m/s\nPresión: %.1f kPa\nPotencia: %d %%\nCabeceo: %.0f°\nObjetivo: %.0f°\nBatería: %.1f\nEscudo: %.1f\nT-%.1f") % [ship.stages().size(), ship.mass(), ship.twr(session.body.surface_gravity), int(ship.delta_v()), cost, ship.stage_fuel(ship.active_stage()), ship.fuel_total(), float(flight.h) / 1000.0, Vector2(flight.vx, flight.vy).length(), float(flight.q) / 1000.0, int(session.state.throttle * 100), session.state.pitch, -90.0 if phase in ["retrograde", "deorbit"] else session.target_pitch(), session.state.battery, shield, session.state.countdown]
 	if phase == "entry":
-		_telemetry.text += "\nEntrada: %.1f°\nCorredor: %.0f° a %.0f°" % [session.state.entry_angle, session.design.entry_min, session.design.entry_max]
+		_telemetry.text += tr("\nEntrada: %.1f°\nCorredor: %.0f° a %.0f°") % [session.state.entry_angle, session.design.entry_min, session.design.entry_max]
 	var notes := "\n".join(session.state.log)
 	var show_brief: bool = bool(assembling) and bool(guide.ready)
-	_report.text = BRIEF + "\n\n" + notes if show_brief else notes
+	_report.text = tr(BRIEF) + "\n\n" + notes if show_brief else notes
 	_report.add_theme_font_size_override("font_size", 15 if show_brief else 13)
 	_report.add_theme_color_override("font_color", Ui.IVORY if show_brief else Ui.IVORY_DIM)
 	_canvas.queue_redraw()
@@ -267,7 +267,7 @@ func _draw_ship() -> void:
 	_canvas.draw_rect(rect, Color("101b28"))
 	var center := _canvas.size * Vector2(0.5, 0.55)
 	if session.ship.parts.is_empty():
-		_canvas.draw_string(Ui.sans(), center - Vector2(130, 0), "Coloca el motor en la base", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Ui.INFO)
+		_canvas.draw_string(Ui.sans(), center - Vector2(130, 0), tr("Coloca el motor en la base"), HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Ui.INFO)
 		return
 	var bounds := ShipRenderer.bounds(session.ship.parts)
 	var scale_factor := minf((_canvas.size.y - 60.0) / maxf(bounds.size.y, 1.0), 1.0)
@@ -284,10 +284,10 @@ func _draw_ship() -> void:
 		if not session.assembly().ready:
 			_canvas.draw_rect(slot.grow(4), Ui.INFO, false, 2.0)
 	_canvas.draw_set_transform_matrix(Transform2D.IDENTITY)
-	_canvas.draw_string(Ui.sans(), Vector2(12, 24), "Base abajo, cabina arriba" if session.phase() == "assembly" else "MZ-1 BALLAST: práctica", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
+	_canvas.draw_string(Ui.sans(), Vector2(12, 24), tr("Base abajo, cabina arriba") if session.phase() == "assembly" else tr("MZ-1 BALLAST: práctica"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
 	if session.phase() == "assembly":
 		var guide := session.assembly()
-		_canvas.draw_string(Ui.sans(), Vector2(12, _canvas.size.y - 12), "Montaje listo" if guide.ready else "Siguiente posición: %d desde la base" % (int(guide.index) + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Ui.INFO)
+		_canvas.draw_string(Ui.sans(), Vector2(12, _canvas.size.y - 12), tr("Montaje listo") if guide.ready else tr("Siguiente posición: %d desde la base") % (int(guide.index) + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Ui.INFO)
 	elif session.phase() == "entry":
 		var start := Vector2(20, _canvas.size.y - 55)
 		var width := _canvas.size.x - 40.0
@@ -297,7 +297,7 @@ func _draw_ship() -> void:
 		_canvas.draw_line(start + Vector2(width * lo, 0), start + Vector2(width * hi, 0), Ui.LAMP_GO, 12)
 		var marker := start + Vector2(width * (session.state.entry_angle + 30.0) / 29.0, 0)
 		_canvas.draw_line(marker - Vector2(0, 15), marker + Vector2(0, 15), Ui.IVORY, 3)
-		_canvas.draw_string(Ui.sans(), start + Vector2(0, 35), "Inclinado                     Plano", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
+		_canvas.draw_string(Ui.sans(), start + Vector2(0, 35), tr("Inclinado                     Plano"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
 	elif session.phase() in ["ascent", "steering", "retrograde", "deorbit"]:
 		var dial := Vector2(_canvas.size.x - 80, _canvas.size.y - 90)
 		var target := deg_to_rad(-90.0 if session.phase() in ["retrograde", "deorbit"] else session.target_pitch()) - PI * 0.5
@@ -306,4 +306,4 @@ func _draw_ship() -> void:
 		var tolerance := deg_to_rad(float(session.design.corridor_tolerance))
 		_canvas.draw_arc(dial, 45, target - tolerance, target + tolerance, 12, Ui.LAMP_GO, 8)
 		_canvas.draw_line(dial, dial + Vector2.from_angle(actual) * 45, Ui.IVORY, 3)
-		_canvas.draw_string(Ui.sans(), dial + Vector2(-45, 70), "Corredor", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
+		_canvas.draw_string(Ui.sans(), dial + Vector2(-45, 70), tr("Corredor"), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)

@@ -3,8 +3,12 @@ class_name BodyDef
 extends Resource
 
 @export var id: StringName = &""
-@export var display_name: String = ""
-@export_multiline var description: String = ""
+@export var display_name: String = "":
+	get:
+		return tr(display_name)
+@export_multiline var description: String = "":
+	get:
+		return tr(description)
 @export var color: Color = Color.WHITE
 @export var atmo_color: Color = Color(0.5, 0.7, 1.0, 0.35)
 @export var is_star: bool = false

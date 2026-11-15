@@ -28,7 +28,7 @@ func _ready() -> void:
 	_col = Ui.vbox(panel, 8)
 	var good := Run.outcome == &"delivered" or Run.outcome == &"partial"
 	var head := Ui.hbox(_col, 8)
-	head.add_child(Lamp.new("Entrega" if good else "Pérdida", Lamp.GO if good else Lamp.WARNING))
+	head.add_child(Lamp.new(tr("Entrega") if good else tr("Pérdida"), Lamp.GO if good else Lamp.WARNING))
 	var headline := Ui.label(head, _headline(), Ui.SIZE_READOUT, Ui.IVORY)
 	headline.add_theme_font_override("font", Ui.bold())
 	var why := Ui.label(_col, Run.outcome_text, Ui.SIZE_TEXT, Ui.IVORY)
@@ -37,7 +37,7 @@ func _ready() -> void:
 	_list = Ui.vbox(_col, 2)
 	var total_well := Ui.well(_col)
 	var total_col := Ui.vbox(total_well, 2)
-	Ui.legend(total_col, "Total")
+	Ui.legend(total_col, tr("Total"))
 	_total_label = Ui.label(total_col, "", Ui.SIZE_HERO, Ui.IVORY)
 	_total_label.add_theme_font_override("font", Ui.mono())
 	_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -47,11 +47,11 @@ func _ready() -> void:
 
 func _headline() -> String:
 	match Run.outcome:
-		&"delivered": return "Entrega completa"
-		&"partial": return "Entrega parcial"
-		&"aborted": return "Misión abortada"
-		&"stranded": return "A la deriva"
-	return "Nave perdida"
+		&"delivered": return tr("Entrega completa")
+		&"partial": return tr("Entrega parcial")
+		&"aborted": return tr("Misión abortada")
+		&"stranded": return tr("A la deriva")
+	return tr("Nave perdida")
 
 
 ## Calcula todas las lineas y aplica el resultado al perfil antes de animar.
@@ -62,39 +62,39 @@ func _settle() -> void:
 		var base := contract.payout - contract.advance
 		if Run.outcome == &"partial":
 			base = int(base * 0.5)
-		_add("Pago del contrato", base, Ui.IVORY)
+		_add(tr("Pago del contrato"), base, Ui.IVORY)
 		if Profile.assist:
 			var cut := int(base * (1.0 - Run.assist_payout_mult()))
-			_add("Modo asistido, -15 %", -cut, Ui.LAMP_CAUTION)
+			_add(tr("Modo asistido, -15 %"), -cut, Ui.LAMP_CAUTION)
 			base -= cut
 		var grade_mult: float = GRADE_MULT.get(Run.grade, 1.0)
 		if grade_mult != 1.0:
-			_add("Aterrizaje %s  x%.2f" % [Run.grade, grade_mult], int(base * (grade_mult - 1.0)), Ui.INFO)
+			_add(tr("Aterrizaje %s  x%.2f") % [Run.grade, grade_mult], int(base * (grade_mult - 1.0)), Ui.INFO)
 		var t: float = Run.space_state.get("t", 0.0)
 		if t <= contract.deadline:
-			_add("A tiempo, +15 %", int(base * 0.15), Ui.LAMP_GO)
+			_add(tr("A tiempo, +15 %"), int(base * 0.15), Ui.LAMP_GO)
 		else:
-			_add("Fuera de plazo  -30%", -int(base * 0.3), Ui.LAMP_WARNING)
+			_add(tr("Fuera de plazo  -30%"), -int(base * 0.3), Ui.LAMP_WARNING)
 		if Run.streak > 0:
-			_add("Racha x%.2f" % Run.streak_mult(), int(base * (Run.streak_mult() - 1.0)), Ui.IVORY)
+			_add(tr("Racha x%.2f") % Run.streak_mult(), int(base * (Run.streak_mult() - 1.0)), Ui.IVORY)
 	elif contract != null:
-		_add("Adelanto ya cobrado", 0, Ui.IVORY_DIM)
+		_add(tr("Adelanto ya cobrado"), 0, Ui.IVORY_DIM)
 	if Run.earnings != 0:
-		_add("Botín en ruta", Run.earnings, Ui.IVORY)
+		_add(tr("Botín en ruta"), Run.earnings, Ui.IVORY)
 	if Run.science > 0:
-		_add("Ciencia  %d x %d" % [Run.science, SCIENCE_VALUE], Run.science * SCIENCE_VALUE, Ui.MYSTERY)
+		_add(tr("Ciencia  %d x %d") % [Run.science, SCIENCE_VALUE], Run.science * SCIENCE_VALUE, Ui.MYSTERY)
 	for bet: Dictionary in Run.side_bets:
 		var won := _bet_won(str(bet.kind), delivered)
 		var prize := int(bet.stake * bet.mult) if won else 0
-		_add("Apuesta %s  (%d)" % [_bet_name(str(bet.kind)), int(bet.stake)], prize, Ui.LAMP_GO if won else Ui.LAMP_WARNING)
+		_add(tr("Apuesta %s  (%d)") % [_bet_name(str(bet.kind)), int(bet.stake)], prize, Ui.LAMP_GO if won else Ui.LAMP_WARNING)
 	if not delivered and Run.insurance > 0:
 		var cover := int((Run.spent - Run.premium) * Profile.INSURANCE_COVER[Run.insurance])
-		_add("Seguro %s" % Profile.INSURANCE_NAMES[Run.insurance], cover, Ui.INFO)
+		_add(tr("Seguro %s") % tr(Profile.INSURANCE_NAMES[Run.insurance]), cover, Ui.INFO)
 	for part: ShipPart in Run.salvage:
 		part.reveal()
 		Profile.inventory.append(part.to_dict())
 	if not Run.salvage.is_empty():
-		_add("Chatarra al inventario  (%d)" % Run.salvage.size(), 0, Ui.IVORY_DIM)
+		_add(tr("Chatarra al inventario  (%d)") % Run.salvage.size(), 0, Ui.IVORY_DIM)
 	for line: Array in _lines:
 		_total += int(line[1])
 	Profile.credits += _total
@@ -104,7 +104,7 @@ func _settle() -> void:
 	if not delivered:
 		var lesson := Profile.learn_random(Run.rng)
 		if lesson != "":
-			_add("Lección: " + str(Profile.LESSONS[lesson]), 0, Ui.LAMP_GO)
+			_add(tr("Lección: ") + tr(str(Profile.LESSONS[lesson])), 0, Ui.LAMP_GO)
 	Profile.save_profile()
 
 
@@ -125,9 +125,9 @@ func _bet_won(kind: String, delivered: bool) -> bool:
 
 func _bet_name(kind: String) -> String:
 	match kind:
-		"fuel": return "combustible"
-		"deadline": return "plazo"
-	return "aterrizaje perfecto"
+		"fuel": return tr("combustible")
+		"deadline": return tr("plazo")
+	return tr("aterrizaje perfecto")
 
 
 func _play() -> void:
@@ -154,14 +154,14 @@ func _play() -> void:
 	Juice.flash(Ui.IVORY if _total > 0 else Ui.LAMP_WARNING, 0.3)
 	if Run.boxes > 0:
 		await _open_boxes()
-	Ui.label(_col, "Créditos: %s" % Ui.money(Profile.credits), Ui.SIZE_TEXT, Ui.IVORY)
-	var back := Ui.primary(Ui.button(_col, "Volver al hangar", func() -> void: Router.go(&"hangar")))
+	Ui.label(_col, tr("Créditos: %s") % Ui.money(Profile.credits), Ui.SIZE_TEXT, Ui.IVORY)
+	var back := Ui.primary(Ui.button(_col, tr("Volver al hangar"), func() -> void: Router.go(&"hangar")))
 	Kinetic.enter(back, 0.04, {"scale": Vector2(0.92, 0.86), "elastic": true, "beam": true, "duration": 0.30})
 	back.grab_focus()
 
 
 func _open_boxes() -> void:
-	Ui.legend(_col, "Cajas misteriosas x%d" % Run.boxes)
+	Ui.legend(_col, tr("Cajas misteriosas x%d") % Run.boxes)
 	var row := Ui.hbox(_col, 12)
 	for i: int in 3:
 		var reel := Ui.label(row, "?", 28, Ui.MYSTERY)

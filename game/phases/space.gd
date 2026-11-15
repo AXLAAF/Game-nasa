@@ -61,12 +61,17 @@ var _rescue_button: Button
 var _repair_button: Button
 var _salvage_button: Button
 var _planets: Dictionary = {} ## id de cuerpo -> Planet
+var _shadows: SunShadows
 
 
 func _ready() -> void:
 	if Run.contract == null or Run.ship.parts.is_empty():
 		Run.debug_setup()
 	bodies = Catalog.body_list()
+	_shadows = SunShadows.new()
+	_shadows.bodies = bodies
+	_shadows.show_behind_parent = true
+	add_child(_shadows)
 	for body: BodyDef in bodies:
 		if not body.is_star:
 			var planet := Planet.make(body, body.radius * 2.0)
@@ -173,7 +178,7 @@ func _poi_known(poi: Dictionary) -> bool:
 func _build_hud() -> void:
 	var root := Ui.root(self)
 	var row := Ui.console(root)
-	for key: Array in [["distance", "Distancia", ""], ["relative", "Vel. relativa", "m/s"], ["deadline", "Plazo", "días"]]:
+	for key: Array in [["distance", tr("Distancia"), ""], ["relative", tr("Vel. relativa"), "m/s"], ["deadline", tr("Plazo"), tr("días")]]:
 		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 88.0)
 	var well := Ui.well(row)
 	well.custom_minimum_size = Vector2(270, 0)
@@ -182,15 +187,15 @@ func _build_hud() -> void:
 	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
 	_info.add_theme_constant_override("line_spacing", 0)
 	var gauges := Ui.console_gauges(row, 2)
-	for key: Array in [["dv", "Delta-v", Ui.IVORY], ["battery", "Batería", Ui.LAMP_GO], ["temp", "Temperatura", Ui.LAMP_CAUTION], ["od", "Sobrecarga", Ui.LAMP_WARNING]]:
+	for key: Array in [["dv", tr("Delta-v"), Ui.IVORY], ["battery", tr("Batería"), Ui.LAMP_GO], ["temp", tr("Temperatura"), Ui.LAMP_CAUTION], ["od", tr("Sobrecarga"), Ui.LAMP_WARNING]]:
 		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
 	var buttons := Ui.console_keys(row, 2)
-	_repair_button = Ui.compact(Ui.button(buttons, "Reparar (R)", _repair_card))
-	Ui.compact(Ui.button(buttons, "Estado (C)", func() -> void: Ui.toggle_status(self)))
-	_salvage_button = Ui.compact(Ui.button(buttons, "Instalar (I)", _salvage_card))
+	_repair_button = Ui.compact(Ui.button(buttons, tr("Reparar (R)"), _repair_card))
+	Ui.compact(Ui.button(buttons, tr("Estado (C)"), func() -> void: Ui.toggle_status(self)))
+	_salvage_button = Ui.compact(Ui.button(buttons, tr("Instalar (I)"), _salvage_card))
 	if not Profile.arcade:
-		Ui.compact(Ui.button(buttons, "Navegación (N)", _toggle_nav))
-	_rescue_button = Ui.compact(Ui.button(buttons, "Pedir rescate", _stranded_card))
+		Ui.compact(Ui.button(buttons, tr("Navegación (N)"), _toggle_nav))
+	_rescue_button = Ui.compact(Ui.button(buttons, tr("Pedir rescate"), _stranded_card))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
 	Ui.place(ticker, Ui.TICKER_RECT)
@@ -201,7 +206,7 @@ func _build_hud() -> void:
 	_prompt.offset_top = -Ui.CONSOLE_H - 70
 	_prompt.offset_bottom = -Ui.CONSOLE_H - 70
 	_prompt.offset_right = -ShipInterior.panel_width() # centrado en el vuelo que el panel interior no tapa
-	Ui.keys(root, "WASD moverse (inercia, sin gravedad)   Mayús sobrecarga   Ctrl fino   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom" if Profile.arcade else "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom")
+	Ui.keys(root, tr("WASD moverse (inercia, sin gravedad)   Mayús sobrecarga   Ctrl fino   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom") if Profile.arcade else tr("A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom"))
 
 
 # ---------------------------------------------------------------- input
@@ -247,14 +252,14 @@ func _toggle_nav() -> void:
 	if nav_assist:
 		hold = 0
 	Synth.play(&"beep")
-	Events.toast.emit("Navegación asistida %s" % ("ON" if nav_assist else "OFF"), Ui.LAMP_GO if nav_assist else Ui.IVORY_DIM)
+	Events.toast.emit(tr("Navegación asistida %s") % ("ON" if nav_assist else "OFF"), Ui.LAMP_GO if nav_assist else Ui.IVORY_DIM)
 
 
 func _set_warp(index: int) -> void:
 	var cap := _warp_cap()
 	if index > cap:
 		Synth.play(&"deny")
-		Events.toast.emit("Suelta el motor para acelerar el tiempo", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Suelta el motor para acelerar el tiempo"), Ui.LAMP_CAUTION)
 	warp_i = mini(index, cap)
 
 
@@ -312,7 +317,7 @@ func _scan_target() -> void:
 	if not (target is Dictionary) or target.scanned:
 		return
 	if (st.pos as Vector2).distance_to(poi_pos(st.t, target)) > 1500.0:
-		Events.toast.emit("Fuera de alcance del escaner (1500)", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Fuera de alcance del escaner (1500)"), Ui.LAMP_CAUTION)
 		return
 	if Run.battery < 0.15 * Thermal.battery_capacity(Run.ship):
 		Synth.play(&"deny")
@@ -320,18 +325,18 @@ func _scan_target() -> void:
 	Run.apply({"battery": -0.15})
 	target.scanned = true
 	Synth.play(&"beep")
-	Events.toast.emit("Escaneo: %s %s" % [Ui.RARITY_NAMES[target.rarity], _poi_name(target)], Ui.RARITY[target.rarity])
+	Events.toast.emit(tr("Escaneo: %s %s") % [Loc.t(Ui.RARITY_NAMES[target.rarity]), _poi_name(target)], Ui.RARITY[target.rarity])
 
 
 func _poi_name(poi: Dictionary) -> String:
 	if poi.has("name"):
-		return String(poi.name)
+		return tr(String(poi.name))
 	match poi.kind:
-		&"asteroid": return "asteroide"
-		&"derelict": return "nave abandonada"
-		&"signal": return "señal"
-		&"comet": return "cometa"
-	return "luna"
+		&"asteroid": return tr("asteroide")
+		&"derelict": return tr("nave abandonada")
+		&"signal": return tr("señal")
+		&"comet": return tr("cometa")
+	return tr("luna")
 
 
 # ---------------------------------------------------------------- simulacion
@@ -402,6 +407,9 @@ func _process(delta: float) -> void:
 ## Los planetas son nodos con shader: se colocan aqui y _draw_body solo anade anillos y nombre.
 ## Por debajo de PLANET_MIN_PX en pantalla no hay grano que mostrar y se dibuja un punto.
 func _place_planets() -> void:
+	var energy := 1.55 if flare_warn >= 0.0 else 1.0
+	_shadows.time = st.t
+	_shadows.queue_redraw()
 	for body: BodyDef in bodies:
 		if body.is_star:
 			continue
@@ -413,6 +421,8 @@ func _place_planets() -> void:
 			planet.fit(body.radius * 2.0, on_screen)
 			planet.position = pos - planet.size * 0.5
 			planet.light_from(-pos)
+			planet.set_eclipse(SunLight.cover(pos, body.radius, bodies, st.t, body.id))
+			planet.set_sun_energy(energy)
 
 
 func _wasd_dir() -> Vector2:
@@ -458,13 +468,13 @@ func _nav_text() -> String:
 	var aligned := absf(angle_difference(heading, float(_nav.aim))) < 0.35
 	match _nav.phase:
 		&"boost":
-			return ("Empuja con W: acelera hacia el objetivo" if aligned else "Gira hacia el marcador turquesa y luego W") + ", hasta %d" % int(_nav.v_want)
+			return (tr("Empuja con W: acelera hacia el objetivo") if aligned else tr("Gira hacia el marcador turquesa y luego W")) + tr(", hasta %d") % int(_nav.v_want)
 		&"brake":
-			return ("Empuja con W: frena el cierre" if aligned else "Gira hacia el marcador ámbar para frenar") + ", cierre %d" % int(_nav.closing)
+			return (tr("Empuja con W: frena el cierre") if aligned else tr("Gira hacia el marcador ámbar para frenar")) + tr(", cierre %d") % int(_nav.closing)
 		&"capture":
-			return "Cerca: baja la velocidad relativa y pulsa L si es un planeta"
+			return tr("Cerca: baja la velocidad relativa y pulsa L si es un planeta")
 		&"coast":
-			return "Inercia: espera (cierre %d, falta %d)" % [int(_nav.closing), int(_nav.need)]
+			return tr("Inercia: espera (cierre %d, falta %d)") % [int(_nav.closing), int(_nav.need)]
 	return ""
 
 
@@ -513,7 +523,7 @@ func _thrust(delta: float, dt: float) -> Vector2:
 						overdrive = 0.4
 						Card.malfunction(engine)
 					else:
-						Events.toast.emit("El motor tose, pero aguanta", Ui.LAMP_CAUTION)
+						Events.toast.emit(tr("El motor tose, pero aguanta"), Ui.LAMP_CAUTION)
 	var push_dir := wasd.normalized() if Profile.arcade else Vector2.from_angle(heading)
 	if Profile.arcade:
 		var arcade_acc := clampf(acc * ARCADE_ACCEL_MULT, ARCADE_MIN_ACCEL * throttle, ARCADE_MAX_ACCEL) * (1.4 if over else 1.0)
@@ -529,22 +539,15 @@ func _collide(body: BodyDef) -> void:
 	Juice.hit(1.0)
 	Fx.burst(self, st.pos, Ui.LAMP_CAUTION, 160, 40.0 / zoom, 1.4)
 	if body.is_star:
-		Run.destroy("La nave se fundio al caer en %s." % body.display_name)
+		Run.destroy(tr("La nave se fundio al caer en %s.") % body.display_name)
 	else:
-		Run.destroy("La presión de %s aplastó la nave." % body.display_name)
+		Run.destroy(tr("La presión de %s aplastó la nave.") % body.display_name)
 
 
 func _sun_flux() -> float:
 	var pos: Vector2 = st.pos
-	for body: BodyDef in bodies:
-		if body.is_star:
-			continue
-		var bp := Gravity.body_pos(body, st.t)
-		var away := bp.normalized()
-		var d := pos - bp
-		var along := d.dot(away)
-		if along > 0.0 and (d - away * along).length() < body.radius:
-			return 0.0
+	if SunLight.in_umbra(pos, bodies, st.t):
+		return 0.0
 	return Thermal.flux(pos.length())
 
 
@@ -560,10 +563,10 @@ func _environment(dt: float) -> void:
 	if _env_clock > 15.0:
 		_env_clock = 0.0
 		if Run.temp > Thermal.HOT:
-			Events.toast.emit("Sobrecalentamiento: la electrónica sufre", Ui.LAMP_WARNING)
+			Events.toast.emit(tr("Sobrecalentamiento: la electrónica sufre"), Ui.LAMP_WARNING)
 			_raise(Run.roll_stress(0.35 + (Run.temp - Thermal.HOT) * 2.0, ELECTRONICS))
 		elif Run.temp < Thermal.COLD:
-			Events.toast.emit("Congelación: líneas de combustible rígidas", Ui.INFO)
+			Events.toast.emit(tr("Congelación: líneas de combustible rígidas"), Ui.INFO)
 			ship.leak(0.03)
 			_raise(Run.roll_stress(0.3 + (Thermal.COLD - Run.temp) * 2.0, [&"tank", &"engine", &"battery"]))
 		if f > 2.5:
@@ -582,7 +585,7 @@ func _hazards(dt: float) -> void:
 	if flare_warn < 0.0 and flare_timer <= warn_time:
 		flare_warn = flare_timer
 		Synth.play(&"alarm")
-		Events.toast.emit("Llamarada solar en %d s, escóndete tras un planeta" % int(warn_time), Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Llamarada solar en %d s, escóndete tras un planeta") % int(warn_time), Ui.LAMP_CAUTION)
 	if flare_timer <= 0.0:
 		flare_warn = -1.0
 		flare_timer = Run.rng.randf_range(90.0, 170.0)
@@ -605,7 +608,7 @@ func _hazards(dt: float) -> void:
 			_rad_clock += dt
 			if _rad_clock > 10.0:
 				_rad_clock = 0.0
-				Events.toast.emit("Radiación de %s" % body.display_name, Ui.MYSTERY)
+				Events.toast.emit(tr("Radiación de %s") % body.display_name, Ui.MYSTERY)
 				_raise(Run.roll_stress(0.5 * (1.0 - shield), ELECTRONICS))
 			break
 
@@ -613,7 +616,7 @@ func _hazards(dt: float) -> void:
 func _flare() -> void:
 	var f := _sun_flux()
 	if f <= 0.0:
-		Events.toast.emit("La llamarada pasó. A salvo en la sombra.", Ui.LAMP_GO)
+		Events.toast.emit(tr("La llamarada pasó. A salvo en la sombra."), Ui.LAMP_GO)
 		Run.apply({"science": 1})
 		Run.win_streak()
 		return
@@ -622,15 +625,15 @@ func _flare() -> void:
 	var shield := clampf(Run.ship.sum_stat(&"rad_resist"), 0.0, 0.9)
 	var hold_odds := clampf(0.85 - minf(f, 4.0) * 0.12 + shield * 0.5, 0.15, 0.97)
 	var choices: Array = [
-		_choice("Apagar sistemas", 0.9, {}, {"rand_break": true}, {"battery": -0.4}, "Todo volvió a encender.", "Algo no volvió a encender."),
-		_choice("Aguantar", hold_odds, {}, {"rand_break": true, "map": -0.25, "comms": -0.25}, {}, "El blindaje aguanto.", "Circuitos fritos."),
+		_choice(tr("Apagar sistemas"), 0.9, {}, {"rand_break": true}, {"battery": -0.4}, tr("Todo volvió a encender."), tr("Algo no volvió a encender.")),
+		_choice(tr("Aguantar"), hold_odds, {}, {"rand_break": true, "map": -0.25, "comms": -0.25}, {}, tr("El blindaje aguanto."), tr("Circuitos fritos.")),
 	]
 	if Run.ship.has_kind(&"solar"):
-		choices.append(_choice("Absorber con los paneles", 0.4, {"battery": 1.0, "science": 2}, {"rand_break": true, "vision": -0.3}, {}, "Batería a tope.", "Los paneles se quemaron."))
+		choices.append(_choice(tr("Absorber con los paneles"), 0.4, {"battery": 1.0, "science": 2}, {"rand_break": true, "vision": -0.3}, {}, tr("Batería a tope."), tr("Los paneles se quemaron.")))
 	_event_freeze = true
 	Card.show_card({
-		"title": "Llamarada solar",
-		"text": "Una tormenta de protones barre la nave. Flujo solar x%.1f." % f,
+		"title": tr("Llamarada solar"),
+		"text": tr("Una tormenta de protones barre la nave. Flujo solar x%.1f.") % f,
 		"tone": &"malfunction",
 		"choices": choices,
 		"scanned": Run.ship.kind_output(&"sensor") >= 0.7 or Profile.has_lesson("odds") or Profile.assist,
@@ -653,9 +656,9 @@ func _micrometeoroid() -> void:
 		if Run.admit(victim):
 			Card.malfunction(victim)
 		else:
-			Events.toast.emit("Impacto en %s. Aguanto." % victim.def.display_name, Ui.IVORY)
+			Events.toast.emit(tr("Impacto en %s. Aguanto.") % victim.def.display_name, Ui.IVORY)
 	else:
-		Events.toast.emit("Micrometeoroide rebota en %s" % victim.def.display_name, Ui.IVORY_DIM)
+		Events.toast.emit(tr("Micrometeoroide rebota en %s") % victim.def.display_name, Ui.IVORY_DIM)
 		victim.wear = minf(victim.wear + 0.05, 1.0)
 
 
@@ -693,13 +696,13 @@ func _encounter(poi: Dictionary) -> void:
 		if target is Dictionary and target == poi:
 			target = Run.target()
 		Card.show_card({
-			"title": String(poi.name),
-			"text": String(poi.text),
+			"title": tr(String(poi.name)),
+			"text": tr(String(poi.text)),
 			"tone": &"encounter",
 			"rarity": 1,
 			"choices": [
-				_choice("Fotografiar y registrar", 1.0, {"science": 1}, {}, {}, "Queda en el informe de la misión.", ""),
-				_choice("Seguir de largo", 1.0, {}),
+				_choice(tr("Fotografiar y registrar"), 1.0, {"science": 1}, {}, {}, tr("Queda en el informe de la misión."), ""),
+				_choice(tr("Seguir de largo"), 1.0, {}),
 			],
 			"scanned": true,
 		})
@@ -800,7 +803,7 @@ func _repair_card() -> void:
 	if Card.busy():
 		return
 	if Run.crew >= 2:
-		Events.toast.emit("El tripulante repara en la nave. Tirada penalizada: V / Y", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("El tripulante repara en la nave. Tirada penalizada: V / Y"), Ui.LAMP_CAUTION)
 		return
 	var part: ShipPart = null
 	for p: ShipPart in Run.ship.parts:
@@ -815,19 +818,19 @@ func _repair_card() -> void:
 	for value: Variant in Run.mods.values():
 		damaged = damaged or float(value) < 0.0
 	if part == null and not damaged:
-		Events.toast.emit("Nada que reparar", Ui.IVORY_DIM)
+		Events.toast.emit(tr("Nada que reparar"), Ui.IVORY_DIM)
 		return
 	var choices: Array = []
 	if part != null:
-		choices.append(_choice("Kit: reparar %s" % part.def.display_name, 1.0, {"fix": true}, {}, {"kits": -1}, "Como nueva."))
-		choices.append(_choice("Improvisar con cinta", 0.6, {"fix": true}, {"wear": 0.25, "battery": -0.2}, {}, "Aguanta. De milagro.", "Lo empeoraste."))
+		choices.append(_choice(tr("Kit: reparar %s") % part.def.display_name, 1.0, {"fix": true}, {}, {"kits": -1}, tr("Como nueva.")))
+		choices.append(_choice(tr("Improvisar con cinta"), 0.6, {"fix": true}, {"wear": 0.25, "battery": -0.2}, {}, tr("Aguanta. De milagro."), tr("Lo empeoraste.")))
 	if damaged:
-		choices.append(_choice("Kit: recalibrar sensores", 1.0, {"restore": true}, {}, {"kits": -1}, "Sistemas limpios."))
-		choices.append(_choice("Reiniciar a lo bruto", 0.5, {"restore": true}, {"rand_break": true}, {}, "Reinicio limpio.", "Algo salto en chispas."))
-	choices.append(_choice("Dejarlo así", 1.0, {}))
+		choices.append(_choice(tr("Kit: recalibrar sensores"), 1.0, {"restore": true}, {}, {"kits": -1}, tr("Sistemas limpios.")))
+		choices.append(_choice(tr("Reiniciar a lo bruto"), 0.5, {"restore": true}, {"rand_break": true}, {}, tr("Reinicio limpio."), tr("Algo salto en chispas.")))
+	choices.append(_choice(tr("Dejarlo así"), 1.0, {}))
 	Card.show_card({
-		"title": "Taller de a bordo",
-		"text": ("%s. Estado: %s." % [part.def.display_name, part.health_text()]) if part != null else "Los sensores están degradados.",
+		"title": tr("Taller de a bordo"),
+		"text": (tr("%s. Estado: %s.") % [part.def.display_name, part.health_text()]) if part != null else tr("Los sensores están degradados."),
 		"tone": &"info",
 		"part": part,
 		"choices": choices,
@@ -839,17 +842,17 @@ func _salvage_card() -> void:
 	if Card.busy():
 		return
 	if Run.salvage.is_empty():
-		Events.toast.emit("No tienes chatarra para instalar", Ui.IVORY_DIM)
+		Events.toast.emit(tr("No tienes chatarra para instalar"), Ui.IVORY_DIM)
 		return
 	var part: ShipPart = Run.salvage[0]
 	Card.show_card({
-		"title": "Instalar chatarra",
-		"text": "Una pieza misteriosa: %s. Montarla en pleno vuelo es una apuesta; si sale mal, se pierde y golpea la nave." % part.def.display_name,
+		"title": tr("Instalar chatarra"),
+		"text": tr("Una pieza misteriosa: %s. Montarla en pleno vuelo es una apuesta; si sale mal, se pierde y golpea la nave.") % part.def.display_name,
 		"tone": &"bet",
 		"part": part,
 		"choices": [
-			_choice("Instalar ahora", 0.7, {"install": true}, {"discard": true, "rand_break": true}, {}, "Encaja.", "Se solto y reboto contra el casco."),
-			_choice("Guardarla para vender", 1.0, {}),
+			_choice(tr("Instalar ahora"), 0.7, {"install": true}, {"discard": true, "rand_break": true}, {}, tr("Encaja."), tr("Se solto y reboto contra el casco.")),
+			_choice(tr("Guardarla para vender"), 1.0, {}),
 		],
 	})
 
@@ -858,13 +861,13 @@ func _stranded_card() -> void:
 	if Card.busy():
 		return
 	Card.show_card({
-		"title": "A la deriva",
-		"text": "Tanques secos. La agencia puede enviar un remolque, pero la misión se da por perdida.",
+		"title": tr("A la deriva"),
+		"text": tr("Tanques secos. La agencia puede enviar un remolque, pero la misión se da por perdida."),
 		"tone": &"bet",
 		"choices": [
-			_choice("Pedir rescate", 1.0, {"rescue": true}),
-			_choice("Esperar un carguero de paso", 0.25, {"fuel": 0.15}, {"battery": -0.3}, {}, "Te pasaron combustible.", "Nadie vino."),
-			_choice("Seguir intentando", 1.0, {}),
+			_choice(tr("Pedir rescate"), 1.0, {"rescue": true}),
+			_choice(tr("Esperar un carguero de paso"), 0.25, {"fuel": 0.15}, {"battery": -0.3}, {}, tr("Te pasaron combustible."), tr("Nadie vino.")),
+			_choice(tr("Seguir intentando"), 1.0, {}),
 		],
 	})
 
@@ -875,50 +878,50 @@ func _update_hud() -> void:
 	var ship := Run.ship
 	var t: float = st.t
 	var lines := PackedStringArray()
-	lines.append("Día %d, tiempo %s, racha x%.2f" % [int(t), Run.time_label(warp_i), Run.streak_mult()])
+	lines.append(tr("Día %d, tiempo %s, racha x%.2f") % [int(t), Run.time_label(warp_i), Run.streak_mult()])
 	if target != null:
 		var tp := _target_pos(t, target)
 		var tv := Gravity.body_vel(target, t) if target is BodyDef else Vector2.ZERO
 		var label: String = target.display_name if target is BodyDef else _poi_name(target)
-		lines.append("Objetivo: %s%s" % [label, " (guiado)" if nav_assist else ""])
+		lines.append(tr("Objetivo: %s%s") % [label, tr(" (guiado)") if nav_assist else ""])
 		(_readouts.distance as Label).text = "%d" % int((st.pos as Vector2).distance_to(tp))
 		(_readouts.relative as Label).text = "%d" % int(((st.vel as Vector2) - tv).length())
 		if not _nav.is_empty():
-			var phase_name := "inercia"
+			var phase_name := tr("inercia")
 			match _nav.phase:
-				&"boost": phase_name = "acelerar"
-				&"brake": phase_name = "frenar"
-				&"capture": phase_name = "capturar"
-			lines.append("Guiado: %s a %d, falta %d, cierre %d" % [phase_name, int(_nav.v_want), int(_nav.need), int(_nav.closing)])
+				&"boost": phase_name = tr("acelerar")
+				&"brake": phase_name = tr("frenar")
+				&"capture": phase_name = tr("capturar")
+			lines.append(tr("Guiado: %s a %d, falta %d, cierre %d") % [phase_name, int(_nav.v_want), int(_nav.need), int(_nav.closing)])
 		if _pred.has("closest_dist") and is_finite(float(_pred.closest_dist)):
-			lines.append("Paso más cercano: %d en %d s" % [int(_pred.closest_dist), int(_pred.closest_time)])
+			lines.append(tr("Paso más cercano: %d en %d s") % [int(_pred.closest_dist), int(_pred.closest_time)])
 	var left := Run.contract.deadline - t
 	(_readouts.deadline as Label).text = "%d" % maxi(int(left), 0)
 	if left <= 0.0:
-		lines.append("Plazo vencido: el pago baja")
+		lines.append(tr("Plazo vencido: el pago baja"))
 	if left < 0.0 and not _deadline_warned:
 		_deadline_warned = true
-		Events.toast.emit("Plazo vencido: el pago bajará", Ui.LAMP_WARNING)
+		Events.toast.emit(tr("Plazo vencido: el pago bajará"), Ui.LAMP_WARNING)
 	var degraded := PackedStringArray()
 	for ch: StringName in [&"map", &"vision", &"comms"]:
 		if Run.channel(ch) < 0.8:
-			degraded.append("%s %d %%" % [{&"map": "mapa", &"vision": "visión", &"comms": "comunicaciones"}[ch], int(Run.channel(ch) * 100.0)])
+			degraded.append("%s %d %%" % [{&"map": tr("mapa"), &"vision": tr("visión"), &"comms": tr("comunicaciones")}[ch], int(Run.channel(ch) * 100.0)])
 	if not degraded.is_empty():
-		lines.append("Degradado: " + ", ".join(degraded))
+		lines.append(tr("Degradado: ") + ", ".join(degraded))
 	_info.text = "\n".join(lines)
 	if target == null:
 		(_readouts.distance as Label).text = "-"
 		(_readouts.relative as Label).text = "-"
 	var dv := ship.delta_v()
-	(_gauges.dv as Gauge).set_value(dv / float(st.get("dv0", 1.0)), "%d m/s" % int(dv), dv < 300.0)
+	(_gauges.dv as Gauge).set_value(dv / float(st.get("dv0", 1.0)), tr("%d m/s") % int(dv), dv < 300.0)
 	var cap := Thermal.battery_capacity(ship)
 	(_gauges.battery as Gauge).set_value(Run.battery / cap, "%d %%" % int(Run.battery / cap * 100.0), Run.battery < cap * 0.15)
-	var temp_text := "Caliente" if Run.temp > Thermal.HOT else ("Helado" if Run.temp < Thermal.COLD else "%d %%" % int(Run.temp * 100.0))
+	var temp_text := tr("Caliente") if Run.temp > Thermal.HOT else (tr("Helado") if Run.temp < Thermal.COLD else "%d %%" % int(Run.temp * 100.0))
 	(_gauges.temp as Gauge).set_value(Run.temp / 1.2, temp_text, Run.temp > Thermal.HOT or Run.temp < Thermal.COLD)
 	(_gauges.od as Gauge).set_value(overdrive, "%d %%" % int(overdrive * 100.0), overdrive > 0.5)
 	# Kits y chatarra van en su tecla; el desgaste por pieza lo dice la matriz de lamparas.
-	_repair_button.text = "Reparar (R): %d kits" % Run.kits
-	_salvage_button.text = "Instalar (I): %d" % Run.salvage.size()
+	_repair_button.text = tr("Reparar (R): %d kits") % Run.kits
+	_salvage_button.text = tr("Instalar (I): %d") % Run.salvage.size()
 	var thrust_ok := ship.thrust() > 0.0
 	var dry := ship.fuel_total() <= 0.05 or (thrust_ok and dv < 5.0)
 	var empty := dry and approach == null
@@ -928,16 +931,16 @@ func _update_hud() -> void:
 		_stranded_card()
 	if approach != null:
 		var rel := ((st.vel as Vector2) - Gravity.body_vel(approach, t)).length() / RocketMath.SPACE_SCALE
-		_prompt.text = "Entrar a %s (L), %d m/s relativa" % [approach.display_name, int(rel)]
+		_prompt.text = tr("Entrar a %s (L), %d m/s relativa") % [approach.display_name, int(rel)]
 		_prompt.add_theme_color_override("font_color", Ui.LAMP_GO if approach == Run.target() else Ui.IVORY)
 	elif flare_warn >= 0.0:
-		_prompt.text = "Llamarada en %d s" % maxi(int(flare_timer), 0)
+		_prompt.text = tr("Llamarada en %d s") % maxi(int(flare_timer), 0)
 		_prompt.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
 	elif not _nav.is_empty() and (nav_assist or Profile.assist):
 		_prompt.text = _nav_text()
 		_prompt.add_theme_color_override("font_color", Ui.INFO)
 	else:
-		_prompt.text = "Manteniendo %s" % ("progrado" if hold == 1 else "retrógrado") if hold != 0 else ""
+		_prompt.text = tr("Manteniendo %s") % (tr("progrado") if hold == 1 else tr("retrógrado")) if hold != 0 else ""
 		_prompt.add_theme_color_override("font_color", Ui.INFO)
 
 
@@ -970,7 +973,9 @@ func _draw() -> void:
 	draw_arc(Vector2.ZERO, belt_mid + belt_w * 0.12, 0.0, TAU, 160, Color(0.55, 0.48, 0.42, 0.045), belt_w * 0.45)
 	for rock: Vector3 in _belt_rocks:
 		var a := rock.y + rot
-		draw_circle(Vector2(cos(a), sin(a)) * rock.x, rock.z * maxf(px, 1.0), Color(0.58, 0.52, 0.46, 0.65))
+		var rock_pos := Vector2(cos(a), sin(a)) * rock.x
+		var rock_col := Color(0.16, 0.14, 0.13, 0.45) if SunLight.in_umbra(rock_pos, bodies, t) else Color(0.58, 0.52, 0.46, 0.65)
+		draw_circle(rock_pos, rock.z * maxf(px, 1.0), rock_col)
 	for body: BodyDef in bodies:
 		if body.is_star:
 			continue
@@ -1016,21 +1021,33 @@ func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 	var r := maxf(body.radius, 3.5 * px)
 	var atmo := body.atmo_color if body.atmosphere > 0.0 else body.color
 	var mist := Ui.mist_texture()
+	var eclipsed := SunLight.in_umbra(pos, bodies, st.t, body.id)
+	var to_sun := Vector2.UP if pos.length_squared() <= 1.0 else -pos.normalized()
 	if body.atmosphere > 0.0:
 		var hr := r * 1.55
-		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, 0.22))
+		var mist_a := 0.05 if eclipsed else 0.22
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, mist_a))
 	elif body.hazards.has(&"heat") and body.atmosphere <= 0.0:
 		var hr_lava := r * 1.5
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr_lava, hr_lava), Vector2(hr_lava * 2.0, hr_lava * 2.0)), false, Color(1.5, 0.55, 0.16, 0.22))
 	# De cerca los anillos los pinta el shader de Planet; este arco solo acompana al punto lejano.
 	if body.id == &"saturno" and body.radius * 2.0 * zoom < PLANET_MIN_PX:
+		var local_sun := to_sun.rotated(0.26)
+		var a0 := local_sun.angle()
+		var width := maxf(2.4 * px, 1.2)
 		draw_set_transform(pos, -0.26, Vector2(2.15, 0.4))
-		draw_arc(Vector2.ZERO, body.radius * 1.55, 0.0, TAU, 64, Color(0.93, 0.84, 0.62, 0.55), maxf(2.4 * px, 1.2))
+		draw_arc(Vector2.ZERO, body.radius * 1.55, a0 - PI * 0.5, a0 + PI * 0.5, 32, Color(1.25, 1.08, 0.72, 0.72), width)
+		draw_arc(Vector2.ZERO, body.radius * 1.55, a0 + PI * 0.5, a0 + PI * 1.5, 32, Color(0.22, 0.16, 0.1, 0.4), width)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if body.radius * 2.0 * zoom < PLANET_MIN_PX:
 		var hr_dot := r * 2.2
-		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, 0.3))
-		draw_circle(pos, r * 1.05, Color(body.color.r * 1.5, body.color.g * 1.5, body.color.b * 1.5))
+		var dot_a := 0.08 if eclipsed else 0.3
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, dot_a))
+		var night := Color(body.color.r * 0.16, body.color.g * 0.16, body.color.b * 0.22)
+		draw_circle(pos, r * 1.05, night)
+		if not eclipsed:
+			var day := Color(minf(body.color.r * 1.65, 2.2), minf(body.color.g * 1.65, 2.2), minf(body.color.b * 1.65, 2.2))
+			draw_circle(pos + to_sun * r * 0.42, r * 0.58, day)
 	if body.hazards.has(&"radiation"):
 		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.32), 2.0 * px)
 	if body.landable:
@@ -1092,11 +1109,26 @@ func _draw_ship(px: float) -> void:
 		var flame_len := s * (2.0 + overdrive * 2.0) * flick
 		draw_line(pos - dir * s * 0.8, pos - dir * (s * 4.5 + flame_len * 1.6), Color(1.2, 2.2, 3.0, 0.28), 2.4 * px)
 		draw_colored_polygon(PackedVector2Array([pos - dir * s * 0.6 + side * s * 0.4, pos - dir * (s * 0.6 + flame_len), pos - dir * s * 0.6 - side * s * 0.4]), Color(3.0, 1.6 + overdrive, 0.5, 0.9))
-	draw_colored_polygon(PackedVector2Array([pos + dir * s, pos - dir * s * 0.7 + side * s * 0.6, pos - dir * s * 0.4, pos - dir * s * 0.7 - side * s * 0.6]), Color(0.95, 0.97, 1.0))
+	var hull := PackedVector2Array([pos + dir * s, pos - dir * s * 0.7 + side * s * 0.6, pos - dir * s * 0.4, pos - dir * s * 0.7 - side * s * 0.6])
+	var to_sun := Vector2.UP if pos.length_squared() <= 1.0 else -pos.normalized()
+	var in_shadow := SunLight.in_umbra(pos, bodies, st.t)
+	var cols := PackedColorArray()
+	for vertex: Vector2 in hull:
+		cols.append(_hull_color((vertex - pos).normalized(), to_sun, dir, in_shadow))
+	draw_polygon(hull, cols)
 	var frame := Gravity.dominant(pos, st.t, bodies)
 	var rel: Vector2 = st.vel - Gravity.body_vel(frame, st.t)
 	if rel.length() > 0.01:
 		draw_line(pos + rel.normalized() * s * 1.6, pos + rel.normalized() * s * 2.6, Ui.LAMP_GO, 2.0 * px)
+
+
+func _hull_color(normal: Vector2, to_sun: Vector2, dir: Vector2, in_shadow: bool) -> Color:
+	var nd := clampf(normal.dot(to_sun), 0.0, 1.0)
+	var flare := 1.4 if flare_warn >= 0.0 else 1.0
+	var col := Color(0.10, 0.13, 0.22) if in_shadow else Color(0.40, 0.48, 0.64).lerp(Color(1.35 * flare, 1.22 * flare, 0.9), nd)
+	if burning and normal.dot(dir) < -0.15:
+		col = col.lerp(Color(2.6, 1.2, 0.4), 0.72)
+	return col
 
 
 func _text(pos: Vector2, text: String, color: Color, px: float) -> void:
