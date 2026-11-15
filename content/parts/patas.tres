@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_vldkr")
 id = &"patas"
-display_name = "Patas de aterrizaje"
-description = "Aguantan aterrizajes más duros."
+display_name = "Patas de panal"
+description = "Panal de aluminio que se aplasta, como en el módulo lunar. Aguanta un golpe más duro."
 kind = &"legs"
 radial = true
 mass = 0.3

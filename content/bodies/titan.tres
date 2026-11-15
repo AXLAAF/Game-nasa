@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_titan"]
+
+[resource]
+script = ExtResource("1_titan")
+id = &"titan"
+display_name = "Titán"
+description = "Luna de Saturno con aire y frío. Huygens, llevado por el Cassini de la NASA, se posó aquí el 14 de enero de 2005."
+color = Color(0.78, 0.5, 0.24, 1)
+atmo_color = Color(0.95, 0.65, 0.3, 0.45)
+parent_id = &"saturno"
+orbit_radius = 260.0
+orbit_phase = 0.4
+radius = 10.0
+mu = 2200.0
+surface_gravity = 1.35
+atmosphere = 0.6
+hazards = Array[StringName]([&"cold"])
+payout = 2.4

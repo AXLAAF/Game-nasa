@@ -16,7 +16,7 @@ func _physics_process(delta: float) -> void:
 		return
 	var wish := Controls.crew_vector() * 150.0
 	if host.on_hull:
-		position = host.stick_to_hull(position + wish * delta)
+		position = host.slide_hull(position, wish * delta)
 		velocity = Vector2.ZERO
 	else:
 		velocity = wish

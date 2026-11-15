@@ -19,11 +19,10 @@ func _ready() -> void:
 	col.grow_vertical = Control.GROW_DIRECTION_BOTH
 	var title := Ui.label(col, "Margin Zero", Ui.SIZE_HERO * 2, Ui.IVORY)
 	title.add_theme_font_override("font", Ui.bold())
-	Ui.legend(col, "Deuda orbital")
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 18
 	col.add_child(spacer)
-	var training := Ui.button(col, "Repetir práctica de vuelo" if Profile.training_completed else "Primera misión: aprender a volar", func() -> void: Router.go(&"training"))
+	var training := Ui.button(col, "Repetir práctica de montaje" if Profile.training_completed else "Primera misión: armar la nave", func() -> void: Router.go(&"training"))
 	if not Profile.training_completed:
 		Ui.primary(training)
 	var new_game := Ui.primary(Ui.button(col, "Nueva partida", _new_game))
@@ -87,7 +86,7 @@ func _start(is_arcade: Variant = null) -> void:
 func _credits() -> void:
 	var modal := Modal.new("Créditos")
 	for text: String in [
-		"Margin Zero: Deuda Orbital",
+		"Margin Zero",
 		"Hecho para NASA Space Apps Challenge, reto Space Mission Design Game.",
 		"Datos abiertos: NASA Planetary Fact Sheet (NSSDCA), JPL Small-Body Database, NASA DONKI y NASA Deep Space Network.",
 		"Tipografía B612 y B612 Mono, SIL Open Font License.",

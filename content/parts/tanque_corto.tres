@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_d7ouo")
 id = &"tanque_corto"
-display_name = "Tanque corto"
-description = "4 t de propelente."
+display_name = "Tanque Al-Li corto"
+description = "Tanque de aluminio-litio. 4 t de propelente."
 cost = 110
 mass = 0.5
 fuel = 4.0

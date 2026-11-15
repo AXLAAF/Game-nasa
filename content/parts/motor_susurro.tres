@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_hyjhq")
 id = &"motor_susurro"
-display_name = "Motor Susurro"
-description = "Motor de vacio: casi no empuja pero estira cada gota."
+display_name = "Motor RL10"
+description = "Motor de vacío, como el RL10 del Centauro. Casi no empuja, pero estira cada gota."
 kind = &"engine"
 cost = 300
 mass = 0.6

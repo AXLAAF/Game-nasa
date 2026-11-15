@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_1fvx4")
 id = &"bateria"
-display_name = "Batería"
-description = "Guarda energía para la sombra."
+display_name = "Batería Li-Ion"
+description = "Batería de litio-ion. Guarda energía para la sombra y los picos."
 kind = &"battery"
 cost = 70
 mass = 0.1

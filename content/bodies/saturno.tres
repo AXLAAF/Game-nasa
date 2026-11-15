@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_saturno"]
+
+[resource]
+script = ExtResource("1_saturno")
+id = &"saturno"
+display_name = "Saturno"
+description = "Gigante con anillos, a 9,6 UA [NASA]. Cassini se destruyó en su atmósfera en 2017. El suelo útil está en Titán."
+color = Color(0.9, 0.82, 0.62, 1)
+atmo_color = Color(0.95, 0.85, 0.6, 0.3)
+parent_id = &"sol"
+orbit_radius = 19166.0
+orbit_phase = 4.7
+radius = 44.0
+mu = 120000.0
+surface_gravity = 10.44
+atmosphere = 1.6
+landable = false
+hazards = Array[StringName]([&"cold"])

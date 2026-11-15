@@ -6,9 +6,9 @@
 script = ExtResource("1_ug0b2")
 id = &"luna"
 display_name = "Luna"
-description = "Cerca y sin aire: hay que bajar a motor."
+description = "A unos 384 000 km de la Tierra [NASA]. Sin aire: hay que bajar a motor. Ahí siguen las etapas de descenso Apolo y los vehículos lunares."
 color = Color(0.7, 0.7, 0.72, 1)
-parent_id = &"terra"
+parent_id = &"tierra"
 orbit_radius = 140.0
 orbit_phase = 1.0
 radius = 8.0

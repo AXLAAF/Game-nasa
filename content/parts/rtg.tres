@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_8obke")
 id = &"rtg"
-display_name = "RTG nuclear"
-description = "Energía constante en cualquier sitio. También calienta."
+display_name = "MMRTG"
+description = "Generador de plutonio-238, como el de Curiosity. Da energía en cualquier sitio y también calienta."
 kind = &"rtg"
 radial = true
 cost = 380

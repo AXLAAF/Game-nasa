@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_cdru7")
 id = &"desacoplador"
-display_name = "Desacoplador"
-description = "Separa la etapa de abajo. Lo de abajo se tira con él."
+display_name = "Pernos de etapa"
+description = "Pernos frangibles: separan la etapa de abajo y se van con ella."
 kind = &"decoupler"
 cost = 60
 mass = 0.1

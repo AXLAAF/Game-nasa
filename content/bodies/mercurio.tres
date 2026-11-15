@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_mercurio"]
+
+[resource]
+script = ExtResource("1_mercurio")
+id = &"mercurio"
+display_name = "Mercurio"
+description = "El más cercano al Sol: 0,39 UA [NASA]. Sin aire y con el día abrasador. MESSENGER chocó aquí en 2015."
+color = Color(0.62, 0.55, 0.48, 1)
+atmo_color = Color(0, 0, 0, 0)
+parent_id = &"sol"
+orbit_radius = 774.0
+orbit_phase = 0.6
+radius = 12.0
+mu = 7000.0
+surface_gravity = 3.7
+atmosphere = 0.0
+hazards = Array[StringName]([&"heat"])
+payout = 1.45

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_venus"]
+
+[resource]
+script = ExtResource("1_venus")
+id = &"venus"
+display_name = "Venus"
+description = "A 0,72 UA [NASA]. El aire real es unas 90 veces más denso que el de la Tierra; aquí está suavizado para que un escudo y un paracaídas puedan bajar."
+color = Color(0.86, 0.74, 0.42, 1)
+atmo_color = Color(0.95, 0.82, 0.45, 0.55)
+parent_id = &"sol"
+orbit_radius = 1446.0
+orbit_phase = 2.1
+radius = 28.0
+mu = 36000.0
+surface_gravity = 8.87
+atmosphere = 1.2
+hazards = Array[StringName]([&"heat"])
+payout = 1.4

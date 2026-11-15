@@ -17,6 +17,7 @@ var _p2_lamp: Lamp
 var _p2_hint: Label
 var _join_button: Button
 var _first_focus: Control
+var _reset_armed: bool = false
 var _time: float = 0.0
 var _home: Planet
 var _moon: Planet
@@ -51,37 +52,65 @@ func _ready() -> void:
 	_best_label = Ui.readout(maker_row, "Mejor pago", "", 120.0)
 	_players_label = Ui.readout(maker_row, "Jugadores", "", 110.0)
 	var left := Ui.panel(root)
-	Ui.place(left, Rect2(40, 170, 330, 0))
+	left.set_anchors_preset(Control.PRESET_LEFT_WIDE)
+	left.offset_left = 40
+	left.offset_top = 170
+	left.offset_right = 370
+	left.offset_bottom = -20
 	var col := Ui.vbox(left, 8)
 	Ui.legend(col, "Jugadores")
 	_build_player_slots(col)
 	Ui.legend(col, "Seguro de la nave")
 	_insurance_box = Ui.hbox(col, 4)
 	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
-	Ui.button(col, "Práctica: mi primer cohete", func() -> void: Router.go(&"training"))
-	Ui.legend(col, "Lecciones")
+	Ui.button(col, "Práctica: armar la nave", func() -> void: Router.go(&"training"))
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	col.add_child(scroll)
+	var lessons := Ui.vbox(scroll, 8)
+	lessons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	Ui.legend(lessons, "Lecciones")
 	if Profile.lessons.is_empty():
-		var none := Ui.label(col, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
+		var none := Ui.label(lessons, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
 		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		none.custom_minimum_size = Vector2(300, 0)
 	for id: String in Profile.lessons:
-		var l := Ui.label(col, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
+		var l := Ui.label(lessons, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(300, 0)
 	Ui.label(col, "Inventario: %d piezas guardadas" % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
+	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
+	reset.pressed.connect(func() -> void:
+		if _reset_armed:
+			Profile.reset()
+			Router.go(&"hangar")
+		else:
+			_reset_armed = true
+			reset.text = "¿Seguro? Pulsa otra vez para borrar todo")
 	var right := Ui.panel(root)
-	right.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	right.set_anchors_preset(Control.PRESET_FULL_RECT)
 	right.offset_left = 400
-	right.offset_right = -40
 	right.offset_top = 170
+	right.offset_right = -40
+	right.offset_bottom = -20
+	right.clip_contents = true
 	var board_col := Ui.vbox(right, 10)
+	board_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var head := Ui.hbox(board_col)
 	Ui.plate(head, "Contratos")
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
-	Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
-	_board = Ui.vbox(board_col, 10)
+	var reroll := Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
+	reroll.size_flags_horizontal = Control.SIZE_SHRINK_END
+	var board_scroll := ScrollContainer.new()
+	board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	board_col.add_child(board_scroll)
+	_board = Ui.vbox(board_scroll, 10)
+	_board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_refresh()
 	_update_players_ui()
 	_focus_menu()
@@ -165,22 +194,33 @@ func _contract_card(contract: Contract) -> PanelContainer:
 	card.mouse_exited.connect(func() -> void:
 		card.add_theme_stylebox_override("panel", rest_style))
 	_board.add_child(card)
-	var row := Ui.hbox(card, 16)
+	var row := Ui.hbox(card, 12)
 	row.add_child(_planet_icon(body))
 	var info := Ui.vbox(row, 2)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.label(info, contract.title, 18, Ui.IVORY)
+	var title := Ui.label(info, contract.title, 18, Ui.IVORY)
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if body != null:
-		Ui.label(info, body.description, 13, Ui.IVORY_DIM)
-		Ui.label(info, "Delta-v estimado %d m/s, plazo %d días" % [int(contract.dv_estimate), int(contract.deadline)], Ui.SIZE_LEGEND, Ui.INFO)
+		var blurb := Ui.label(info, body.description, 13, Ui.IVORY_DIM)
+		blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		blurb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var dv := Ui.label(info, "Delta-v estimado %d m/s, plazo %d días" % [int(contract.dv_estimate), int(contract.deadline)], Ui.SIZE_LEGEND, Ui.INFO)
+		dv.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		dv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if contract.hidden_hazard != &"":
-		info.add_child(Lamp.new("Rumores de peligro", Lamp.CAUTION))
+		var rumor := Lamp.new("Rumores de peligro", Lamp.CAUTION)
+		rumor.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		info.add_child(rumor)
 	var money := Ui.vbox(row, 2)
+	money.size_flags_horizontal = Control.SIZE_SHRINK_END
+	money.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	Ui.label(money, Ui.money(contract.payout), 24, Ui.IVORY)
 	Ui.label(money, "Adelanto %s" % Ui.money(contract.advance), 13, Ui.IVORY_DIM)
 	Ui.label(money, "Presupuesto %s" % Ui.money(Profile.budget(contract)), 13, Ui.LAMP_GO)
 	var accept := Ui.primary(Ui.button(row, "Aceptar contrato", _accept.bind(contract)))
-	accept.custom_minimum_size = Vector2(170, 44)
+	accept.custom_minimum_size = Vector2(168, 44)
+	accept.size_flags_horizontal = Control.SIZE_SHRINK_END
 	accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	if _first_focus == null:
 		_first_focus = accept
@@ -271,7 +311,7 @@ func _draw() -> void:
 	if _home == null:
 		return
 	var view := get_viewport_rect().size
-	var center := Vector2(view.x * 0.82, view.y * 1.05)
+	var center := Vector2(view.x * 0.86, view.y + _home.size.y * 0.34)
 	_home.position = center - _home.size * 0.5
 	var a := _time * 0.25
 	var moon := center + Vector2(cos(a), sin(a) * 0.35) * 420.0

@@ -41,6 +41,7 @@ func run() -> int:
 	failed += _event_card()
 	failed += _hull_motion()
 	failed += await _walk_repair()
+	failed += await _orange_fault()
 	print("Coop: %d failed" % failed)
 	return failed
 
@@ -161,6 +162,9 @@ func _repair_rules() -> int:
 	if ShipInterior.can_repair(&"engine", true, false):
 		push_error("FAIL el motor no se repara desde la esclusa si no estás en su sala")
 		failed += 1
+	if not ShipInterior.can_repair(&"sensor", false, true, true) or not ShipInterior.can_repair(&"rtg", false, true, true):
+		push_error("FAIL sensores y RTG no se reparan en el casco como los paneles")
+		failed += 1
 	return failed
 
 
@@ -277,6 +281,17 @@ func _hull_motion() -> int:
 	if moved.distance_to(top) < 8.0:
 		push_error("FAIL el tripulante no avanza por el casco")
 		failed += 1
+	var pos := interior.stick_to_hull(Vector2(box.position.x, box.get_center().y))
+	for _i: int in 40:
+		pos = interior.slide_hull(pos, Vector2(0.0, -12.0))
+	if pos.y > box.position.y - 5.0:
+		push_error("FAIL la esquina izquierda no deja pasar arriba")
+		failed += 1
+	for _i: int in 40:
+		pos = interior.slide_hull(pos, Vector2(12.0, 0.0))
+	if pos.x < box.end.x:
+		push_error("FAIL no se llega al lado derecho del casco")
+		failed += 1
 	Run.crew = previous_crew
 	Run.ship = previous_ship
 	return failed
@@ -329,9 +344,12 @@ func _walk_repair() -> int:
 		failed += 1
 	interior.busy = false
 	interior.interact(interior._center(2))
-	if interior.busy or not solar.broken:
-		push_error("FAIL el panel se reparó desde el interior")
+	var inside_games := _minigames()
+	if not interior.busy or inside_games.is_empty() or (inside_games[0] as Node).get("mode") != &"align":
+		push_error("FAIL el aro del panel, dentro de la cabina, no abre la reparación")
 		failed += 1
+	_drop_minigames()
+	interior.busy = false
 	interior.interact(interior._center(1))
 	if not interior.on_hull or tree.paused:
 		push_error("FAIL la esclusa no abrió el casco")
@@ -351,6 +369,22 @@ func _walk_repair() -> int:
 			push_error("FAIL el panel no abrió su alineación, o el vuelo se detuvo")
 			failed += 1
 		_drop_minigames()
+		interior.busy = false
+		var mirror: Rect2 = ShipRenderer.mirror(station.rect)
+		interior.interact(mirror.get_center())
+		var other := _minigames()
+		if other.is_empty() or (other[0] as Node).get("mode") != &"align":
+			push_error("FAIL el panel del otro lado no abre la reparación")
+			failed += 1
+		_drop_minigames()
+		interior.busy = false
+		var beside := Vector2(mirror.get_center().x, ShipRenderer.bounds(Run.ship.parts).position.y - ShipInterior.HULL_OUT)
+		interior.interact(beside)
+		var corner := _minigames()
+		if not interior.on_hull or not interior.busy or corner.is_empty() or (corner[0] as Node).get("mode") != &"align":
+			push_error("FAIL el panel junto a la esclusa no se repara en el casco")
+			failed += 1
+		_drop_minigames()
 	interior.busy = false
 	interior.interact(interior.stick_to_hull(interior._center(1)))
 	if interior.on_hull or interior.busy or tree.paused:
@@ -368,6 +402,43 @@ func _walk_repair() -> int:
 	capsule.broken = false
 	interior.queue_free()
 	_restore(previous_crew, previous_kits, previous_ship, was_paused)
+	return failed
+
+
+func _orange_fault() -> int:
+	var failed := 0
+	var previous_crew := Run.crew
+	var previous_kits := Run.kits
+	var previous_ship := Run.ship
+	var tree := Engine.get_main_loop() as SceneTree
+	Run.crew = 2
+	Run.ship = ShipModel.new()
+	var engine := _part(&"motor_trueno")
+	var capsule := _part(&"capsula")
+	if engine == null or capsule == null:
+		_restore(previous_crew, previous_kits, previous_ship, false)
+		return 1
+	engine.broken = false
+	engine.condition = 0.35
+	engine.wear = 0.0
+	Run.ship.parts = [engine, capsule]
+	var interior := ShipInterior.new()
+	tree.root.add_child(interior)
+	await tree.process_frame
+	if engine.health() != ShipPart.Health.FAULTY:
+		push_error("FAIL el motor gastado no queda en falla naranja")
+		failed += 1
+	interior.interact(interior._center(0))
+	if not interior.busy or _minigames().is_empty():
+		push_error("FAIL la falla naranja no abrió el minijuego")
+		failed += 1
+	_drop_minigames()
+	interior._finished(true, engine)
+	if engine.health() >= ShipPart.Health.FAULTY or engine.broken:
+		push_error("FAIL reparar la falla naranja no la quitó")
+		failed += 1
+	interior.queue_free()
+	_restore(previous_crew, previous_kits, previous_ship, tree.paused)
 	return failed
 
 

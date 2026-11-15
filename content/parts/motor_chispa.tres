@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_wt7on")
 id = &"motor_chispa"
-display_name = "Motor Chispa"
-description = "Motor pequeño y eficiente. Poco empuje: no levanta naves pesadas."
+display_name = "Motor AJ10"
+description = "Propelentes almacenables, como el SPS del Apolo. No levanta una nave pesada desde el suelo."
 kind = &"engine"
 cost = 220
 thrust = 140.0

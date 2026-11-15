@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_thms5")
 id = &"torre_escape"
-display_name = "Torre de escape"
-description = "Aborta el despegue y salva la cápsula (BACKSPACE)."
+display_name = "Torre LES"
+description = "Torre de escape de tracción, como la del Apolo. Aborta el despegue y salva la cápsula (Retroceso)."
 kind = &"escape"
 cost = 180
 mass = 0.8

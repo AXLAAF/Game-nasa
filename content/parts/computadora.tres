@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_bcmia")
 id = &"computadora"
-display_name = "Computadora de vuelo"
-description = "Predicción de trayectoria completa."
+display_name = "Computadora RAD750"
+description = "Computadora de vuelo endurecida, como la de Curiosity. Predice la trayectoria completa."
 kind = &"computer"
 cost = 150
 mass = 0.1

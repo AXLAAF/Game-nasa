@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_wnar0")
 id = &"radiador"
-display_name = "Radiador"
-description = "Disipa calor cerca de la estrella."
+display_name = "Radiador de amoníaco"
+description = "Como los paneles de la estación. Tira el calor cerca del Sol."
 kind = &"radiator"
 radial = true
 cost = 140

@@ -46,9 +46,9 @@ Etiquetas usadas: **[NASA]** = dato real de los anexos; **[DIS]** = licencia de 
 ### Primera misión de práctica (implementación del 15 de noviembre de 2026)
 
 Antes de arriesgar una nave, el menú y el hangar ofrecen una práctica opcional y
-repetible: Tierra → órbita → Tierra. No acepta contratos ni usa créditos o piezas
-del perfil. Solo guarda `training_completed` después del aterrizaje; salir o
-saltar conserva ese indicador sin marcar nuevas lecciones como completadas.
+repetible que solo enseña a armar el cohete. No acepta contratos ni usa créditos
+o piezas del perfil. Guarda `training_completed` al terminar un montaje válido;
+salir antes no lo marca.
 
 El montaje enseña una receta de abajo hacia arriba: Trueno, tanque gordo,
 desacoplador, Susurro, tanque largo, escudo, cabina, paracaídas, panel y batería.
@@ -57,15 +57,16 @@ colocación, retirada y movimiento recalcula el primer paso pendiente. Se verifi
 motor y combustible por etapa, TWR, delta-v y energía. Los extras añaden capacidad
 a cambio de masa y coste; el ensayo incluye una variante con antena.
 
-En vuelo se verifican ignición, orientación, reducción y recuperación de potencia
-ante carga aerodinámica, reparación de un desacoplador atascado, separación manual de la
-etapa agotada, empuje superior, orientación retrógrada, frenado, corredor de entrada
-y dos despliegues de paracaídas. El combustible activo se muestra separado del total.
-Las lecciones críticas congelan la física hasta actuar; el rumbo se asiste al
-soltar el giro. El tramo de costa hasta la entrada se resume explícitamente [DIS].
-Al fallar se restaura el último punto de control, incluidos combustible, escudo,
-energía, estado físico y RNG, con objetos independientes. La avería programada
-se repite al restaurar su punto de control.
+Al cerrar el montaje, la pantalla explica en corto la ignición (Espacio en el
+verde del reloj), inclinar hacia el arco verde, separar cuando se agota el
+combustible de la etapa activa, y cómo orbita el modo realista. Esas mismas ideas
+vuelven en las guías de Despegue y Espacio. La práctica jugable no simula el vuelo.
+
+La sesión determinista sigue pudiendo volar Tierra → órbita → Tierra para las
+pruebas: ignición, orientación, carga aerodinámica, desacoplador atascado,
+separación, frenado, corredor y paracaídas. El combustible activo va separado del
+total. Las lecciones críticas congelan la física hasta actuar. Al fallar se
+restaura el último punto de control, con objetos independientes.
 
 La implementación está aislada del flujo legado: `TrainingSession` es RefCounted,
 consume `PlayerCommand` y avanza a 30 Hz con `SimRng`; la vista solo envía comandos

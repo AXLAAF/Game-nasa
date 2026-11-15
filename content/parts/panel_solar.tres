@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_j041m")
 id = &"panel_solar"
-display_name = "Panel solar"
-description = "Energía gratis cerca del sol. Inútil lejos. Se sobrecalienta muy cerca."
+display_name = "Panel triple unión"
+description = "Celdas GaInP/GaAs/Ge. Rinden cerca del Sol, casi nada lejos, y se queman muy cerca."
 kind = &"solar"
 radial = true
 cost = 110

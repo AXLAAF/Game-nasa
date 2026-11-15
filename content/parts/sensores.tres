@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_nrrfq")
 id = &"sensores"
-display_name = "Sensores"
-description = "Avisan antes de llamaradas y muestran rarezas."
+display_name = "Seguidor estelar"
+description = "Orientación por estrellas. Avisa de llamaradas y marca lo que hay alrededor."
 kind = &"sensor"
 radial = true
 cost = 120

@@ -6,7 +6,7 @@
 script = ExtResource("1_l0jc2")
 id = &"rcs"
 display_name = "Propulsores RCS"
-description = "Mejoran el control de giro."
+description = "Motores pequeños de actitud, como los del Apolo. Giran la nave gastando propelente."
 kind = &"rcs"
 radial = true
 cost = 90

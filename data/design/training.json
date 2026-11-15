@@ -35,27 +35,27 @@
     {
       "id": "motor_trueno",
       "title": "Motor de primera etapa",
-      "why": "El motor va abajo. Trueno levanta el peso del cohete, pero consume más combustible."
+      "why": "El motor va abajo. El H-1 levanta el peso del cohete, pero consume más combustible."
     },
     {
       "id": "tanque_ancho",
       "title": "Tanque de primera etapa",
-      "why": "Colócalo sobre Trueno. Cada motor consume solo los tanques de su etapa."
+      "why": "Colócalo sobre el H-1. Cada motor consume solo los tanques de su etapa."
     },
     {
       "id": "desacoplador",
       "title": "Límite entre etapas",
-      "why": "Va sobre el primer tanque. Al activarlo se descarta todo lo que queda debajo, incluido el desacoplador."
+      "why": "Va sobre el primer tanque. Al activarlo se descarta todo lo que queda debajo, incluidos los pernos de etapa."
     },
     {
       "id": "motor_susurro",
       "title": "Motor de segunda etapa",
-      "why": "Susurro va encima del desacoplador. Es eficiente en el vacío; solo no levanta esta nave desde el suelo."
+      "why": "El RL10 va encima de los pernos de etapa. Es eficiente en el vacío; solo no levanta esta nave desde el suelo."
     },
     {
       "id": "tanque_largo",
       "title": "Tanque de segunda etapa",
-      "why": "Este tanque alimenta Susurro. El combustible de abajo no sirve después de separar."
+      "why": "Este tanque alimenta el RL10. El combustible de abajo no sirve después de separar."
     },
     {
       "id": "escudo_termico",
@@ -65,7 +65,7 @@
     {
       "id": "capsula",
       "title": "Cabina de mando",
-      "why": "La cabina debe quedar en la etapa que conservas. No la pongas debajo del desacoplador."
+      "why": "La cabina debe quedar en la etapa que conservas. No la pongas debajo de los pernos de etapa."
     },
     {
       "id": "paracaidas",
@@ -131,7 +131,7 @@
     },
     "upper_power": {
       "title": "Comprueba la nueva etapa",
-      "text": "La masa descartada ya no pesa. Sube la potencia hasta 100 % [DIS] para comprobar que Susurro produce empuje con su propio tanque."
+      "text": "La masa descartada ya no pesa. Sube la potencia hasta 100 % [DIS] para comprobar que el RL10 produce empuje con su propio tanque."
     },
     "orbit": {
       "title": "Órbita y regreso",
@@ -167,7 +167,7 @@
     },
     "failed": {
       "title": "Revisa y reintenta",
-      "text": "Usa Reintentar para recuperar el último punto de control. La práctica no cambia créditos, deuda, contratos ni inventario."
+      "text": "Usa Reintentar para recuperar el último punto de control. La práctica no cambia créditos, contratos ni inventario."
     },
     "power_restore": {
       "title": "Recupera potencia para subir",

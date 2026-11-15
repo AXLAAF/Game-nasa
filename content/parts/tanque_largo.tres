@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_052rs")
 id = &"tanque_largo"
-display_name = "Tanque largo"
-description = "9 t de propelente."
+display_name = "Tanque Al-Li largo"
+description = "Tanque de aluminio-litio. 9 t de propelente."
 cost = 210
 fuel = 9.0
 size = Vector2(40, 80)

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_ligero")
 id = &"escudo_ligero"
-display_name = "Escudo ligero"
-description = "Ablativo barato. Sirve para entradas suaves, no para Rubra a lo bruto."
+display_name = "Escudo SLA-561"
+description = "Ablativo ligero de las Viking. Sirve para una entrada suave, como la de Marte."
 kind = &"heatshield"
 cost = 180
 mass = 0.35

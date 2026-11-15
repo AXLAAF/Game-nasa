@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_giro")
 id = &"giroscopio"
-display_name = "Giroscopio"
-description = "Estabiliza la nave. Mejora la movilidad sin gastar propelente."
+display_name = "Rueda de reacción"
+description = "Gira la nave sin gastar propelente, como las ruedas del Hubble."
 kind = &"rcs"
 radial = true
 cost = 160

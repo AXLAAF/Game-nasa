@@ -12,15 +12,16 @@ const STEPS: Dictionary = {
 	],
 	&"assembly": [
 		["Sigue la lista de despegue", "A la derecha, Siguiente paso te dice qué le falta a la nave y por qué. Cuando la lista queda en verde, pulsa Despegar."],
-		["Construye por etapas", "Para tu primer cohete, de abajo hacia arriba: Trueno, tanque gordo, desacoplador, Susurro, tanque largo, escudo, cabina y extras. Cada motor usa solo el tanque de su etapa. El hangar ofrece una práctica guiada sin deuda; el clic del catálogo coloca piezas automáticamente."],
+		["Construye por etapas", "Para tu primer cohete, de abajo hacia arriba: H-1, núcleo ancho, pernos de etapa, RL10, tanque Al-Li largo, escudo PICA, cápsula Apolo y extras. Cada motor usa solo el tanque de su etapa. El hangar ofrece una práctica guiada. El clic del catálogo coloca piezas automáticamente."],
 		["Calidad y presupuesto", "Chatarra y Usada cuestan menos, pero fallan más. Arrastra una pieza para moverla y usa clic derecho para quitarla y recuperar su precio."],
 	],
 	&"launch": [
-		["Ignición en T-0", "Pulsa Espacio cuando la aguja entre en la zona verde del reloj. Retroceso aborta el lanzamiento y te devuelve el presupuesto."],
-		["Vuelo y etapas", "Usa W/S para potencia y A/D para seguir la zona verde del dial. Mira el combustible de la etapa activa: cuando se agote, comprueba que la siguiente tiene motor y tanque; pulsa Espacio para separar. Hacerlo antes desperdicia combustible. Si el cierre se atasca, resuelve la avería y reintenta."],
+		["Ignición", "Pulsa Espacio cuando la aguja entre en el verde del reloj. Antes de tiempo no enciende. Retroceso aborta el lanzamiento y te devuelve el presupuesto."],
+		["Inclínala hacia el verde", "W da potencia y A/D giran. Lleva la marca al arco verde. Ese giro pone velocidad de lado: sin ella el cohete sube y vuelve a caer."],
+		["Separa al acabarse el combustible", "Mira el combustible de la etapa que está encendida. Cuando llegue a cero, pulsa Espacio para soltar lo de abajo. Separar antes tira combustible que todavía servía. La etapa de arriba usa su propio motor y su propio tanque."],
 	],
 	&"space": [
-		["Navegación y rumbo", "A/D giran, W acelera y 1-6 cambian la velocidad del tiempo. Pulsa N para ver la flecha guía hacia tu destino (Tab cambia objetivo)."],
+		["Órbita", "En el modo realista la nave no se frena sola. Cae todo el tiempo; si vas bastante de lado, el planeta se curva debajo y no lo tocas: eso es una órbita. W empuja hacia la nariz. A favor del movimiento sube el lado opuesto; en contra lo baja y puedes volver a caer. A/D giran, N muestra la guía, Tab cambia el objetivo y 1-6 adelantan el tiempo mientras costas."],
 		["Energía y emergencias", "Vigila batería y temperatura. Si aparece una llamarada solar, escóndete tras un planeta. R repara piezas rotas y L inicia el descenso al llegar."],
 	],
 	&"descent": [
@@ -36,6 +37,7 @@ const STEPS: Dictionary = {
 static var _open: Tutorial
 
 var _all: bool = false
+var _froze: bool = false
 var _phase: StringName = &""
 var _pages: Array[Dictionary] = []
 var _index: int = 0
@@ -79,12 +81,13 @@ static func _show(phase: StringName, all_chapters: bool) -> void:
 func _ready() -> void:
 	layer = 45
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	get_tree().paused = true
 	_pages = _collect()
 	if _pages.is_empty():
-		get_tree().paused = false
 		queue_free()
 		return
+	_froze = Run.crew < 2 and not get_tree().paused
+	if _froze:
+		get_tree().paused = true
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -220,7 +223,12 @@ func _collect() -> Array[Dictionary]:
 	for phase: StringName in phases:
 		var chapter: Array = STEPS.get(phase, [])
 		for step: Array in chapter:
-			pages.append({"phase": phase, "title": String(step[0]), "text": String(step[1])})
+			var title := String(step[0])
+			var text := String(step[1])
+			if phase == &"space" and title == "Órbita" and Profile.arcade:
+				title = "Sin gravedad"
+				text = "Este modo no orbita: WASD empuja con inercia y no hay gravedad. Mayús sobrecarga, Ctrl afina, 1-6 adelantan el tiempo, Tab cambia el objetivo, F escanea y L entra al llegar."
+			pages.append({"phase": phase, "title": title, "text": text})
 	return pages
 
 
@@ -277,7 +285,8 @@ func _finish(skipped: bool) -> void:
 		Profile.mark_tutorial(String(_phase))
 	if _open == self:
 		_open = null
-	get_tree().paused = false
+	if _froze:
+		get_tree().paused = false
 	Synth.play(&"click")
 	if Kinetic.is_reduced() or DisplayServer.get_name() == "headless" or _panel == null:
 		queue_free()

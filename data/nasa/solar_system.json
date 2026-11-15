@@ -1,0 +1,29 @@
+{
+  "label": "[NASA]",
+  "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+  "note": "Distancias en UA. En el juego, 1 UA = 2000 unidades de órbita y la Tierra permanece en 2000. Gravedades superficiales se usan tal cual. La densidad del aire de Venus y Marte está suavizada en el BodyDef [juego] para que el descenso siga siendo jugable.",
+  "au_to_orbit_radius": 2000,
+  "bodies": {
+    "mercurio": {"au": 0.387, "g_m_s2": 3.7, "radius_km": 2439.7},
+    "venus": {"au": 0.723, "g_m_s2": 8.87, "radius_km": 6051.8, "surface_pressure_bar": 92},
+    "tierra": {"au": 1.0, "g_m_s2": 9.81, "radius_km": 6371},
+    "luna": {"parent": "tierra", "distance_km": 384400, "g_m_s2": 1.62, "radius_km": 1737.4},
+    "marte": {"au": 1.524, "g_m_s2": 3.71, "radius_km": 3389.5, "surface_pressure_bar": 0.006},
+    "jupiter": {"au": 5.204, "g_m_s2": 24.79, "radius_km": 69911, "landable": false},
+    "saturno": {"au": 9.583, "g_m_s2": 10.44, "radius_km": 58232, "landable": false},
+    "urano": {"au": 19.201, "g_m_s2": 8.87, "radius_km": 25362, "landable": false},
+    "neptuno": {"au": 30.07, "g_m_s2": 11.15, "radius_km": 24622, "landable": false},
+    "titan": {"parent": "saturno", "g_m_s2": 1.35, "radius_km": 2574.7}
+  },
+  "relics": [
+    {"id": "apollo11", "body": "luna", "what": "Etapa de descenso del Eagle", "when": "1969-07-20", "source": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1969-059C"},
+    {"id": "apollo15_rover", "body": "luna", "what": "Vehículo lunar del Apolo 15", "when": "1971", "source": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1971-063C"},
+    {"id": "opportunity", "body": "marte", "what": "Opportunity, último contacto", "when": "2018-06-10", "source": "https://science.nasa.gov/mission/mer-opportunity/"},
+    {"id": "insight", "body": "marte", "what": "InSight, fin de misión por polvo en los paneles", "when": "2022-12-15", "source": "https://science.nasa.gov/mission/insight/"},
+    {"id": "viking1", "body": "marte", "what": "Viking 1, último contacto", "when": "1982-11-11", "source": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1975-075C"},
+    {"id": "messenger", "body": "mercurio", "what": "Impacto de MESSENGER", "when": "2015-04-30", "source": "https://science.nasa.gov/mission/messenger/"},
+    {"id": "pioneer_venus", "body": "venus", "what": "Sondas Pioneer Venus Multiprobe", "when": "1978-12", "source": "https://nssdc.gsfc.nasa.gov/nmc/spacecraft/display.action?id=1978-078D"},
+    {"id": "huygens", "body": "titan", "what": "Huygens (ESA), llevado por Cassini (NASA)", "when": "2005-01-14", "source": "https://science.nasa.gov/mission/cassini/"},
+    {"id": "near_shoemaker", "body": "eros", "au": 1.46, "what": "NEAR Shoemaker posado en Eros", "when": "2001-02-12", "source": "https://science.nasa.gov/mission/near-shoemaker/"}
+  ]
+}

@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_urano"]
+
+[resource]
+script = ExtResource("1_urano")
+id = &"urano"
+display_name = "Urano"
+description = "Gigante de hielo a 19,2 UA [NASA]. El Sol calienta poco y no hay suelo donde posarse."
+color = Color(0.55, 0.85, 0.84, 1)
+atmo_color = Color(0.6, 0.95, 0.95, 0.35)
+parent_id = &"sol"
+orbit_radius = 38402.0
+orbit_phase = 5.5
+radius = 32.0
+mu = 70000.0
+surface_gravity = 8.87
+atmosphere = 1.5
+landable = false
+hazards = Array[StringName]([&"cold"])

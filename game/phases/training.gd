@@ -1,6 +1,7 @@
 extends Node2D
 
-## Adaptador de entrada y presentación. Toda mutación de la práctica es un comando.
+## Adaptador de entrada y presentación. La práctica jugable es solo el montaje.
+const BRIEF := "Ignición: pulsa Espacio cuando la aguja entre en el verde del reloj. Antes de tiempo no enciende.\n\nInclina la nave hacia el arco verde. Ese giro da velocidad de lado; sin ella sube y vuelve a caer.\n\nSepara con Espacio cuando se acabe el combustible de la etapa activa. Hacerlo antes tira combustible que aún servía. La etapa de arriba usa su propio motor y su propio tanque.\n\nEn el espacio, modo realista: la nave no se frena sola. Cae siempre; si vas bastante de lado, el planeta se curva y no lo tocas. Eso es una órbita. Empujar a favor del movimiento sube el lado opuesto. Empujar en contra lo baja y puedes volver a caer."
 var session: TrainingSession
 var _pending: Array[PlayerCommand] = []
 var _accumulator := 0.0
@@ -29,6 +30,7 @@ var _suggested := ""
 var _saved_completion := false
 var _button_axis := 0.0
 var _button_steer := 0.0
+var _leaving := false
 
 func _ready() -> void:
 	session = TrainingData.create_session()
@@ -52,7 +54,7 @@ func _build_ui() -> void:
 	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	Ui.label(heading, "BALLAST-1: Primera misión", 24, Ui.IVORY)
 	_progress = Ui.label(heading, "", 13, Ui.INFO)
-	Ui.button(header, "Reintentar fase", func() -> void: _send(&"retry"))
+	Ui.button(header, "Reiniciar montaje", func() -> void: _send(&"retry"))
 	Ui.button(header, "Salir de práctica", func() -> void: Router.go(&"hangar"))
 	var columns := Ui.hbox(page, 14)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -115,11 +117,11 @@ func _build_ui() -> void:
 	_hold_button(_flight_controls, "Girar izquierda (%s)" % _binding(&"cmd_steer_left"), -1, true)
 	_hold_button(_flight_controls, "Girar derecha (%s)" % _binding(&"cmd_steer_right"), 1, true)
 	var actions := Ui.hbox(footer, 8)
-	_confirm = Ui.primary(Ui.button(actions, "", func() -> void: _send(&"confirm")))
+	_confirm = Ui.primary(Ui.button(actions, "", _on_confirm))
 	_confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_repair = Ui.button(actions, "Reparar", func() -> void: _send(&"repair"))
 	_chute = Ui.button(actions, "Paracaídas", func() -> void: _send(&"parachute"))
-	Ui.label(footer, "Práctica sin deuda. Asistencia de rumbo al soltar el giro. Las ventanas educativas congelan el vuelo.", 12, Ui.IVORY_DIM)
+	Ui.label(footer, "Solo se arma la nave. No gasta créditos ni piezas del perfil.", 12, Ui.IVORY_DIM)
 
 func _hold_button(parent: Node, text: String, direction: float, steering: bool) -> Button:
 	var button := Ui.button(parent, text, func() -> void: pass)
@@ -139,13 +141,27 @@ func _move(offset: int) -> void:
 func _send(action: StringName) -> void:
 	_pending.append(PlayerCommand.new(action))
 
+func _on_confirm() -> void:
+	if _leaving:
+		return
+	if session.phase() == "assembly" and session.assembly().ready:
+		_leaving = true
+		Profile.complete_training()
+		Router.go(&"hangar")
+		return
+	if session.phase() != "assembly":
+		_send(&"confirm")
+
 func _process(delta: float) -> void:
-	if Modal.busy():
+	if _leaving or Modal.busy():
 		_accumulator = 0.0
 		return
 	# La entrada discreta se consume una vez; los ejes se muestrean por tick.
-	for pair: Array in [[&"cmd_confirm", &"confirm"], [&"cmd_repair", &"repair"], [&"cmd_parachute", &"parachute"]]:
-		if Controls.cmd_just(pair[0]): _send(pair[1])
+	if Controls.cmd_just(&"cmd_confirm"):
+		_on_confirm()
+	for pair: Array in [[&"cmd_repair", &"repair"], [&"cmd_parachute", &"parachute"]]:
+		if Controls.cmd_just(pair[0]):
+			_send(pair[1])
 	_accumulator += delta * float(session.design.play_speed)
 	while _accumulator >= TrainingSession.DT:
 		var commands: Array[PlayerCommand] = _pending.duplicate()
@@ -174,7 +190,11 @@ func _refresh() -> void:
 	_title.text = lesson.title
 	_instructions.text = lesson.text
 	var guide := session.assembly()
-	if assembling:
+	if assembling and guide.ready:
+		_title.text = "Nave lista"
+		_instructions.text = "El montaje cumple. A la derecha está, en corto, la ignición, el arco verde, la separación y la órbita del modo realista."
+		_feedback.text = ""
+	elif assembling:
 		_title.text = "%d. %s" % [mini(int(guide.index) + 1, session.design.recipe.size()), guide.title]
 		_instructions.text = "%s\n\nPosiciones desde la base hacia la cima." % guide.why
 		_feedback.text = guide.error
@@ -192,7 +212,7 @@ func _refresh() -> void:
 	_flight_controls.visible = not assembling and phase not in ["complete", "failed"]
 	_axis_down.text = "%s (%s)" % ["Entrada más inclinada" if phase == "entry" else "Menos potencia", _binding(&"cmd_throttle_down")]
 	_axis_up.text = "%s (%s)" % ["Entrada más plana" if phase == "entry" else "Más potencia", _binding(&"cmd_throttle_up")]
-	_progress.text = "Entrenamiento Tierra → órbita → Tierra | %s" % ("Completado" if Profile.training_completed else "Aprende sin arriesgar tu campaña")
+	_progress.text = "Práctica de montaje | %s" % ("Completada" if Profile.training_completed else "Arma la nave sin arriesgar la campaña")
 	for id: String in _part_buttons:
 		var button: Button = _part_buttons[id]
 		Ui.mark_selected(button, id == guide.part)
@@ -210,9 +230,12 @@ func _refresh() -> void:
 		for i: int in session.ship.parts.size():
 			_stack.add_item("%d. %s" % [i + 1, session.ship.parts[i].def.display_name])
 		_selected = -1
-	var actions := {"assembly": "Despegar", "countdown": "Ignición", "ascent": "Separar etapa", "stage_ready": "Separar etapa", "stage_repaired": "Reintentar separación", "orbit": "Iniciar regreso", "entry": "Entrar en atmósfera"}
-	_confirm.text = "%s (%s)" % [actions.get(phase, "Completa la acción indicada"), _binding(&"cmd_confirm")]
-	_confirm.disabled = not actions.has(phase) or (assembling and not guide.ready)
+	var actions := {"countdown": "Ignición", "ascent": "Separar etapa", "stage_ready": "Separar etapa", "stage_repaired": "Reintentar separación", "orbit": "Iniciar regreso", "entry": "Entrar en atmósfera"}
+	var label := "Terminar práctica" if guide.ready else "Completa el montaje"
+	if not assembling:
+		label = String(actions.get(phase, "Completa la acción indicada"))
+	_confirm.text = "%s (%s)" % [label, _binding(&"cmd_confirm")]
+	_confirm.disabled = (assembling and not guide.ready) or (not assembling and not actions.has(phase))
 	_confirm.visible = phase not in ["complete", "failed"]
 	_repair.text = "Reparar (%s)" % _binding(&"cmd_repair")
 	_repair.disabled = phase != "jammed"
@@ -230,7 +253,11 @@ func _refresh() -> void:
 	_telemetry.text = "Etapas: %d\nMasa: %.1f t\nTWR: %.2f\nDelta-v: %d m/s\nCoste de diseño: %d cr\n\nCombustible ACTIVO: %.2f t\nCombustible TOTAL: %.2f t\n\nAltitud: %.1f km\nVelocidad: %.0f m/s\nPresión: %.1f kPa\nPotencia: %d %%\nCabeceo: %.0f°\nObjetivo: %.0f°\nBatería: %.1f\nEscudo: %.1f\nT-%.1f" % [ship.stages().size(), ship.mass(), ship.twr(session.body.surface_gravity), int(ship.delta_v()), cost, ship.stage_fuel(ship.active_stage()), ship.fuel_total(), float(flight.h) / 1000.0, Vector2(flight.vx, flight.vy).length(), float(flight.q) / 1000.0, int(session.state.throttle * 100), session.state.pitch, -90.0 if phase in ["retrograde", "deorbit"] else session.target_pitch(), session.state.battery, shield, session.state.countdown]
 	if phase == "entry":
 		_telemetry.text += "\nEntrada: %.1f°\nCorredor: %.0f° a %.0f°" % [session.state.entry_angle, session.design.entry_min, session.design.entry_max]
-	_report.text = "\n".join(session.state.log)
+	var notes := "\n".join(session.state.log)
+	var show_brief: bool = bool(assembling) and bool(guide.ready)
+	_report.text = BRIEF + "\n\n" + notes if show_brief else notes
+	_report.add_theme_font_size_override("font_size", 15 if show_brief else 13)
+	_report.add_theme_color_override("font_color", Ui.IVORY if show_brief else Ui.IVORY_DIM)
 	_canvas.queue_redraw()
 
 func _draw_ship() -> void:

@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_p8cyg")
 id = &"paracaidas"
-display_name = "Paracaídas"
-description = "Freno (P) y principal (P otra vez). Respeta las ventanas de velocidad."
+display_name = "Paracaídas DGB"
+description = "Disco y banda, como el de Perseverance. Freno (P) y principal (P otra vez)."
 kind = &"parachute"
 cost = 120
 mass = 0.2

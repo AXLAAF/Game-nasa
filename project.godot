@@ -38,6 +38,8 @@ Controls="*res://game/autoload/controls.gd"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/mode="fullscreen"
+window/size/borderless=true
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 

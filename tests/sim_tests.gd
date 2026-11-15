@@ -65,7 +65,8 @@ func _test_catalog() -> void:
 	check(catalog.parts.size() >= 23, "catalog parts loaded")
 	check(catalog.bodies.size() >= 7, "catalog bodies loaded")
 	check(catalog.star() != null and catalog.home() != null, "star and home exist")
-	check(catalog.body(&"ceniza") != null and catalog.body(&"ceniza").parent_id == &"rubra", "ceniza orbits rubra")
+	check(catalog.body(&"titan") != null and catalog.body(&"titan").parent_id == &"saturno", "titan orbits saturn")
+	check(catalog.body(&"tierra") != null and catalog.body(&"tierra").is_home, "earth is home")
 	check(catalog.part(&"giroscopio") != null and catalog.part(&"escudo_ligero") != null, "new parts exist")
 	check(not catalog.malfunctions_for(&"engine").is_empty(), "engine malfunctions")
 	check(not catalog.malfunctions_for(&"rtg").is_empty(), "generic malfunction fallback")
@@ -100,7 +101,7 @@ func _test_checklist() -> void:
 	c.target = &"luna"
 	c.dv_estimate = 3500.0
 	var luna: BodyDef = _catalog().body(&"luna")
-	var rubra: BodyDef = _catalog().body(&"rubra")
+	var marte: BodyDef = _catalog().body(&"marte")
 	var empty := ShipModel.new()
 	var rows: Array[Dictionary] = assembly_script.checklist(empty, c, luna, 0)
 	check(String(rows[0].label) == "Cápsula" and int(rows[0].state) == Lamp.WARNING and bool(rows[0].blocks), "checklist capsule blocks")
@@ -124,9 +125,9 @@ func _test_checklist() -> void:
 	for row: Dictionary in ready_rows:
 		blocked = blocked or bool(row.blocks)
 	check(not blocked, "checklist starter ship can launch")
-	var rubra_rows: Array[Dictionary] = assembly_script.checklist(ready, c, rubra, 0)
+	var marte_rows: Array[Dictionary] = assembly_script.checklist(ready, c, marte, 0)
 	var shield: Dictionary = {}
-	for row: Dictionary in rubra_rows:
+	for row: Dictionary in marte_rows:
 		if row.label == "Escudo térmico":
 			shield = row
 	check(int(shield.state) == Lamp.WARNING and String(shield.hint) != "", "checklist atmosphere explains heat shield")
@@ -317,10 +318,10 @@ func _test_part_viability() -> void:
 	var chute: PartDef = _catalog().part(&"paracaidas")
 	var v_luna: Dictionary = asm.part_viability(chute)
 	check(v_luna.badge == "NO NECESARIA" and v_luna.affordable, "parachute not needed on airless moon")
-	c.target = &"rubra"
-	var v_rubra: Dictionary = asm.part_viability(chute)
-	check(v_rubra.badge == "NECESARIA" and v_rubra.affordable, "parachute needed on Rubra")
-	c.target = &"hielo"
+	c.target = &"marte"
+	var v_marte: Dictionary = asm.part_viability(chute)
+	check(v_marte.badge == "NECESARIA" and v_marte.affordable, "parachute needed on Mars")
+	c.target = &"titan"
 	var solar: PartDef = _catalog().part(&"panel_solar")
 	var v_ice: Dictionary = asm.part_viability(solar)
 	check(v_ice.badge == "POCO VIABLE", "solar panel warned on distant ice moon")
@@ -341,7 +342,7 @@ func _test_starfield_palettes() -> void:
 		c.title = "Misión %d" % i
 		c.cargo = "Carga %d" % i
 		c.payout = 1000 + i * 250
-		c.target = [&"luna", &"ignea", &"rubra", &"glacia", &"hielo", &"ceniza", &"terra"][i]
+		c.target = [&"luna", &"mercurio", &"marte", &"jupiter", &"titan", &"venus", &"tierra"][i]
 		var p := Starfield.palette_for(c, i)
 		check(p.col is Color and p.accent is Color and p.warm is Color, "palette %d returns colors" % i)
 		seen_idx[int(p.index)] = true
@@ -420,9 +421,9 @@ func _test_arcade() -> void:
 	near(float(profile.premium_rate()), sim_rate, 0.001, "arcade keeps insurance premium identical")
 	near(float(run.assist_payout_mult()), sim_payout, 0.001, "arcade keeps payout multiplier identical")
 	var bodies: Array[BodyDef] = cat.body_list()
-	var terra: BodyDef = cat.body(&"terra")
+	var tierra: BodyDef = cat.body(&"tierra")
 	var SpaceScript := load("res://game/phases/space.gd") as GDScript
-	var p0 := Gravity.body_pos(terra, 0.0) + Vector2(terra.radius * 3.0, 0.0)
+	var p0 := Gravity.body_pos(tierra, 0.0) + Vector2(tierra.radius * 3.0, 0.0)
 	var v0 := Vector2(12.0, -8.0)
 	var st := {"pos": p0, "vel": v0, "t": 0.0}
 	SpaceScript.arcade_space_step(st, 2.0, bodies, Vector2.ZERO)
@@ -456,17 +457,17 @@ func _test_arcade() -> void:
 	var ship := _make(["motor_trueno", "tanque_ancho", "capsula", "paracaidas"])
 	var fuel0 := ship.fuel_total()
 	var d_free := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
-	DescentScript.arcade_descent_step(d_free, ship, terra, 0.0, 0.0, 0.0, 0.0, 1.0)
+	DescentScript.arcade_descent_step(d_free, ship, tierra, 0.0, 0.0, 0.0, 0.0, 1.0)
 	check(float(d_free.vy) < -45.0, "arcade descent falls under local gravity without input")
 	near(ship.fuel_total(), fuel0, 0.001, "arcade descent spends no fuel while falling idle")
 	var d_brake := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
-	DescentScript.arcade_descent_step(d_brake, ship, terra, 0.0, 1.0, 0.0, 0.0, 1.0)
+	DescentScript.arcade_descent_step(d_brake, ship, tierra, 0.0, 1.0, 0.0, 0.0, 1.0)
 	check(float(d_brake.vy) > float(d_free.vy), "arcade descent W brakes vertical fall with engines")
 	var d_right := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
-	DescentScript.arcade_descent_step(d_right, ship, terra, 1.0, 0.0, 0.0, 0.0, 1.0)
+	DescentScript.arcade_descent_step(d_right, ship, tierra, 1.0, 0.0, 0.0, 0.0, 1.0)
 	check(float(d_right.vx) > 5.0, "arcade descent D steers trajectory right with engines")
 	var d_left := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
-	DescentScript.arcade_descent_step(d_left, ship, terra, -1.0, 0.0, 0.0, 0.0, 1.0)
+	DescentScript.arcade_descent_step(d_left, ship, tierra, -1.0, 0.0, 0.0, 0.0, 1.0)
 	check(float(d_left.vx) < -5.0, "arcade descent A steers trajectory left with engines")
 	profile.assist = was_assist
 	profile.arcade = was_arcade
@@ -536,8 +537,8 @@ func _test_contracts() -> void:
 		var back := Contract.from_dict(c.to_dict())
 		check(back.target == c.target and back.payout == c.payout, "contract round trip")
 	var luna_dv := RocketMath.mission_dv(_catalog().body(&"luna"))
-	var hielo_dv := RocketMath.mission_dv(_catalog().body(&"hielo"))
-	check(hielo_dv > luna_dv, "far targets need more dv")
+	var titan_dv := RocketMath.mission_dv(_catalog().body(&"titan"))
+	check(titan_dv > luna_dv, "far targets need more dv")
 
 
 ## Piloto automatico que sigue el corredor: devuelve el dv que sobra en orbita, o -1.
@@ -604,7 +605,7 @@ func _entry(ship: ShipModel, body: BodyDef, gamma: float, v0: float) -> Dictiona
 
 func _test_entry() -> void:
 	var ship := _make(["escudo_termico", "capsula", "paracaidas"])
-	for id: StringName in [&"rubra", &"ignea", &"terra"]:
+	for id: StringName in [&"marte", &"venus", &"tierra"]:
 		var body: BodyDef = _catalog().body(id)
 		var v0 := RocketMath.orbit_speed(body) * 1.12
 		var edge := RocketMath.skip_edge(ship, body, v0)
@@ -617,8 +618,8 @@ func _test_entry() -> void:
 		check(shallow.skip, "%s: shallower than the edge skips out" % id)
 		check(not good.skip and good.shield < 30.0 and good.hull < 1.0, "%s: corridor entry survives on one shield" % id)
 		check(steep.hull > good.hull, "%s: steep entry overheats the hull more" % id)
-	var rubra: BodyDef = _catalog().body(&"rubra")
+	var marte: BodyDef = _catalog().body(&"marte")
 	var area := ship.area() * 1.3 * 1.1 + 300.0 * 3.0
-	var terminal := sqrt(2.0 * ship.mass() * 1000.0 * rubra.surface_gravity / (RocketMath.density(rubra, 0.0) * area))
-	print("  paracaidas en rubra: %.1f m/s" % terminal)
+	var terminal := sqrt(2.0 * ship.mass() * 1000.0 * marte.surface_gravity / (RocketMath.density(marte, 0.0) * area))
+	print("  paracaidas en marte: %.1f m/s" % terminal)
 	check(terminal < 11.0, "one main chute lands on Rubra without crashing")

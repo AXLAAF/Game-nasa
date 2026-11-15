@@ -3,9 +3,11 @@ extends CanvasLayer
 
 ## El tripulante camina sobre la nave diseñada: dentro de la cabina y, al salir, pegado al casco.
 
-const EXTERIOR: Array[StringName] = [&"solar", &"radiator", &"antenna", &"heatshield", &"parachute", &"legs", &"rcs", &"escape"]
+const EXTERIOR: Array[StringName] = [&"solar", &"radiator", &"antenna", &"sensor", &"rtg", &"heatshield", &"parachute", &"legs", &"rcs", &"escape"]
 const PANEL_W := 280.0
 const HATCH_REACH := 28.0
+const HULL_OUT := 14.0
+const REPAIR_REACH := 40.0
 const MAP_SCRIPT := preload("res://game/crew/room_map.gd")
 const CREW_SCRIPT := preload("res://game/crew/crew_body.gd")
 
@@ -36,7 +38,7 @@ static func view_shift(zoom: float) -> Vector2:
 	var w := panel_width()
 	if w <= 0.0:
 		return Vector2.ZERO
-	return Vector2(w * 0.5 / maxf(zoom, 0.05), 0.0)
+	return Vector2(w * 0.5 / maxf(zoom, 0.001), 0.0)
 
 
 static func is_exterior(kind: StringName) -> bool:
@@ -123,7 +125,16 @@ func stick_to_hull(at: Vector2) -> Vector2:
 		else:
 			y = box.end.y
 	var edge := Vector2(x, y)
-	return edge + _outward_normal(edge, box) * 14.0
+	return edge + _outward_normal(edge, box) * HULL_OUT
+
+
+## Avanza por el perímetro. En la esquina sigue de largo: la otra cara deja de quedar aislada.
+func slide_hull(from: Vector2, delta: Vector2) -> Vector2:
+	var box := ShipRenderer.bounds(Run.ship.parts)
+	if _hull_span(box) < 1.0:
+		return from
+	var t := _hull_t(box, from)
+	return _hull_point(box, t + delta.dot(_hull_tangent(t, box)))
 
 
 func _outward_normal(edge: Vector2, box: Rect2) -> Vector2:
@@ -139,6 +150,91 @@ func _outward_normal(edge: Vector2, box: Rect2) -> Vector2:
 	if is_equal_approx(nearest, dt):
 		return Vector2.UP
 	return Vector2.DOWN
+
+
+func _hull_span(box: Rect2) -> float:
+	return 2.0 * (box.size.x + box.size.y)
+
+
+func _hull_tangent(t: float, box: Rect2) -> Vector2:
+	var w := box.size.x
+	var h := box.size.y
+	var p := fposmod(t, _hull_span(box))
+	if p < w:
+		return Vector2.RIGHT
+	if p < w + h:
+		return Vector2.DOWN
+	if p < w + h + w:
+		return Vector2.LEFT
+	return Vector2.UP
+
+
+func _hull_edge(box: Rect2, t: float) -> Vector2:
+	var w := box.size.x
+	var h := box.size.y
+	var p := fposmod(t, _hull_span(box))
+	if p < w:
+		return Vector2(box.position.x + p, box.position.y)
+	p -= w
+	if p < h:
+		return Vector2(box.end.x, box.position.y + p)
+	p -= h
+	if p < w:
+		return Vector2(box.end.x - p, box.end.y)
+	p -= w
+	return Vector2(box.position.x, box.end.y - p)
+
+
+func _hull_point(box: Rect2, t: float) -> Vector2:
+	var tangent := _hull_tangent(t, box)
+	return _hull_edge(box, t) + Vector2(tangent.y, -tangent.x) * HULL_OUT
+
+
+func _hull_t(box: Rect2, at: Vector2) -> float:
+	var w := box.size.x
+	var h := box.size.y
+	var dl := at.x - box.position.x
+	var dr := box.end.x - at.x
+	var dt := at.y - box.position.y
+	var db := box.end.y - at.y
+	var x := clampf(at.x, box.position.x, box.end.x)
+	var y := clampf(at.y, box.position.y, box.end.y)
+	var side := 3
+	if dl < 0.0 or dr < 0.0 or dt < 0.0 or db < 0.0:
+		var best := 0.0
+		var chosen := false
+		if dl < 0.0:
+			best = dl
+			side = 3
+			chosen = true
+		if dr < 0.0 and (not chosen or dr < best):
+			best = dr
+			side = 1
+			chosen = true
+		if dt < 0.0 and (not chosen or dt < best):
+			best = dt
+			side = 0
+			chosen = true
+		if db < 0.0 and (not chosen or db < best):
+			best = db
+			side = 2
+	else:
+		var m := minf(minf(dl, dr), minf(dt, db))
+		if is_equal_approx(m, dt):
+			side = 0
+		elif is_equal_approx(m, dr):
+			side = 1
+		elif is_equal_approx(m, db):
+			side = 2
+	match side:
+		0:
+			return x - box.position.x
+		1:
+			return w + (y - box.position.y)
+		2:
+			return w + h + (box.end.x - x)
+		_:
+			return w + h + w + (box.end.y - y)
 
 
 ## Las lamparas de la nave viven en la misma esquina. Se corren para no tapar el corte.
@@ -163,7 +259,7 @@ func _interact_inside(at: Vector2) -> void:
 	var index := _index_at(at)
 	if index == _airlock():
 		var hatch_part: ShipPart = Run.ship.parts[index]
-		if hatch_part.broken and can_repair(hatch_part.def.kind, false, true, false):
+		if _serviceable(hatch_part) and can_repair(hatch_part.def.kind, false, true, false):
 			_begin(hatch_part)
 			return
 		_rebuild(true)
@@ -176,28 +272,44 @@ func _interact_inside(at: Vector2) -> void:
 	if index < 0:
 		return
 	var part: ShipPart = Run.ship.parts[index]
-	if part.broken and can_repair(part.def.kind, false, true, false):
+	if _serviceable(part) and (can_repair(part.def.kind, false, true, false) or is_exterior(part.def.kind)):
 		_begin(part)
-	elif part.broken and is_exterior(part.def.kind):
-		Events.toast.emit("Está en el casco. Sal por la cápsula.", Ui.LAMP_CAUTION)
 
 
 func _interact_hull(at: Vector2) -> void:
+	var part := _exterior_at(at)
+	var repair := part != null and _serviceable(part)
+	if repair and _near_hatch(at) and _station_distance(at, part) > at.distance_to(hatch_point()):
+		repair = false
+	if repair:
+		_begin(part)
+		return
 	if _near_hatch(at):
 		_rebuild(false)
 		Events.toast.emit("Volviste a la cabina", Ui.INFO)
-		return
-	var part := _exterior_at(at)
-	if part != null and part.broken:
-		_begin(part)
 		return
 	if part != null:
 		Events.toast.emit("%s en orden" % part.def.display_name, Ui.IVORY_DIM)
 
 
+func _station_distance(at: Vector2, part: ShipPart) -> float:
+	var best := INF
+	for row: Dictionary in _exterior_stations():
+		if row.part != part:
+			continue
+		var rect: Rect2 = row.rect
+		var closest := Vector2(clampf(at.x, rect.position.x, rect.end.x), clampf(at.y, rect.position.y, rect.end.y))
+		best = minf(best, at.distance_to(closest))
+	return best
+
+
 func _begin(part: ShipPart) -> void:
 	busy = true
 	Minigame.start(Minigame.for_part(part.def.kind), _finished.bind(part), true)
+
+
+func _serviceable(part: ShipPart) -> bool:
+	return part.broken or part.health() == ShipPart.Health.FAULTY
 
 
 func _finished(success: bool, part: ShipPart) -> void:
@@ -208,18 +320,27 @@ func _finished(success: bool, part: ShipPart) -> void:
 		part.wear = minf(part.wear + 0.2, 1.0)
 		Events.toast.emit("La reparación falló", Ui.LAMP_WARNING)
 		return
-	if not part.broken:
-		Card.release_fault(part, true)
-		return
-	if Run.kits > 0:
+	var was_broken := part.broken
+	if was_broken and Run.kits > 0:
 		Run.kits -= 1
 		Run.apply({"fix": true}, part)
-		Card.release_fault(part, true)
 		Events.toast.emit("%s reparada" % part.def.display_name, Ui.LAMP_GO)
-	else:
+	elif was_broken:
 		Run.apply({"fix": true, "wear": 0.15}, part)
-		Card.release_fault(part, true)
 		Events.toast.emit("Improvisada, sin kits", Ui.LAMP_CAUTION)
+	else:
+		Events.toast.emit("%s revisada" % part.def.display_name, Ui.LAMP_GO)
+	_settle(part)
+	Card.release_fault(part, true)
+
+
+## Una reparación lograda deja la pieza al menos gastada. Si no, el aro naranja vuelve al instante.
+func _settle(part: ShipPart) -> void:
+	var life := part.condition * (1.0 - part.wear)
+	if life >= 0.55:
+		return
+	var room := maxf(1.0 - part.wear, 0.2)
+	part.condition = maxf(part.condition, 0.55 / room)
 
 
 func paint_map(canvas: Node2D) -> void:
@@ -238,7 +359,12 @@ func paint_map(canvas: Node2D) -> void:
 		if part.def.radial and part.side == 0:
 			_paint_damage(canvas, part, ShipRenderer.mirror(rects[i]), pulse, marked)
 		if marked and _crew != null:
-			canvas.draw_line(_crew.position, rects[i].get_center(), Ui.LAMP_WARNING, 2.0)
+			var target := rects[i].get_center()
+			if part.def.radial and part.side == 0:
+				var other := ShipRenderer.mirror(rects[i]).get_center()
+				if _crew.position.distance_to(other) < _crew.position.distance_to(target):
+					target = other
+			canvas.draw_line(_crew.position, target, Ui.LAMP_WARNING, 2.0)
 	var hatch := _hatch_rect()
 	canvas.draw_rect(hatch, Color(0.45, 1.3, 1.5, 0.9), false, 2.0)
 	if on_hull:
@@ -308,14 +434,18 @@ func _refresh_hint() -> void:
 	if on_hull:
 		if inside:
 			_hint.text = "Falla en cabina. Enter en el anillo cian para entrar."
+		elif _has_fault(true):
+			_hint.text = "Rodea el casco hasta el aro y pulsa Enter."
 		else:
 			_hint.text = "Enter en el anillo cian para volver a la cabina."
 	elif outside:
-		_hint.text = "Falla en el casco. Sal por el marco cian."
+		_hint.text = "Enter sobre el aro naranja. Si no llegas, sal por el marco cian."
 	else:
 		var hatch := _airlock()
 		if hatch >= 0 and hatch < Run.ship.parts.size() and Run.ship.parts[hatch].broken:
 			_hint.text = "Cápsula rota: Enter sobre ella repara. El marco cian es la salida."
+		elif _has_fault(false):
+			_hint.text = "Falla naranja: Enter sobre el aro para repararla."
 		else:
 			_hint.text = "Enter en la cápsula (marco cian) para salir al casco."
 
@@ -377,8 +507,32 @@ func _center(index: int) -> Vector2:
 	return rects[index].get_center()
 
 
+func _has_fault(hull: bool) -> bool:
+	for part: ShipPart in Run.ship.parts:
+		if part.health() != ShipPart.Health.FAULTY:
+			continue
+		if is_exterior(part.def.kind) == hull:
+			return true
+	return false
+
+
 func _index_at(at: Vector2) -> int:
-	return ShipRenderer.pick(Run.ship.parts, at)
+	var hit := ShipRenderer.pick(Run.ship.parts, at)
+	if hit >= 0:
+		return hit
+	var rects := ShipRenderer.layout(Run.ship.parts)
+	var best := -1
+	var best_d := 22.0
+	for i: int in Run.ship.parts.size():
+		if not _serviceable(Run.ship.parts[i]):
+			continue
+		var rect := rects[i]
+		var reach := maxf(minf(rect.size.x, rect.size.y) * 0.7, 12.0)
+		var d := at.distance_to(rect.get_center())
+		if d <= reach and d < best_d:
+			best = i
+			best_d = d
+	return best
 
 
 func _airlock() -> int:
@@ -404,12 +558,14 @@ func _exterior_stations() -> Array:
 		var part: ShipPart = Run.ship.parts[i]
 		if is_exterior(part.def.kind):
 			out.append({"part": part, "rect": rects[i]})
+			if part.def.radial and part.side == 0:
+				out.append({"part": part, "rect": ShipRenderer.mirror(rects[i])})
 	return out
 
 
 func _exterior_at(at: Vector2) -> ShipPart:
 	var best: ShipPart = null
-	var best_d := 28.0
+	var best_d := REPAIR_REACH
 	for row: Dictionary in _exterior_stations():
 		var rect: Rect2 = row.rect
 		var closest := Vector2(clampf(at.x, rect.position.x, rect.end.x), clampf(at.y, rect.position.y, rect.end.y))

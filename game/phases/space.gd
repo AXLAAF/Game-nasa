@@ -8,9 +8,20 @@ const ARCADE_ACCEL_MULT := 4.5
 const ARCADE_MIN_ACCEL := 50.0
 const ARCADE_MAX_ACCEL := 110.0
 const POI_RADIUS := 40.0
-const BELT := Vector2(3950.0, 4750.0)
+const BELT := Vector2(4400.0, 6800.0) ## cinturón de asteroides, unas 2,2 a 3,4 UA [juego]
 const ELECTRONICS: Array[StringName] = [&"computer", &"sensor", &"antenna", &"battery", &"solar"]
-const POI_ICON := {&"asteroid": "A", &"derelict": "D", &"signal": "?", &"comet": "C", &"moon": "L"}
+const POI_ICON := {&"asteroid": "A", &"derelict": "D", &"signal": "?", &"comet": "C", &"moon": "L", &"relic": "N"}
+const RELICS: Array[Dictionary] = [
+	{"body": &"luna", "alt": 4.5, "phase": 0.4, "name": "Eagle, Apolo 11", "text": "La etapa de descenso del Eagle sigue en la Base de la Tranquilidad. La NASA la dejó el 20 de julio de 1969."},
+	{"body": &"luna", "alt": 4.5, "phase": 2.2, "name": "Rover del Apolo 15", "text": "El vehículo lunar del Apolo 15 sigue en el valle de Hadley. La NASA lo apagó al marcharse, en 1971."},
+	{"body": &"marte", "alt": 4.5, "phase": 0.8, "name": "Opportunity", "text": "Opportunity dejó de llamar el 10 de junio de 2018, cubierto por una tormenta de polvo en Meridiani. La NASA no volvió a oírlo."},
+	{"body": &"marte", "alt": 4.5, "phase": 2.6, "name": "InSight", "text": "InSight se apagó el 15 de diciembre de 2022: el polvo tapó sus paneles en Elysium. Sigue en el suelo."},
+	{"body": &"marte", "alt": 4.5, "phase": 4.4, "name": "Viking 1", "text": "Viking 1 calló el 11 de noviembre de 1982 en Chryse Planitia. El aterrizador de la NASA sigue ahí."},
+	{"body": &"mercurio", "alt": 4.5, "phase": 1.1, "name": "Impacto de MESSENGER", "text": "MESSENGER chocó contra Mercurio el 30 de abril de 2015, cerca del cráter Shakespeare. No quedó posado: son restos del impacto."},
+	{"body": &"venus", "alt": 4.5, "phase": 3.0, "name": "Pioneer Venus", "text": "En diciembre de 1978 las sondas Pioneer Venus de la NASA llegaron al suelo y callaron en menos de una hora. El calor y la presión las apagaron."},
+	{"body": &"titan", "alt": 4.5, "phase": 0.9, "name": "Huygens", "text": "Huygens, de la ESA, viajó en el Cassini de la NASA y se posó en Titán el 14 de enero de 2005. Sigue en ese suelo frío."},
+	{"r": 2920.0, "phase": 1.3, "name": "NEAR Shoemaker", "text": "NEAR Shoemaker se posó en el asteroide Eros el 12 de febrero de 2001. La NASA lo dejó ahí al acabar la misión. Eros orbita a unas 1,46 UA."},
+]
 const PLANET_MIN_PX := 14.0
 
 var bodies: Array[BodyDef] = []
@@ -38,6 +49,7 @@ var _rad_clock: float = 0.0
 var _stranded_offered: bool = false
 var _deadline_warned: bool = false
 var _leaving: bool = false
+var _event_freeze: bool = false ## la llamarada no cambia el warp; el reloj para solo con la carta
 var _belt_rocks: PackedVector3Array = PackedVector3Array()
 var _cam: Camera2D
 var _stars: Starfield
@@ -124,11 +136,28 @@ func _spawn_pois() -> void:
 		if parent != null and not parent.is_star:
 			Run.pois.append({"id": id, "kind": &"moon", "body": body.id, "rarity": 0, "done": false, "scanned": true})
 			id += 1
+	for relic: Dictionary in RELICS:
+		var poi := relic.duplicate()
+		poi["id"] = id
+		poi["kind"] = &"relic"
+		poi["rarity"] = 1
+		poi["done"] = false
+		poi["scanned"] = false
+		if not poi.has("dir"):
+			poi["dir"] = 1.0
+		Run.pois.append(poi)
+		id += 1
 
 
 func poi_pos(t: float, poi: Dictionary) -> Vector2:
 	if poi.kind == &"moon":
 		return Gravity.body_pos(Catalog.body(poi.body), t)
+	if poi.kind == &"relic" and poi.has("body"):
+		var host := Catalog.body(poi.body)
+		if host == null:
+			return Vector2.ZERO
+		var ang := float(poi.phase)
+		return Gravity.body_pos(host, t) + Vector2(cos(ang), sin(ang)) * host.radius * float(poi.alt)
 	var r: float = poi.r
 	var a: float = poi.phase + sqrt(Catalog.star().mu / (r * r * r)) * t * float(poi.dir)
 	return Vector2(cos(a), sin(a)) * r
@@ -182,7 +211,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		if mb.button_index == MOUSE_BUTTON_WHEEL_UP:
 			target_zoom = minf(target_zoom * 1.2, 12.0)
 		elif mb.button_index == MOUSE_BUTTON_WHEEL_DOWN:
-			target_zoom = maxf(target_zoom / 1.2, 0.04)
+			target_zoom = maxf(target_zoom / 1.2, _zoom_floor())
 		elif mb.button_index == MOUSE_BUTTON_LEFT:
 			_pick_target(get_global_mouse_position())
 		return
@@ -224,13 +253,11 @@ func _set_warp(index: int) -> void:
 	var cap := _warp_cap()
 	if index > cap:
 		Synth.play(&"deny")
-		Events.toast.emit("Suelta el motor para acelerar el tiempo" if burning else "Llamarada: el tiempo no se acelera", Ui.LAMP_CAUTION)
+		Events.toast.emit("Suelta el motor para acelerar el tiempo", Ui.LAMP_CAUTION)
 	warp_i = mini(index, cap)
 
 
 func _warp_cap() -> int:
-	if flare_warn >= 0.0:
-		return 0
 	if burning:
 		return 1 if Profile.arcade else 0
 	return Run.TIME_SCALES.size() - 1
@@ -296,6 +323,8 @@ func _scan_target() -> void:
 
 
 func _poi_name(poi: Dictionary) -> String:
+	if poi.has("name"):
+		return String(poi.name)
 	match poi.kind:
 		&"asteroid": return "asteroide"
 		&"derelict": return "nave abandonada"
@@ -334,7 +363,13 @@ func _process(delta: float) -> void:
 		_leave(&"debrief", 1.6 if Run.outcome == &"lost" else 0.4)
 		return
 	zoom = lerpf(zoom, target_zoom, minf(delta * 6.0, 1.0))
-	if Profile.arcade and _wasd_dir() != Vector2.ZERO and flare_warn < 0.0:
+	if _event_freeze:
+		_update_hud()
+		_cam.position = st.pos + ShipInterior.view_shift(zoom)
+		_cam.zoom = Vector2(zoom, zoom)
+		queue_redraw()
+		return
+	if Profile.arcade and _wasd_dir() != Vector2.ZERO:
 		warp_i = mini(warp_i, 1)
 	warp_i = mini(warp_i, _warp_cap())
 	var dt := minf(delta, 0.05) * Run.time_scale(warp_i)
@@ -545,7 +580,6 @@ func _hazards(dt: float) -> void:
 	var warn_time := 25.0 if sensors else 8.0
 	if flare_warn < 0.0 and flare_timer <= warn_time:
 		flare_warn = flare_timer
-		warp_i = 0
 		Synth.play(&"alarm")
 		Events.toast.emit("Llamarada solar en %d s, escóndete tras un planeta" % int(warn_time), Ui.LAMP_CAUTION)
 	if flare_timer <= 0.0:
@@ -592,13 +626,14 @@ func _flare() -> void:
 	]
 	if Run.ship.has_kind(&"solar"):
 		choices.append(_choice("Absorber con los paneles", 0.4, {"battery": 1.0, "science": 2}, {"rand_break": true, "vision": -0.3}, {}, "Batería a tope.", "Los paneles se quemaron."))
+	_event_freeze = true
 	Card.show_card({
 		"title": "Llamarada solar",
 		"text": "Una tormenta de protones barre la nave. Flujo solar x%.1f." % f,
 		"tone": &"malfunction",
 		"choices": choices,
 		"scanned": Run.ship.kind_output(&"sensor") >= 0.7 or Profile.has_lesson("odds") or Profile.assist,
-	})
+	}, func(_ok: bool) -> void: _event_freeze = false)
 
 
 func _micrometeoroid() -> void:
@@ -631,7 +666,14 @@ func _raise(failed: Array[ShipPart]) -> void:
 func _check_pois() -> void:
 	var pos: Vector2 = st.pos
 	for poi: Dictionary in Run.pois:
-		if poi.done:
+		if poi.done or poi.kind != &"relic":
+			continue
+		if pos.distance_to(poi_pos(st.t, poi)) < POI_RADIUS:
+			poi.done = true
+			_encounter(poi)
+			return
+	for poi: Dictionary in Run.pois:
+		if poi.done or poi.kind == &"relic":
 			continue
 		var reach := POI_RADIUS
 		if poi.kind == &"moon":
@@ -643,6 +685,24 @@ func _check_pois() -> void:
 
 
 func _encounter(poi: Dictionary) -> void:
+	if poi.kind == &"relic":
+		Synth.play(&"chime")
+		Juice.slowmo(0.3, 0.4)
+		warp_i = 0
+		if target is Dictionary and target == poi:
+			target = Run.target()
+		Card.show_card({
+			"title": String(poi.name),
+			"text": String(poi.text),
+			"tone": &"encounter",
+			"rarity": 1,
+			"choices": [
+				_choice("Fotografiar y registrar", 1.0, {"science": 1}, {}, {}, "Queda en el informe de la misión.", ""),
+				_choice("Seguir de largo", 1.0, {}),
+			],
+			"scanned": true,
+		})
+		return
 	var options := Catalog.encounters_for(poi.kind, poi.rarity)
 	if options.is_empty():
 		return
@@ -858,7 +918,9 @@ func _update_hud() -> void:
 	# Kits y chatarra van en su tecla; el desgaste por pieza lo dice la matriz de lamparas.
 	_repair_button.text = "Reparar (R): %d kits" % Run.kits
 	_salvage_button.text = "Instalar (I): %d" % Run.salvage.size()
-	var empty := dv < 5.0 and approach == null
+	var thrust_ok := ship.thrust() > 0.0
+	var dry := ship.fuel_total() <= 0.05 or (thrust_ok and dv < 5.0)
+	var empty := dry and approach == null
 	_rescue_button.visible = empty
 	if empty and not _stranded_offered:
 		_stranded_offered = true
@@ -878,6 +940,24 @@ func _update_hud() -> void:
 		_prompt.add_theme_color_override("font_color", Ui.INFO)
 
 
+## Lo bastante lejos para que, con la nave en la orbita exterior, quepa el sistema entero.
+func _zoom_floor() -> float:
+	var outer := 0.0
+	for body: BodyDef in bodies:
+		if body.is_star:
+			continue
+		var reach := body.orbit_radius + body.radius
+		var parent := Catalog.body(body.parent_id)
+		if parent != null and not parent.is_star:
+			reach += parent.orbit_radius
+		outer = maxf(outer, reach)
+	if outer <= 1.0:
+		return 0.04
+	var view := get_viewport_rect().size
+	var span := minf(view.x, maxf(view.y - Ui.CONSOLE_H, 1.0))
+	return minf(0.04, span / (outer * 4.0 * 1.08))
+
+
 func _draw() -> void:
 	var px := 1.0 / zoom
 	var t: float = st.t
@@ -894,7 +974,8 @@ func _draw() -> void:
 		if body.is_star:
 			continue
 		var parent := Catalog.body(body.parent_id)
-		draw_arc(Gravity.body_pos(parent, t), body.orbit_radius, 0.0, TAU, 128, Color(body.color, 0.25), px)
+		var steps := clampi(int(TAU * body.orbit_radius * zoom / 10.0), 48, 180)
+		draw_arc(Gravity.body_pos(parent, t), body.orbit_radius, 0.0, TAU, steps, Color(body.color, 0.25), px)
 	var flaring := flare_warn >= 0.0 and int(Time.get_ticks_msec() / 200.0) % 2 == 0
 	var now_s := Time.get_ticks_msec() * 0.001
 	var pulse := 1.0 + 0.08 * sin(now_s * 3.0)
@@ -912,9 +993,10 @@ func _draw() -> void:
 		var ring_r := star.radius * (1.28 + k * 0.68) * pulse
 		var ring_col := Color(1.35, 0.68, 0.24, 0.14 if not flaring else 0.24).lerp(Color(1.0, 0.35, 0.1, 0.03), frac)
 		draw_circle(Vector2.ZERO, ring_r, ring_col)
-	draw_circle(Vector2.ZERO, star.radius * 1.12, Color(1.85, 1.05, 0.38, 0.85))
-	draw_circle(Vector2.ZERO, star.radius, Color(2.2, 1.55, 0.75))
-	draw_circle(Vector2.ZERO, star.radius * 0.62, Color(2.5, 2.05, 1.35))
+	var sun_r := maxf(star.radius, 5.0 * px)
+	draw_circle(Vector2.ZERO, sun_r * 1.12, Color(1.85, 1.05, 0.38, 0.85))
+	draw_circle(Vector2.ZERO, sun_r, Color(2.2, 1.55, 0.75))
+	draw_circle(Vector2.ZERO, sun_r * 0.62, Color(2.5, 2.05, 1.35))
 	for body: BodyDef in bodies:
 		if not body.is_star:
 			_draw_body(body, Gravity.body_pos(body, t), px)
@@ -936,9 +1018,13 @@ func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 	if body.atmosphere > 0.0:
 		var hr := r * 1.55
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, 0.22))
-	elif body.id == &"ignea":
+	elif body.hazards.has(&"heat") and body.atmosphere <= 0.0:
 		var hr_lava := r * 1.5
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr_lava, hr_lava), Vector2(hr_lava * 2.0, hr_lava * 2.0)), false, Color(1.5, 0.55, 0.16, 0.22))
+	if body.id == &"saturno":
+		draw_set_transform(pos, 0.18, Vector2(2.15, 0.4))
+		draw_arc(Vector2.ZERO, body.radius * 1.55, 0.0, TAU, 64, Color(0.93, 0.84, 0.62, 0.55), maxf(2.4 * px, 1.2))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if body.radius * 2.0 * zoom < PLANET_MIN_PX:
 		var hr_dot := r * 2.2
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, 0.3))
@@ -947,7 +1033,10 @@ func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.32), 2.0 * px)
 	if body.landable:
 		draw_arc(pos, body.radius * 2.6, 0.0, TAU, 48, Color(1, 1, 1, 0.12), px)
-	_text(pos + Vector2(r * 1.25 + 6.0 * px, -4.0 * px), body.display_name, Ui.IVORY if body == Run.target() else Ui.IVORY_DIM, px)
+	var parent := Catalog.body(body.parent_id)
+	var separation := pos.distance_to(Gravity.body_pos(parent, st.t)) * zoom if parent != null else 80.0
+	if separation >= 18.0:
+		_text(pos + Vector2(r * 1.25 + 6.0 * px, -4.0 * px), body.display_name, Ui.IVORY if body == Run.target() else Ui.IVORY_DIM, px)
 
 
 func _draw_poi(poi: Dictionary, px: float) -> void:

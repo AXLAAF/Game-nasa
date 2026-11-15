@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_marte"]
+
+[resource]
+script = ExtResource("1_marte")
+id = &"marte"
+display_name = "Marte"
+description = "A 1,52 UA [NASA]. El aire real es muy fino; en el juego alcanza para un paracaídas. El polvo tapa los paneles de las sondas que se quedaron."
+color = Color(0.85, 0.35, 0.25, 1)
+atmo_color = Color(1, 0.6, 0.45, 0.3)
+parent_id = &"sol"
+orbit_radius = 3048.0
+orbit_phase = 3.4
+radius = 16.0
+mu = 12000.0
+surface_gravity = 3.71
+atmosphere = 0.25
+hazards = Array[StringName]([&"dust"])
+payout = 1.6

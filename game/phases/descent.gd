@@ -443,7 +443,7 @@ func _heat(speed: float, dt: float) -> void:
 		part.ablative -= absorbed * SHIELD_USE
 		load -= absorbed
 		if part.ablative <= 0.0:
-			Events.toast.emit("Escudo térmico agotado", Ui.LAMP_WARNING)
+			Events.toast.emit("Escudo ablativo agotado", Ui.LAMP_WARNING)
 	hull_heat = maxf(hull_heat + load * 0.6 * (1.0 - resist * 0.6) - dt * 0.012, 0.0)
 	if hull_heat > 1.0:
 		_stress_clock += dt

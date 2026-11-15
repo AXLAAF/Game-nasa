@@ -8,8 +8,10 @@ const KEYBOARD_ONLY := -2
 
 var _key_just: Dictionary = {}
 var _joy_just: Dictionary = {}
+var _joy_held: Dictionary = {}
 var _axis_just: Dictionary = {}
 var _axis_dir: Dictionary = {}
+var _axis_now: Dictionary = {}
 
 
 func _ready() -> void:
@@ -27,24 +29,30 @@ func _input(event: InputEvent) -> void:
 			_key_just[key.physical_keycode] = true
 		if key.keycode != KEY_NONE:
 			_key_just[key.keycode] = true
-	elif event is InputEventJoypadButton and event.pressed:
+	elif event is InputEventJoypadButton:
 		var button := event as InputEventJoypadButton
-		_joy_just["%d:%d" % [button.device, int(button.button_index)]] = true
+		var id := "%d:%d" % [button.device, int(button.button_index)]
+		if event.pressed:
+			_joy_just[id] = true
+			_joy_held[id] = true
+		else:
+			_joy_held.erase(id)
 	elif event is InputEventJoypadMotion:
 		var motion := event as InputEventJoypadMotion
+		var axis_id := "%d:%d" % [motion.device, int(motion.axis)]
+		_axis_now[axis_id] = motion.axis_value
 		var dir := 0
 		if motion.axis_value > DEAD:
 			dir = 1
 		elif motion.axis_value < -DEAD:
 			dir = -1
-		var id := "%d:%d" % [motion.device, int(motion.axis)]
-		var prev := int(_axis_dir.get(id, 0))
+		var prev := int(_axis_dir.get(axis_id, 0))
 		if dir != 0 and dir != prev:
-			_axis_just["%s:%d" % [id, dir]] = true
+			_axis_just["%s:%d" % [axis_id, dir]] = true
 		if dir == 0:
-			_axis_dir.erase(id)
+			_axis_dir.erase(axis_id)
 		else:
-			_axis_dir[id] = dir
+			_axis_dir[axis_id] = dir
 
 
 func steer() -> float:
@@ -106,7 +114,7 @@ func crew_vector() -> Vector2:
 		v.y -= 1.0
 	if _key_down(&"crew_down"):
 		v.y += 1.0
-	var stick := Vector2(_axis_value(_crew_device(), JOY_AXIS_LEFT_X), _axis_value(_crew_device(), JOY_AXIS_LEFT_Y))
+	var stick := _pad_vector(_crew_device())
 	if stick.length() > DEAD:
 		v += stick
 	return v.limit_length(1.0)
@@ -159,6 +167,20 @@ func _crew_device() -> int:
 
 func _has_crew_pad() -> bool:
 	return Input.get_connected_joypads().has(1)
+
+
+## Palanca izquierda y cruceta del mando del tripulante. El comandante no usa este dispositivo.
+func _pad_vector(device: int) -> Vector2:
+	var v := Vector2(_axis_value(device, JOY_AXIS_LEFT_X), _axis_value(device, JOY_AXIS_LEFT_Y))
+	if _button_down(device, JOY_BUTTON_DPAD_LEFT):
+		v.x -= 1.0
+	if _button_down(device, JOY_BUTTON_DPAD_RIGHT):
+		v.x += 1.0
+	if _button_down(device, JOY_BUTTON_DPAD_UP):
+		v.y -= 1.0
+	if _button_down(device, JOY_BUTTON_DPAD_DOWN):
+		v.y += 1.0
+	return v
 
 
 func _left_stick(device: int) -> Vector2:
@@ -227,7 +249,7 @@ func _joy_edge(action: StringName, device: int) -> bool:
 
 func _button_down(device: int, button: JoyButton) -> bool:
 	for dev: int in _devices(device):
-		if Input.is_joy_button_pressed(dev, button):
+		if Input.is_joy_button_pressed(dev, button) or _joy_held.has("%d:%d" % [dev, int(button)]):
 			return true
 	return false
 
@@ -256,8 +278,9 @@ func _axis_edge(device: int, axis: JoyAxis, dir: int) -> bool:
 
 func _axis_value(device: int, axis: JoyAxis) -> float:
 	var best := 0.0
+	var connected := Input.get_connected_joypads()
 	for dev: int in _devices(device):
-		var value := Input.get_joy_axis(dev, axis)
+		var value := Input.get_joy_axis(dev, axis) if connected.has(dev) else float(_axis_now.get("%d:%d" % [dev, int(axis)], 0.0))
 		if absf(value) > absf(best):
 			best = value
 	return best

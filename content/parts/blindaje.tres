@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_n8mty")
 id = &"blindaje"
-display_name = "Blindaje antirradiación"
-description = "Protege electrónica de llamaradas y cinturones de radiación."
+display_name = "Bóveda de titanio"
+description = "Como la bóveda de Juno. Protege la electrónica de llamaradas y cinturones."
 kind = &"shielding"
 cost = 200
 mass = 0.6

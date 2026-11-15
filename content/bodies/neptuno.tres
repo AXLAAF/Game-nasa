@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_neptuno"]
+
+[resource]
+script = ExtResource("1_neptuno")
+id = &"neptuno"
+display_name = "Neptuno"
+description = "El más lejano, a 30,1 UA [NASA]. Oscuro, frío y sin superficie firme."
+color = Color(0.2, 0.35, 0.75, 1)
+atmo_color = Color(0.35, 0.5, 0.95, 0.4)
+parent_id = &"sol"
+orbit_radius = 60140.0
+orbit_phase = 2.8
+radius = 31.0
+mu = 65000.0
+surface_gravity = 11.15
+atmosphere = 1.7
+landable = false
+hazards = Array[StringName]([&"cold"])

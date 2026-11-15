@@ -79,8 +79,11 @@ class ShipView extends Control:
 
 	func fit() -> void:
 		var b := ShipRenderer.bounds(Run.ship.parts)
-		var room := size.y - 140.0
-		scale_factor = clampf(room / maxf(-b.position.y, 1.0), 0.6, 1.8)
+		var room_y := maxf(size.y - 110.0, 40.0)
+		var room_x := maxf(size.x - 36.0, 40.0)
+		var height := maxf(b.size.y, 1.0)
+		var width := maxf(b.size.x, 1.0)
+		scale_factor = clampf(minf(room_y / height, room_x / width), 0.35, 1.8)
 
 	func to_local_ship(p: Vector2) -> Vector2:
 		return (p - origin()) / scale_factor
@@ -208,9 +211,9 @@ class ShipView extends Control:
 		if not hint.is_empty() and not hint.get("radial", false):
 			draw_line(Vector2(o.x - 120, float(hint.y)), Vector2(o.x + 120, float(hint.y)), Ui.IVORY, 2.0)
 		if Run.ship.parts.is_empty():
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Empieza por la cápsula, un motor y un tanque.", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY_DIM)
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Haz clic en el catálogo y se colocan solas. Arrastra para moverlas.", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.INFO)
-		draw_string(Ui.sans(), Vector2(12, size.y - 12), "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Empieza por la cápsula, un motor y un tanque.", HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_TEXT, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Haz clic en el catálogo y se colocan solas. Arrastra para moverlas.", HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_LEGEND, Ui.INFO)
+		draw_string(Ui.sans(), Vector2(12, size.y - 16), "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, size.x - 24, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 
 
 func _ready() -> void:
@@ -374,7 +377,12 @@ func _paint_part_lamps() -> void:
 func _build_center(root: Control) -> void:
 	_view = ShipView.new()
 	_view.phase = self
-	Ui.place(_view, Rect2(350, 10, 580, 700))
+	_view.clip_contents = true
+	_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_view.offset_left = 350
+	_view.offset_top = 10
+	_view.offset_right = -350
+	_view.offset_bottom = -10
 	root.add_child(_view)
 	Kinetic.enter_deferred(_view, 0.05, {"scale": Vector2(0.93, 0.90), "tilt": -0.012, "beam": true, "duration": 0.36})
 
@@ -397,27 +405,25 @@ func _build_right(root: Control) -> void:
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	Ui.plate(info, "Ingeniería")
 	_contract_label = Ui.label(info, "", 13, Ui.IVORY)
-	_contract_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_contract_label.custom_minimum_size = Vector2(284, 0)
+	_fit_copy(_contract_label)
 	Ui.legend(info, "Presupuesto libre / total")
 	_budget_label = Ui.label(info, "", Ui.SIZE_HEAD, Ui.IVORY)
 	_budget_label.add_theme_font_override("font", Ui.mono())
 	Ui.legend(info, "Siguiente paso")
 	_next_label = Ui.label(info, "", Ui.SIZE_TEXT, Ui.IVORY)
-	_next_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_next_label.custom_minimum_size = Vector2(284, 0)
+	_fit_copy(_next_label)
 	_req_box = Ui.vbox(info, 1)
 	_dv = Gauge.new("Delta-v", Ui.INFO)
 	info.add_child(_dv)
 	_twr_label = Ui.label(info, "", 14)
 	_stages_label = Ui.label(info, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_fit_copy(_stages_label)
 	_risk_label = Ui.label(info, "", 14)
 	var sep := HSeparator.new()
 	info.add_child(sep)
 	_part_box = Ui.vbox(info, 4)
 	_launch_note = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
-	_launch_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_launch_note.custom_minimum_size = Vector2(300, 0)
+	_fit_copy(_launch_note)
 	_launch = Ui.primary(Ui.button(col, "Despegar", _on_launch))
 	_launch.custom_minimum_size = Vector2(0, 48)
 	_launch.add_theme_font_size_override("font_size", 22)
@@ -461,7 +467,7 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 	var has_capsule := ship.has_kind(&"capsule")
 	var has_thrust := ship.thrust() > 0.0
 	var has_fuel := ship.fuel_capacity() > 0.0
-	rows.append({"label": "Cápsula", "state": Lamp.GO if has_capsule else Lamp.WARNING, "hint": "" if has_capsule else "Sin cápsula no hay tripulación ni mando. Agrega la Cápsula Mk1.", "blocks": not has_capsule})
+	rows.append({"label": "Cápsula", "state": Lamp.GO if has_capsule else Lamp.WARNING, "hint": "" if has_capsule else "Sin cápsula no hay tripulación ni mando. Agrega la cápsula Apolo.", "blocks": not has_capsule})
 	rows.append({"label": "Motor", "state": Lamp.GO if has_thrust else Lamp.WARNING, "hint": "" if has_thrust else "Sin motor la nave no se mueve. Agrega un motor de Lo básico.", "blocks": not has_thrust})
 	rows.append({"label": "Combustible", "state": Lamp.GO if has_fuel else Lamp.WARNING, "hint": "" if has_fuel else "Un motor sin tanque no tiene qué quemar. Agrega un tanque.", "blocks": false})
 	var home := Catalog.home()
@@ -486,7 +492,7 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 		var need := contract.dv_estimate
 		if dv < need * 0.85:
 			reach_state = Lamp.WARNING
-			reach_hint = "El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con desacoplador." % [int(dv), int(need)]
+			reach_hint = "El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con pernos de etapa." % [int(dv), int(need)]
 		elif dv < need:
 			reach_state = Lamp.CAUTION
 			reach_hint = "Vas justo de combustible: %d de %d m/s." % [int(dv), int(need)]
@@ -654,6 +660,7 @@ func _refresh() -> void:
 		lamp.custom_minimum_size.x = 64
 		req_row.add_child(lamp)
 		var row_label := Ui.label(req_row, String(row.label), Ui.SIZE_LEGEND, Ui.IVORY)
+		_fit_copy(row_label)
 		row_label.tooltip_text = String(row.hint)
 		row_label.mouse_filter = Control.MOUSE_FILTER_PASS
 		if state == Lamp.WARNING:
@@ -712,15 +719,21 @@ func _refresh_part() -> void:
 	if part.def.radial:
 		var side := "ambos" if part.side == 0 else ("izq" if part.side < 0 else "der")
 		place = "montaje %s  altura %d %%" % [side, int(part.mount * 100.0)]
-	Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
+	var detail := Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
+	_fit_copy(detail)
 	var stats := Ui.label(_part_box, stats_text(part.def), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
-	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	stats.custom_minimum_size = Vector2(284, 0)
+	_fit_copy(stats)
 	var row := Ui.hbox(_part_box, 6)
 	if not part.inspected:
 		var cost := "gratis" if Run.free_inspections > 0 else Ui.money(INSPECT_COST)
 		Ui.button(row, "Inspeccionar (%s)" % cost, _inspect)
 	Ui.button(row, "Quitar", remove_part.bind(_selected))
+
+
+func _fit_copy(label: Label) -> void:
+	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	label.custom_minimum_size = Vector2(0, 0)
 
 
 func _on_launch() -> void:
@@ -900,7 +913,7 @@ func part_viability(def: PartDef, stock: ShipPart = null) -> Dictionary:
 				if def.id == &"motor_susurro":
 					badge = "POCO VIABLE"
 					tone = Lamp.CAUTION
-					reason = "Empuje muy bajo para despegar desde Terra; úsalo arriba tras un motor grande."
+					reason = "Empuje muy bajo para despegar desde la Tierra; úsalo arriba tras un motor grande."
 				else:
 					badge = "NECESARIA"
 					tone = Lamp.GO
@@ -970,11 +983,11 @@ func part_viability(def: PartDef, stock: ShipPart = null) -> Dictionary:
 			if f_max > 2.5:
 				badge = "RIESGOSA"
 				tone = Lamp.CAUTION
-				reason = "Cerca del Sol (%s) puede sobrecalentarse; considera RTG o radiador." % (target.display_name if target != null else "destino")
+				reason = "Cerca del Sol (%s) puede sobrecalentarse; considera un MMRTG o un radiador de amoníaco." % (target.display_name if target != null else "destino")
 			elif f_min < 0.2:
 				badge = "POCO VIABLE"
 				tone = Lamp.CAUTION
-				reason = "Tan lejos del Sol rinde menos del 20 %; conviene usar un RTG."
+				reason = "Tan lejos del Sol rinde menos del 20 %; conviene usar un MMRTG."
 			elif power_deficit:
 				badge = "NECESARIA"
 				tone = Lamp.GO

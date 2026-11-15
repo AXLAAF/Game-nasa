@@ -168,6 +168,26 @@ func test_black_commander_pad_edges() -> void:
 	assert_true(Controls.cmd_just(&"cmd_confirm"), "el teclado confirma el vuelo")
 
 
+func test_black_crew_pad_does_not_fly() -> void:
+	if not _require_runtime():
+		return
+	Run.crew = 2
+	var dev := Controls._crew_device()
+	_clear_controls()
+	_feed_joy_button(dev, JOY_BUTTON_DPAD_LEFT)
+	assert_true(Controls.crew_vector().x < -0.5, "la cruceta mueve al tripulante")
+	assert_eq(Controls.steer(), 0.0, "la cruceta no gira la nave")
+	_clear_controls()
+	_feed_joy_motion(dev, JOY_AXIS_LEFT_Y, -1.0)
+	if not Input.get_connected_joypads().has(dev):
+		assert_true(Controls.crew_vector().y < -0.5, "la palanca mueve al tripulante")
+	assert_eq(Controls.throttle_axis(), 0.0, "la palanca no empuja la nave")
+	_clear_controls()
+	_feed_joy_button(dev, JOY_BUTTON_A)
+	assert_true(Controls.crew_interact_just(), "A confirma la reparación")
+	assert_false(Controls.cmd_just(&"cmd_confirm"), "A no confirma el vuelo")
+
+
 func test_black_crew_keys_isolated() -> void:
 	if not _require_runtime():
 		return
@@ -326,7 +346,9 @@ func test_black_walk_interior_then_airlock() -> void:
 	assert_eq(Run.kits, 0, "gastó kit")
 	interior.busy = false
 	interior.interact(interior._center(2))
-	assert_false(interior.busy, "solar no desde su sala")
+	assert_true(interior.busy, "panel en sala abre EVA")
+	_drop_minigames()
+	interior.busy = false
 	assert_true(solar.broken, "solar sigue roto")
 	interior.interact(interior._center(1))
 	assert_true(interior.on_hull, "esclusa abre el casco")
@@ -411,6 +433,14 @@ func _feed_joy_button(device: int, button: JoyButton) -> void:
 	Controls._input(event)
 
 
+func _feed_joy_motion(device: int, axis: JoyAxis, value: float) -> void:
+	var event := InputEventJoypadMotion.new()
+	event.device = device
+	event.axis = axis
+	event.axis_value = value
+	Controls._input(event)
+
+
 func _press_key(code: Key) -> void:
 	var event := InputEventKey.new()
 	event.pressed = true
@@ -431,6 +461,9 @@ func _release_key(code: Key) -> void:
 
 func _clear_controls() -> void:
 	Controls._flush()
+	Controls._joy_held.clear()
+	Controls._axis_now.clear()
+	Controls._axis_dir.clear()
 
 
 func _part(id: StringName) -> ShipPart:

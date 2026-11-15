@@ -6,7 +6,7 @@
 script = ExtResource("1_1fjug")
 id = &"sol"
 display_name = "Sol"
-description = "No te acerques."
+description = "El Sol. No se aterriza."
 color = Color(3, 2.2, 1, 1)
 is_star = true
 radius = 70.0

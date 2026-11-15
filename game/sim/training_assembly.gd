@@ -11,7 +11,7 @@ static func evaluate(ship: ShipModel, design: Dictionary, gravity: float) -> Dic
 				"why": step.why, "error": "" if ship.parts.size() <= i else "La posición %d necesita %s. Mueve o retira la pieza que ocupa ese lugar." % [i + 1, step.title]}
 	var error := ""
 	if ship.stages().size() != 2:
-		error = "Esta práctica necesita exactamente dos etapas; retira los desacopladores extra."
+		error = "Esta práctica necesita exactamente dos etapas; retira los pernos de etapa extra."
 	for stage: Array in ship.stages():
 		if ship.stage_thrust(stage) <= 0.0 or ship.stage_fuel(stage) <= 0.0:
 			error = "Cada etapa necesita un motor operativo y combustible en su propio tanque."

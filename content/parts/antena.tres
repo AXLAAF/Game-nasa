@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_16sg1")
 id = &"antena"
-display_name = "Antena"
-description = "Comunicaciones claras con la agencia."
+display_name = "Antena HGA"
+description = "Antena de alta ganancia. Habla con la Red del Espacio Profundo."
 kind = &"antenna"
 radial = true
 cost = 80

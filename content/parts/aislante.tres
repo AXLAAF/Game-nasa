@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_apnma")
 id = &"aislante"
-display_name = "Manta térmica MLI"
-description = "Mantiene el calor lejos del sol."
+display_name = "Manta MLI"
+description = "Aislante de Kapton, la manta dorada. Guarda el calor de la nave lejos del Sol."
 kind = &"insulation"
 cost = 90
 mass = 0.1

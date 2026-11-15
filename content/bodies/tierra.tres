@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="BodyDef" format=3]
+
+[ext_resource type="Script" path="res://game/data/body_def.gd" id="1_tierra"]
+
+[resource]
+script = ExtResource("1_tierra")
+id = &"tierra"
+display_name = "Tierra"
+description = "Casa. Órbita a 1 UA [NASA]. El radio y la gravedad del mapa están a escala de juego."
+color = Color(0.25, 0.55, 0.95, 1)
+atmo_color = Color(0.5, 0.75, 1, 0.4)
+is_home = true
+parent_id = &"sol"
+orbit_radius = 2000.0
+mu = 43750.0

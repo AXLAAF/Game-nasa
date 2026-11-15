@@ -256,6 +256,8 @@ func _draw_view() -> void:
 		_view.draw_rect(BOX, Ui.INFO, false, 2.0)
 		_view.draw_string(font, Vector2(10, 22), str(_repair_titles().get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
 		_draw_repair(font)
+		if not _done:
+			_view.draw_string(font, Vector2(10, 360), "Palanca, cruceta o flechas. A.", HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.INFO)
 		if _done:
 			_view.draw_string(font, Vector2(10, 352), _msg, HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
 		return
@@ -337,7 +339,7 @@ func _repair_titles() -> Dictionary:
 		&"gear": "Patas: extiende y confirma",
 		&"spin": "RCS: anula el giro",
 		&"cells": "Batería: conecta la celda",
-		&"pellet": "RTG: abrazadera en el zócalo",
+		&"pellet": "MMRTG: abrazadera en el zócalo",
 		&"reboot": "Computadora: repite",
 		&"calibrate": "Sensores: centra y fija",
 		&"bolt": "Desacoplador: corta el perno",
@@ -633,7 +635,7 @@ func _tick_pellet(_delta: float) -> void:
 			_job.clamps = int(_job.clamps) + 1
 			_job.socket = 0.55 if int(_job.clamps) == 1 else 0.78
 			if int(_job.clamps) >= 3:
-				_finish(true, "El RTG queda sujeto")
+				_finish(true, "El MMRTG queda sujeto")
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 2:

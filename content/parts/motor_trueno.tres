@@ -5,8 +5,8 @@
 [resource]
 script = ExtResource("1_nglmr")
 id = &"motor_trueno"
-display_name = "Motor Trueno"
-description = "Mucho empuje, consumo brutal. El clásico de primera etapa."
+display_name = "Motor H-1"
+description = "Primera etapa, como el H-1 del Saturno I. Mucho empuje y mucho consumo."
 kind = &"engine"
 cost = 520
 mass = 3.0
