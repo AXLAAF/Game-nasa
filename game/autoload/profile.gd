@@ -26,6 +26,9 @@ var assist: bool = false ## modo asistido: mas facil, menos pago
 var reduced_motion: bool = false ## sin sacudida, destellos ni lamparas intermitentes
 var crew: int = 1
 var tutorial_seen: Array[String] = []
+var training_completed: bool = false
+## Los runners desactivan la persistencia antes de ejecutar pruebas destructivas.
+var persistence_enabled: bool = true
 var contracts: Array = [] ## diccionarios de Contract.to_dict()
 
 
@@ -95,11 +98,19 @@ func mark_tutorial_all() -> void:
 	save_profile()
 
 
+func complete_training() -> void:
+	if not training_completed:
+		training_completed = true
+		save_profile()
+
+
 func save_profile() -> void:
+	if not persistence_enabled:
+		return
 	var data := {
 		"credits": credits, "runs": runs, "wins": wins, "best": best_payout,
 		"lessons": lessons, "inventory": inventory, "insurance": insurance, "assist": assist, "reduced_motion": reduced_motion, "crew": crew,
-		"tutorial": tutorial_seen, "contracts": contracts,
+		"tutorial": tutorial_seen, "contracts": contracts, "training_completed": training_completed,
 	}
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	if file == null:
@@ -132,6 +143,7 @@ func load_profile() -> void:
 	for phase: Variant in data.get("tutorial", []):
 		tutorial_seen.append(str(phase))
 	contracts = data.get("contracts", [])
+	training_completed = bool(data.get("training_completed", false))
 
 
 func reset() -> void:
@@ -147,4 +159,5 @@ func reset() -> void:
 	crew = 1
 	tutorial_seen.clear()
 	contracts.clear()
+	training_completed = false
 	save_profile()

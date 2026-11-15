@@ -6,6 +6,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	await process_frame
+	root.get_node("Profile").persistence_enabled = false
 	var broken := _compile("res://game")
 	var suite: Script = load("res://tests/sim_tests.gd")
 	if suite == null:
@@ -37,7 +38,8 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var io_failed: int = _run_mcp_suite(io_suite)
-	quit(1 if failed + broken + music_failed + menu_failed + coop_failed + io_failed > 0 else 0)
+	var training_failed := _run_mcp_suite(load("res://tests/test_training.gd"))
+	quit(1 if failed + broken + music_failed + menu_failed + coop_failed + io_failed + training_failed > 0 else 0)
 
 
 func _run_mcp_suite(suite_script: Script) -> int:
@@ -72,7 +74,7 @@ func _run_mcp_suite(suite_script: Script) -> int:
 		suite._free_tracked()
 	suite.suite_teardown()
 	suite._free_tracked()
-	print("CoopIO: %d passed, %d failed" % [passed, failed])
+	print("%s: %d passed, %d failed" % [suite.suite_name(), passed, failed])
 	return failed
 
 

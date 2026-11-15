@@ -6,6 +6,7 @@ extends SceneTree
 
 func _initialize() -> void:
 	await process_frame
+	root.get_node("Profile").persistence_enabled = false
 	var smoke: Script = load("res://tests/smoke.gd")
 	await smoke.new().run(self)
 	print("SMOKE DONE")

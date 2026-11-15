@@ -43,6 +43,51 @@ Etiquetas usadas: **[NASA]** = dato real de los anexos; **[DIS]** = licencia de 
 
 ## 2. Loop principal
 
+### Primera misión de práctica (implementación del 15 de noviembre de 2026)
+
+Antes de arriesgar una nave, el menú y el hangar ofrecen una práctica opcional y
+repetible: Tierra → órbita → Tierra. No acepta contratos ni usa créditos o piezas
+del perfil. Solo guarda `training_completed` después del aterrizaje; salir o
+saltar conserva ese indicador sin marcar nuevas lecciones como completadas.
+
+El montaje enseña una receta de abajo hacia arriba: Trueno, tanque gordo,
+desacoplador, Susurro, tanque largo, escudo, cabina, paracaídas, panel y batería.
+Es una receta educativa, no una restricción universal de construcción. Cada
+colocación, retirada y movimiento recalcula el primer paso pendiente. Se verifican
+motor y combustible por etapa, TWR, delta-v y energía. Los extras añaden capacidad
+a cambio de masa y coste; el ensayo incluye una variante con antena.
+
+En vuelo se verifican ignición, orientación, reducción y recuperación de potencia
+ante carga aerodinámica, reparación de un desacoplador atascado, separación manual de la
+etapa agotada, empuje superior, orientación retrógrada, frenado, corredor de entrada
+y dos despliegues de paracaídas. El combustible activo se muestra separado del total.
+Las lecciones críticas congelan la física hasta actuar; el rumbo se asiste al
+soltar el giro. El tramo de costa hasta la entrada se resume explícitamente [DIS].
+Al fallar se restaura el último punto de control, incluidos combustible, escudo,
+energía, estado físico y RNG, con objetos independientes. La avería programada
+se repite al restaurar su punto de control.
+
+La implementación está aislada del flujo legado: `TrainingSession` es RefCounted,
+consume `PlayerCommand` y avanza a 30 Hz con `SimRng`; la vista solo envía comandos
+y lee resultados. Reutiliza las funciones de integración de RocketMath y las
+estadísticas de ShipModel sin llamar a sus rutas dependientes de autoloads.
+No migra toda la campaña a esta arquitectura ni modifica su balance.
+
+Los pasos, umbrales y escalas de práctica están en `data/design/training.json`
+[DIS]. La gravedad terrestre procede de `data/nasa/training_earth.json` [NASA],
+con fuente NASA; el radio reducido y la atmósfera simplificada son parámetros de
+juego separados. El catálogo legado conserva sus Resources de piezas.
+
+Validación: suite McpTestSuite `training` mediante `test_run` del addon, y runner
+`tests/training_runner.gd` que adapta el mismo handler al runtime sin editor.
+Incluye dos vuelos completos, repetición determinista, errores de montaje,
+separación temprana, etapa superior inválida, avería y reintento, corredor inseguro,
+ventanas congeladas, vuelo de principiante sin ajustes de potencia no explicados y
+aislamiento de campaña. Los runners deshabilitan la persistencia del perfil antes
+de probar; las pruebas antiguas de smoke reinician su estado en memoria.
+`tools/training_walkthrough.gd`
+recorre la práctica y captura estados sin guardar progreso.
+
 ```
         ┌──────────────────────── RUN (8–12 misiones, deuda inicial 8 000 cr) ───────────────────────┐
         │                                                                                              │

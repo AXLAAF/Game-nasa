@@ -23,17 +23,20 @@ func _ready() -> void:
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 18
 	col.add_child(spacer)
+	var training := Ui.button(col, "Repetir práctica de vuelo" if Profile.training_completed else "Primera misión: aprender a volar", func() -> void: Router.go(&"training"))
+	if not Profile.training_completed:
+		Ui.primary(training)
 	var new_game := Ui.primary(Ui.button(col, "Nueva partida", _new_game))
 	var settings := Ui.button(col, "Ajustes", func() -> void: SettingsPanel.show_panel())
 	var credits := Ui.button(col, "Créditos", _credits)
-	for button: Button in [new_game, settings, credits]:
+	for button: Button in [training, new_game, settings, credits]:
 		button.custom_minimum_size.x = 260
 		button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	if not OS.has_feature("web"):
 		var quit := Ui.button(col, "Salir", func() -> void: get_tree().quit())
 		quit.custom_minimum_size.x = 260
 		quit.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	new_game.grab_focus.call_deferred()
+	(new_game if Profile.training_completed else training).grab_focus.call_deferred()
 	Kinetic.enter_deferred(col, 0.0, {"duration": 0.36})
 	Synth.play(&"chime", -6.0)
 
@@ -52,9 +55,11 @@ func _new_game() -> void:
 func _start() -> void:
 	var assist := Profile.assist
 	var reduced_motion := Profile.reduced_motion
+	var training_completed := Profile.training_completed
 	Profile.reset()
 	Profile.assist = assist
 	Profile.reduced_motion = reduced_motion
+	Profile.training_completed = training_completed
 	Profile.save_profile()
 	Router.go(&"hangar")
 

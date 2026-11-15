@@ -1,0 +1,8 @@
+{
+  "label": "[NASA]",
+  "id": "earth",
+  "name": "Tierra",
+  "gravity_m_s2": 9.8,
+  "source": "https://nssdc.gsfc.nasa.gov/planetary/factsheet/",
+  "note": "Gravedad superficial redondeada de la ficha NASA. Radio y atmósfera del modelo jugable se definen por separado en data/design/training.json."
+}

@@ -12,12 +12,12 @@ const STEPS: Dictionary = {
 	],
 	&"assembly": [
 		["Sigue la lista de despegue", "A la derecha, Siguiente paso te dice qué le falta a la nave y por qué. Cuando la lista queda en verde, pulsa Despegar."],
-		["Clic y se coloca sola", "Haz clic en una pieza del catálogo y cae en su sitio: motor abajo, tanque encima y cápsula arriba. La lámpara de cada pieza dice si te sirve en esta misión; pasa el cursor para ver por qué."],
+		["Construye por etapas", "Para tu primer cohete, de abajo hacia arriba: Trueno, tanque gordo, desacoplador, Susurro, tanque largo, escudo, cabina y extras. Cada motor usa solo el tanque de su etapa. El hangar ofrece una práctica guiada sin deuda; el clic del catálogo coloca piezas automáticamente."],
 		["Calidad y presupuesto", "Chatarra y Usada cuestan menos, pero fallan más. Arrastra una pieza para moverla y usa clic derecho para quitarla y recuperar su precio."],
 	],
 	&"launch": [
 		["Ignición en T-0", "Pulsa Espacio cuando la aguja entre en la zona verde del reloj. Retroceso aborta el lanzamiento y te devuelve el presupuesto."],
-		["Vuelo y etapas", "Usa W/S para potencia, A/D para seguir la zona verde del dial y Espacio para soltar una etapa vacía."],
+		["Vuelo y etapas", "Usa W/S para potencia y A/D para seguir la zona verde del dial. Mira el combustible de la etapa activa: cuando se agote, comprueba que la siguiente tiene motor y tanque; pulsa Espacio para separar. Hacerlo antes desperdicia combustible. Si el cierre se atasca, resuelve la avería y reintenta."],
 	],
 	&"space": [
 		["Navegación y rumbo", "A/D giran, W acelera y 1-6 cambian la velocidad del tiempo. Pulsa N para ver la flecha guía hacia tu destino (Tab cambia objetivo)."],
