@@ -320,26 +320,31 @@ func _build_right(root: Control) -> void:
 	panel.offset_right = -10
 	panel.offset_top = 10
 	panel.offset_bottom = -10
+	panel.clip_contents = true
 	var col := Ui.vbox(panel, 6)
-	Ui.plate(col, "Ingeniería")
-	_contract_label = Ui.label(col, "", 13, Ui.IVORY)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	col.add_child(scroll)
+	var info := Ui.vbox(scroll, 6)
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	Ui.plate(info, "Ingeniería")
+	_contract_label = Ui.label(info, "", 13, Ui.IVORY)
 	_contract_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_contract_label.custom_minimum_size = Vector2(300, 0)
-	Ui.legend(col, "Presupuesto libre / total")
-	_budget_label = Ui.label(col, "", Ui.SIZE_HEAD, Ui.IVORY)
+	Ui.legend(info, "Presupuesto libre / total")
+	_budget_label = Ui.label(info, "", Ui.SIZE_HEAD, Ui.IVORY)
 	_budget_label.add_theme_font_override("font", Ui.mono())
 	_dv = Gauge.new("Delta-v", Ui.INFO)
-	col.add_child(_dv)
-	_twr_label = Ui.label(col, "", 14)
-	_stages_label = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
-	_req_box = Ui.vbox(col, 1)
-	_risk_label = Ui.label(col, "", 14)
+	info.add_child(_dv)
+	_twr_label = Ui.label(info, "", 14)
+	_stages_label = Ui.label(info, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_req_box = Ui.vbox(info, 1)
+	_risk_label = Ui.label(info, "", 14)
 	var sep := HSeparator.new()
-	col.add_child(sep)
-	_part_box = Ui.vbox(col, 4)
-	var spacer := Control.new()
-	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	col.add_child(spacer)
+	info.add_child(sep)
+	_part_box = Ui.vbox(info, 4)
 	_launch = Ui.primary(Ui.button(col, "Despegar", _on_launch))
 	_launch.custom_minimum_size = Vector2(0, 48)
 	_launch.add_theme_font_size_override("font_size", 22)
