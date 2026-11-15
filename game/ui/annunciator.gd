@@ -59,9 +59,9 @@ func _process(delta: float) -> void:
 		lamp.state = Lamp.WARNING if h == ShipPart.Health.BROKEN else (Lamp.OFF if h == ShipPart.Health.SOUND else Lamp.CAUTION)
 		lamp.blink = h == ShipPart.Health.FAULTY
 		if h != ShipPart.Health.SOUND:
-			notes.append("%s: %s, %s." % [part.def.display_name, ShipPart.HEALTH_NAME[h].to_lower(), ShipPart.HEALTH_NOTE[h]])
+			notes.append("%s: %s, %s." % [part.def.display_name, tr(ShipPart.HEALTH_NAME[h]).to_lower(), tr(ShipPart.HEALTH_NOTE[h])])
 	if _detail.visible:
-		_detail.text = "\n".join(notes) if not notes.is_empty() else "Todas las piezas en orden."
+		_detail.text = "\n".join(notes) if not notes.is_empty() else tr("Todas las piezas en orden.")
 
 
 func _rebuild(parts: Array) -> void:

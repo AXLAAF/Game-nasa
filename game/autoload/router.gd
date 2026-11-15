@@ -43,6 +43,10 @@ func mount(node: Node) -> void:
 	layer.add_child(_fade)
 
 
+func is_busy() -> bool:
+	return _busy
+
+
 func go(phase_id: StringName) -> void:
 	if _busy or host == null:
 		return

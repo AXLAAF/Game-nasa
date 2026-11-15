@@ -3,8 +3,12 @@ class_name EncounterDef
 extends Resource
 
 @export var id: StringName = &""
-@export var title: String = ""
-@export_multiline var text: String = ""
+@export var title: String = "":
+	get:
+		return tr(title)
+@export_multiline var text: String = "":
+	get:
+		return tr(text)
 ## asteroid, derelict, signal, comet, moon
 @export var poi: StringName = &"signal"
 ## 0 comun, 1 rara, 2 legendaria

@@ -52,15 +52,15 @@ static func requirements(ship: ShipModel, target: BodyDef) -> Array:
 	var f_max := maxf(f_target, 1.0)
 	var t_hot := equilibrium(f_max, ship)
 	var t_cold := equilibrium(f_min, ship)
-	out.append(["Calor en ruta (%d %%)" % int(t_hot * 100.0), t_hot < HOT, "La nave se calienta demasiado en esta ruta. Agrega un radiador."])
-	out.append(["Frío en ruta (%d %%)" % int(t_cold * 100.0), t_cold > COLD, "La nave se enfría demasiado lejos del Sol. Agrega una manta MLI o un MMRTG."])
+	out.append([Loc.t("Calor en ruta (%d %%)") % int(t_hot * 100.0), t_hot < HOT, Loc.t("La nave se calienta demasiado en esta ruta. Agrega un radiador.")])
+	out.append([Loc.t("Frío en ruta (%d %%)") % int(t_cold * 100.0), t_cold > COLD, Loc.t("La nave se enfría demasiado lejos del Sol. Agrega una manta MLI o un MMRTG.")])
 	var gen := power_gen(f_min, ship)
-	out.append(["Energía %.1f / %.1f" % [gen, power_use(ship)], gen >= power_use(ship), "La electrónica gasta más de lo que generas. Agrega un panel de triple unión o un MMRTG."])
+	out.append([Loc.t("Energía %.1f / %.1f") % [gen, power_use(ship)], gen >= power_use(ship), Loc.t("La electrónica gasta más de lo que generas. Agrega un panel de triple unión o un MMRTG.")])
 	if target.atmosphere > 0.0:
-		out.append(["Escudo térmico", ship.has_kind(&"heatshield"), "%s tiene atmósfera: sin escudo la nave se quema al entrar." % target.display_name])
-		out.append(["Paracaídas", ship.has_kind(&"parachute"), "%s tiene aire: el paracaídas frena la caída sin gastar combustible." % target.display_name])
+		out.append([Loc.t("Escudo térmico"), ship.has_kind(&"heatshield"), Loc.t("%s tiene atmósfera: sin escudo la nave se quema al entrar.") % target.display_name])
+		out.append([Loc.t("Paracaídas"), ship.has_kind(&"parachute"), Loc.t("%s tiene aire: el paracaídas frena la caída sin gastar combustible.") % target.display_name])
 	else:
-		out.append(["Motor en la última etapa", ship.stage_thrust(ship.stages().back()) > 0.0, "Sin aire no hay paracaídas: la última etapa necesita motor y combustible para frenar."])
+		out.append([Loc.t("Motor en la última etapa"), ship.stage_thrust(ship.stages().back()) > 0.0, Loc.t("Sin aire no hay paracaídas: la última etapa necesita motor y combustible para frenar.")])
 	if target.hazards.has(&"radiation"):
-		out.append(["Bóveda de titanio", ship.sum_stat(&"rad_resist") >= 0.5, "%s tiene radiación alta: sin la bóveda se daña la electrónica." % target.display_name])
+		out.append([Loc.t("Bóveda de titanio"), ship.sum_stat(&"rad_resist") >= 0.5, Loc.t("%s tiene radiación alta: sin la bóveda se daña la electrónica.") % target.display_name])
 	return out

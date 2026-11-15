@@ -38,7 +38,7 @@ func _ready() -> void:
 static func palette_for(contract: Contract, run_seed := 0) -> Dictionary:
 	var h := absi(run_seed * 37)
 	if contract != null:
-		h = absi(hash("%s_%s_%s_%d_%d" % [contract.title, contract.cargo, String(contract.target), contract.payout, run_seed]))
+		h = absi(hash("%s_%s_%d_%d" % [contract.cargo, String(contract.target), contract.payout, run_seed]))
 	var idx := h % PALETTES.size()
 	var base: Dictionary = PALETTES[idx]
 	var shift := Vector2(float(h % 59) * 0.73, float((h / 7) % 53) * 0.61)

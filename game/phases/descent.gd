@@ -86,7 +86,7 @@ func _ready() -> void:
 		vy = -45.0
 		pitch = 0.0
 		throttle = 0.0
-		_say("Descenso arcade: ajusta tu trayectoria con WASD", Ui.INFO)
+		_say(tr("Descenso arcade: ajusta tu trayectoria con WASD"), Ui.INFO)
 	elif body.atmosphere <= 0.0:
 		gamma = -2.0
 		_commit()
@@ -97,7 +97,7 @@ func _ready() -> void:
 		if Run.channel(&"map") < 0.6 and not Profile.assist:
 			corridor += Vector2.ONE * Run.rng.randf_range(-2.0, 2.0)
 		gamma = edge - width * 0.5
-		_say("Corredor de entrada", Ui.INFO)
+		_say(tr("Corredor de entrada"), Ui.INFO)
 	ShipInterior.spawn(self)
 
 
@@ -110,40 +110,40 @@ func _hidden_hazard() -> void:
 		&"storms":
 			wind *= 3.0
 			wind += 18.0 * signf(wind + 0.01)
-			text = "tormenta en la zona de aterrizaje"
+			text = tr("tormenta en la zona de aterrizaje")
 		&"dust":
 			Run.apply({"vision": -0.35})
-			text = "polvo, visibilidad reducida"
+			text = tr("polvo, visibilidad reducida")
 		&"radiation":
-			text = "Radiación en superficie"
+			text = tr("Radiación en superficie")
 			_raise(Run.roll_stress(0.6, [&"computer", &"sensor", &"antenna", &"battery"]))
 		&"cold":
 			Run.temp = 0.05
-			text = "Frío extremo: el combustible se espesa"
+			text = tr("Frío extremo: el combustible se espesa")
 			_raise(Run.roll_stress(0.4, [&"tank", &"engine"]))
 		&"heat":
 			hull_heat = 0.35
-			text = "calor extremo, el casco ya viene caliente"
-	Events.toast.emit("Peligro oculto: " + text, Ui.LAMP_WARNING)
-	Run.note("Peligro oculto: " + text)
+			text = tr("calor extremo, el casco ya viene caliente")
+	Events.toast.emit(tr("Peligro oculto: ") + text, Ui.LAMP_WARNING)
+	Run.note(tr("Peligro oculto: ") + text)
 	Synth.play(&"alarm")
 
 
 func _build_hud() -> void:
 	var root := Ui.root(self)
 	var row := Ui.console(root)
-	for key: Array in [["alt", "Altitud", "km"], ["vertical", "Vel. vertical", "m/s"], ["horizontal", "Vel. horizontal", "m/s"]]:
+	for key: Array in [["alt", tr("Altitud"), "km"], ["vertical", tr("Vel. vertical"), "m/s"], ["horizontal", tr("Vel. horizontal"), "m/s"]]:
 		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 110.0)
 	var well := Ui.well(row)
 	well.custom_minimum_size = Vector2(200, 0)
 	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
 	var gauges := Ui.console_gauges(row, 3)
-	for key: Array in [["heat", "Calor del casco", Ui.LAMP_WARNING], ["shield", "Escudo ablativo", Ui.LAMP_CAUTION], ["g", "Carga G", Ui.IVORY], ["burn", "Frenado", Ui.LAMP_GO], ["fuel", "Combustible", Ui.INFO]]:
+	for key: Array in [["heat", tr("Calor del casco"), Ui.LAMP_WARNING], ["shield", tr("Escudo ablativo"), Ui.LAMP_CAUTION], ["g", tr("Carga G"), Ui.IVORY], ["burn", tr("Frenado"), Ui.LAMP_GO], ["fuel", tr("Combustible"), Ui.INFO]]:
 		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
 	var buttons := Ui.console_keys(row, 1)
-	Ui.compact(Ui.button(buttons, "Estado (C)", func() -> void: Ui.toggle_status(self)))
-	Ui.compact(Ui.button(buttons, "Paracaídas (P)", _deploy_chute))
-	Ui.compact(Ui.button(buttons, "Eyectar (E)", _eject))
+	Ui.compact(Ui.button(buttons, tr("Estado (C)"), func() -> void: Ui.toggle_status(self)))
+	Ui.compact(Ui.button(buttons, tr("Paracaídas (P)"), _deploy_chute))
+	Ui.compact(Ui.button(buttons, tr("Eyectar (E)"), _eject))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
 	Ui.place(ticker, Rect2(44, 12, 380, 200))
@@ -221,11 +221,11 @@ func _unhandled_input(_event: InputEvent) -> void:
 	var next := Controls.warp_choice(DESCENT_WARPS.size(), warp_i)
 	if next != warp_i:
 		if next >= 2 and (heat > 0.05 or agl() < 3000.0):
-			Events.toast.emit("Demasiado bajo o caliente para acelerar", Ui.LAMP_CAUTION)
+			Events.toast.emit(tr("Demasiado bajo o caliente para acelerar"), Ui.LAMP_CAUTION)
 			warp_i = 1
 		else:
 			warp_i = next
-			Events.toast.emit("Tiempo %s" % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.INFO)
+			Events.toast.emit(tr("Tiempo %s") % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.INFO)
 
 
 func _commit() -> void:
@@ -236,9 +236,9 @@ func _commit() -> void:
 	state = State.ENTRY if body.atmosphere > 0.0 else State.FLIGHT
 	Synth.play(&"whoosh")
 	if body.atmosphere > 0.0:
-		_say("Interfaz de entrada: %.1f grados" % gamma, Ui.LAMP_CAUTION)
+		_say(tr("Interfaz de entrada: %.1f grados") % gamma, Ui.LAMP_CAUTION)
 	else:
-		_say("Sin atmósfera: frena con el motor (T retro)", Ui.LAMP_CAUTION)
+		_say(tr("Sin atmósfera: frena con el motor (T retro)"), Ui.LAMP_CAUTION)
 
 
 func _stage() -> void:
@@ -248,7 +248,7 @@ func _stage() -> void:
 	Run.ship.drop_stage()
 	Synth.play(&"thud")
 	Juice.shake(0.3)
-	Events.toast.emit("Etapa separada", Ui.INFO)
+	Events.toast.emit(tr("Etapa separada"), Ui.INFO)
 
 
 func _deploy_chute() -> void:
@@ -264,12 +264,12 @@ func _deploy_chute() -> void:
 	var limit := 450.0 if chute == 0 else 120.0
 	Synth.play(&"whoosh", 0.0, 1.3)
 	if chute == 1 and agl() > 6000.0:
-		Events.toast.emit("Demasiado alto para el principal", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Demasiado alto para el principal"), Ui.LAMP_CAUTION)
 		return
 	if speed > limit and Run.rng.randf() < clampf((speed - limit) / 250.0, 0.15, 0.95):
 		var torn := live[0]
 		torn.broken = true
-		_say("Paracaídas desgarrado", Ui.LAMP_WARNING)
+		_say(tr("Paracaídas desgarrado"), Ui.LAMP_WARNING)
 		Juice.hit(0.6)
 		Run.lose_streak()
 		return
@@ -279,12 +279,12 @@ func _deploy_chute() -> void:
 	if chute == 2:
 		for part: ShipPart in live:
 			part.deployed = true
-	_say("Freno desplegado" if chute == 1 else "Principal desplegado", Ui.LAMP_GO)
+	_say(tr("Freno desplegado") if chute == 1 else tr("Principal desplegado"), Ui.LAMP_GO)
 	for part: ShipPart in failed:
 		Card.malfunction(part, func(ok: bool) -> void:
 			if not ok:
 				chute = 0
-				Events.toast.emit("Paracaídas perdido", Ui.LAMP_WARNING))
+				Events.toast.emit(tr("Paracaídas perdido"), Ui.LAMP_WARNING))
 
 
 func _eject() -> void:
@@ -296,8 +296,8 @@ func _eject() -> void:
 	Synth.play(&"boom", -8.0)
 	Juice.hit(0.6)
 	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 70, 260)
-	_say("Cápsula eyectada", Ui.LAMP_CAUTION)
-	Run.note("Cápsula eyectada en %s" % body.display_name)
+	_say(tr("Cápsula eyectada"), Ui.LAMP_CAUTION)
+	Run.note(tr("Cápsula eyectada en %s") % body.display_name)
 
 
 # ---------------------------------------------------------------- simulacion
@@ -369,7 +369,7 @@ func _fly(delta: float) -> void:
 		pitch = rad_to_deg(atan2(-vx, -vy))
 		if Vector2(vx, vy).length() < v_orb * 0.45 or agl() < 7000.0:
 			state = State.FLIGHT
-			_say("Control manual", Ui.INFO)
+			_say(tr("Control manual"), Ui.INFO)
 	else:
 		lift = 0.0
 		if dir_y > 0.0:
@@ -420,7 +420,7 @@ func _fly(delta: float) -> void:
 		Juice.shake(delta * 2.0)
 		if _stress_clock > 0.8:
 			_stress_clock = 0.0
-			_say("Sobrecarga: %.1f G" % g_load, Ui.LAMP_WARNING)
+			_say(tr("Sobrecarga: %.1f G") % g_load, Ui.LAMP_WARNING)
 			Synth.play(&"alarm", -6.0)
 			_raise(Run.roll_stress((g_load - g_cap) / g_cap + 0.4))
 	Juice.shake(clampf(q / 30000.0, 0.0, 1.0) * delta * 1.5)
@@ -443,7 +443,7 @@ func _heat(speed: float, dt: float) -> void:
 		part.ablative -= absorbed * SHIELD_USE
 		load -= absorbed
 		if part.ablative <= 0.0:
-			Events.toast.emit("Escudo ablativo agotado", Ui.LAMP_WARNING)
+			Events.toast.emit(tr("Escudo ablativo agotado"), Ui.LAMP_WARNING)
 	hull_heat = maxf(hull_heat + load * 0.6 * (1.0 - resist * 0.6) - dt * 0.012, 0.0)
 	if hull_heat > 1.0:
 		_stress_clock += dt
@@ -454,18 +454,18 @@ func _heat(speed: float, dt: float) -> void:
 				if not part.broken and part.def.kind != &"capsule":
 					victims.append(part)
 			if victims.is_empty() or hull_heat > 1.5:
-				Run.destroy("La nave se desintegro en la reentrada de %s." % body.display_name)
+				Run.destroy(tr("La nave se desintegro en la reentrada de %s.") % body.display_name)
 				return
 			var victim: ShipPart = victims[Run.rng.randi_range(0, victims.size() - 1)]
 			if Run.admit(victim):
 				victim.broken = true
-				Events.toast.emit("%s se fundio" % victim.def.display_name, Ui.LAMP_WARNING)
+				Events.toast.emit(tr("%s se fundio") % victim.def.display_name, Ui.LAMP_WARNING)
 			Juice.hit(0.4)
 
 
 func _skip_out() -> void:
 	state = State.OVER
-	_say("Rebote en la atmósfera", Ui.LAMP_CAUTION)
+	_say(tr("Rebote en la atmósfera"), Ui.LAMP_CAUTION)
 	Run.lose_streak()
 	Run.space_state.return_body = body.id
 	Run.space_state.return_boost = 1.12
@@ -488,7 +488,7 @@ func _touchdown() -> void:
 	if tilt > 35.0:
 		impact += (tilt - 35.0) * 0.3
 	if impact > tol * 2.5:
-		Run.destroy("Impacto a %d m/s contra %s." % [int(vs), body.display_name])
+		Run.destroy(tr("Impacto a %d m/s contra %s.") % [int(vs), body.display_name])
 		return
 	state = State.LANDED
 	throttle = 0.0
@@ -508,16 +508,16 @@ func _touchdown() -> void:
 		var stress := impact / tol
 		for part: ShipPart in Run.roll_stress(stress, [], ship.parts_in_zone(&"bottom")):
 			part.broken = true
-			Events.toast.emit("%s cedio en el impacto" % part.def.display_name, Ui.LAMP_WARNING)
+			Events.toast.emit(tr("%s cedio en el impacto") % part.def.display_name, Ui.LAMP_WARNING)
 		if impact > tol:
 			for part: ShipPart in Run.roll_stress(stress * 0.6, [], ship.parts_in_zone(&"middle")):
 				part.broken = true
 	if on_pad and body == Run.target():
 		Run.apply({"credits": 200})
-		Events.toast.emit("Aterrizaje en plataforma: +$200", Ui.IVORY)
+		Events.toast.emit(tr("Aterrizaje en plataforma: +$200"), Ui.IVORY)
 	Run.landed_body = body.id
 	Run.grade = grade
-	_say("Aterrizaje %s" % grade, Ui.LAMP_GO if grade in ["S", "A"] else Ui.IVORY)
+	_say(tr("Aterrizaje %s") % grade, Ui.LAMP_GO if grade in ["S", "A"] else Ui.IVORY)
 	Synth.play(&"jackpot" if grade == "S" else &"chime")
 	if grade == "S":
 		Run.win_streak()
@@ -544,34 +544,34 @@ func _show_surface() -> void:
 		child.queue_free()
 	_panel.visible = true
 	var col := Ui.vbox(_panel, 8)
-	Ui.plate(col, "Superficie de %s" % body.display_name)
+	Ui.plate(col, tr("Superficie de %s") % body.display_name)
 	var at_target := body == Run.target()
 	if at_target:
-		var text := "Entregar %s" % Run.contract.cargo.to_lower()
+		var text := tr("Entregar %s") % tr(Run.contract.cargo).to_lower()
 		if ejected:
-			text += "  (cápsula sola: entrega parcial)"
+			text += tr("  (cápsula sola: entrega parcial)")
 		Ui.primary(Ui.button(col, text, _deliver))
 	if not explored:
-		Ui.button(col, "Explorar la zona", _explore)
+		Ui.button(col, tr("Explorar la zona"), _explore)
 	if not Run.ship.broken_parts().is_empty():
-		var fix := Ui.button(col, "Reparar con kit (%d)" % Run.kits, _repair)
+		var fix := Ui.button(col, tr("Reparar con kit (%d)") % Run.kits, _repair)
 		fix.disabled = Run.kits <= 0
 	var need := RocketMath.ascent_dv(body)
 	var dv := Run.ship.delta_v()
 	var can_fly := not ejected and dv >= need and Run.ship.twr(body.surface_gravity) > 1.0
-	var takeoff := Ui.button(col, "Despegar a órbita (%d / %d m/s)" % [int(dv), int(need)], _take_off)
+	var takeoff := Ui.button(col, tr("Despegar a órbita (%d / %d m/s)") % [int(dv), int(need)], _take_off)
 	takeoff.disabled = not can_fly
 	if body.is_home:
-		Ui.button(col, "Terminar la misión en casa", _go_home)
+		Ui.button(col, tr("Terminar la misión en casa"), _go_home)
 	elif not at_target:
-		Ui.button(col, "Abandonar y pedir rescate", _abandon)
+		Ui.button(col, tr("Abandonar y pedir rescate"), _abandon)
 	Kinetic.enter_deferred(_panel, 0.0, {"scale": Vector2(0.88, 0.82), "tilt": -0.032, "elastic": true, "beam": true, "duration": 0.32})
 	Kinetic.cascade(col.get_children(), 0.028, 0.16, {"scale": Vector2(0.95, 0.90), "duration": 0.24})
 
 
 func _deliver() -> void:
 	Run.outcome = &"partial" if ejected else &"delivered"
-	Run.outcome_text = "Entrega %s en %s. Aterrizaje %s." % ["parcial" if ejected else "completa", body.display_name, grade]
+	Run.outcome_text = tr("Entrega %s en %s. Aterrizaje %s.") % [tr("parcial") if ejected else tr("completa"), body.display_name, grade]
 	Synth.play(&"win")
 	Juice.flash(Ui.IVORY, 0.5)
 	Router.go(&"debrief")
@@ -580,21 +580,21 @@ func _deliver() -> void:
 func _explore() -> void:
 	explored = true
 	var deep := ChoiceDef.new()
-	deep.label = "Expedicion profunda"
+	deep.label = tr("Expedicion profunda")
 	deep.odds = 0.45
 	deep.win = {"science": 3, "boxes": 1}
 	deep.lose = {"rand_break": true, "battery": -0.3}
-	deep.win_text = "Cuevas llenas de minerales."
-	deep.lose_text = "El rover volvio a rastras."
+	deep.win_text = tr("Cuevas llenas de minerales.")
+	deep.lose_text = tr("El rover volvio a rastras.")
 	var short := ChoiceDef.new()
-	short.label = "Paseo corto"
+	short.label = tr("Paseo corto")
 	short.odds = 0.85
 	short.win = {"science": 1}
 	short.lose = {"battery": -0.2}
 	var stay := ChoiceDef.new()
-	stay.label = "Quedarse en la nave"
+	stay.label = tr("Quedarse en la nave")
 	Card.show_card({
-		"title": "Exploracion de %s" % body.display_name,
+		"title": tr("Exploracion de %s") % body.display_name,
 		"text": body.description,
 		"tone": &"encounter",
 		"rarity": 1 if body.payout > 1.5 else 0,
@@ -609,7 +609,7 @@ func _repair() -> void:
 	Run.kits -= 1
 	Run.apply({"fix": true}, broken[0])
 	Synth.play(&"coin")
-	Events.toast.emit("%s reparada" % broken[0].def.display_name, Ui.LAMP_GO)
+	Events.toast.emit(tr("%s reparada") % broken[0].def.display_name, Ui.LAMP_GO)
 	_show_surface()
 
 
@@ -634,7 +634,7 @@ func _take_off() -> void:
 
 func _go_home() -> void:
 	Run.outcome = &"aborted"
-	Run.outcome_text = "Volviste a %s sin entregar la carga." % body.display_name
+	Run.outcome_text = tr("Volviste a %s sin entregar la carga.") % body.display_name
 	Router.go(&"debrief")
 
 
@@ -672,28 +672,28 @@ func _update_hud() -> void:
 	var lines := PackedStringArray()
 	if state == State.APPROACH:
 		var c := _corridor()
-		lines.append("Ángulo %.1f" % gamma)
-		lines.append("Corredor de %.1f a %.1f" % [c.x, c.y])
-		lines.append("Velocidad de entrada %d m/s" % int(v0))
-		_prompt.text = "W/S ajustar ángulo   Espacio confirmar   Muy plano rebotas; muy empinado, calor y G"
+		lines.append(tr("Ángulo %.1f") % gamma)
+		lines.append(tr("Corredor de %.1f a %.1f") % [c.x, c.y])
+		lines.append(tr("Velocidad de entrada %d m/s") % int(v0))
+		_prompt.text = tr("W/S ajustar ángulo   Espacio confirmar   Muy plano rebotas; muy empinado, calor y G")
 	elif blackout:
-		lines.append("Apagón de plasma")
-		lines.append("Sin telemetría")
-		_prompt.text = "W/S sustentación arriba o abajo   P paracaídas   E eyectar"
+		lines.append(tr("Apagón de plasma"))
+		lines.append(tr("Sin telemetría"))
+		_prompt.text = tr("W/S sustentación arriba o abajo   P paracaídas   E eyectar")
 	else:
-		lines.append("Sobre el suelo %d m" % int(agl()))
-		lines.append("Velocidad %d m/s" % int(speed))
-		lines.append("Delta-v %d m/s, TWR %.2f" % [int(ship.delta_v()), ship.twr(body.surface_gravity)])
+		lines.append(tr("Sobre el suelo %d m") % int(agl()))
+		lines.append(tr("Velocidad %d m/s") % int(speed))
+		lines.append(tr("Delta-v %d m/s, TWR %.2f") % [int(ship.delta_v()), ship.twr(body.surface_gravity)])
 		var pad := nearest_pad(x)
-		lines.append("Plataforma a %d m a la %s" % [int(absf(pad - x)), "izquierda" if pad < x else "derecha"])
+		lines.append(tr("Plataforma a %d m a la %s") % [int(absf(pad - x)), tr("izquierda") if pad < x else tr("derecha")])
 		if absf(wind) > 1.0:
-			lines.append("Viento %+d m/s" % int(wind))
+			lines.append(tr("Viento %+d m/s") % int(wind))
 		if state == State.ENTRY:
-			_prompt.text = "W/S sustentación   P paracaídas (freno bajo 450 m/s, principal bajo 120)   E eyectar   1-4 tiempo"
+			_prompt.text = tr("W/S sustentación   P paracaídas (freno bajo 450 m/s, principal bajo 120)   E eyectar   1-4 tiempo")
 		elif Profile.arcade:
-			_prompt.text = "WASD ajustar trayectoria con motores   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
+			_prompt.text = tr("WASD ajustar trayectoria con motores   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo")
 		else:
-			_prompt.text = "W/S acelerador   A/D inclinar   T retro   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
+			_prompt.text = tr("W/S acelerador   A/D inclinar   T retro   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo")
 	if state == State.LANDED:
 		_prompt.text = ""
 	_info.text = "\n".join(lines)
@@ -706,17 +706,17 @@ func _update_hud() -> void:
 	for part: ShipPart in ship.of_kind(&"heatshield"):
 		ablative += part.ablative
 		ablative_max += part.def.ablative
-	(_gauges.shield as Gauge).set_value(ablative / maxf(ablative_max, 0.001), "Sin escudo" if ablative_max <= 0.0 else "%d %%" % int(ablative / ablative_max * 100.0), ablative_max > 0.0 and ablative < ablative_max * 0.2)
-	(_gauges.g as Gauge).set_value(g_load / 12.0, "%.1f G" % g_load, g_load > G_LIMIT)
+	(_gauges.shield as Gauge).set_value(ablative / maxf(ablative_max, 0.001), tr("Sin escudo") if ablative_max <= 0.0 else "%d %%" % int(ablative / ablative_max * 100.0), ablative_max > 0.0 and ablative < ablative_max * 0.2)
+	(_gauges.g as Gauge).set_value(g_load / 12.0, tr("%.1f G") % g_load, g_load > G_LIMIT)
 	var max_acc := ship.thrust() * Run.channel(&"thrust") / maxf(ship.mass(), 0.01) - body.surface_gravity
 	var stop := vy * vy / (2.0 * maxf(max_acc, 0.1)) if vy < 0.0 else 0.0
 	var ratio := stop / maxf(agl(), 1.0)
-	(_gauges.burn as Gauge).set_value(ratio, "Quemar ya" if ratio > 0.85 else "%d %%" % int(ratio * 100.0), ratio > 0.85)
+	(_gauges.burn as Gauge).set_value(ratio, tr("Quemar ya") if ratio > 0.85 else "%d %%" % int(ratio * 100.0), ratio > 0.85)
 	var stage := ship.active_stage()
 	var cap := 0.0
 	for part: ShipPart in stage:
 		cap += part.def.fuel * part.boost
-	(_gauges.fuel as Gauge).set_value(ship.stage_fuel(stage) / maxf(cap, 0.001), "%.1f t" % ship.stage_fuel(stage))
+	(_gauges.fuel as Gauge).set_value(ship.stage_fuel(stage) / maxf(cap, 0.001), tr("%.1f t") % ship.stage_fuel(stage))
 	for key: String in ["g", "burn", "fuel"]:
 		(_gauges[key] as Gauge).modulate.a = 0.25 if blackout else 1.0
 
@@ -801,4 +801,4 @@ func _draw_corridor(view: Vector2) -> void:
 	var aim := origin + Vector2.from_angle(deg_to_rad(-gamma)) * length
 	draw_line(origin, aim, Ui.IVORY if inside else Ui.LAMP_WARNING, 3.0)
 	draw_colored_polygon(PackedVector2Array([origin + Vector2(-7, 14), origin + Vector2(7, 14), origin + Vector2(0, -16)]), Color(0.95, 0.97, 1.0))
-	draw_string(Ui.sans(), origin + Vector2(length * 0.15, -36), "Plano: rebotas" if gamma > c.y else ("Empinado: calor" if gamma < c.x else "Dentro del corredor"), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY if inside else Ui.LAMP_WARNING)
+	draw_string(Ui.sans(), origin + Vector2(length * 0.15, -36), tr("Plano: rebotas") if gamma > c.y else (tr("Empinado: calor") if gamma < c.x else tr("Dentro del corredor")), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY if inside else Ui.LAMP_WARNING)

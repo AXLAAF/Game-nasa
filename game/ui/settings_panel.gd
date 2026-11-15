@@ -1,7 +1,10 @@
 class_name SettingsPanel
 extends Modal
 
-## Ajustes: volumen (Settings) y accesibilidad (Profile). El mismo panel en title, pausa y engranaje.
+## Ajustes: volumen y idioma (Settings) y accesibilidad (Profile). El mismo panel en title, pausa y engranaje.
+
+## Nombre de cada idioma en su propio idioma: no se traduce.
+const LANGUAGE_NAMES: Dictionary = {"en": "English", "es": "Español"}
 
 
 static func show_panel() -> SettingsPanel:
@@ -11,23 +14,50 @@ static func show_panel() -> SettingsPanel:
 
 
 func _init() -> void:
-	super("Ajustes")
-	Ui.legend(col, "Audio")
-	_slider("General", &"master")
-	_slider("Música", &"music")
-	_slider("Efectos", &"sfx")
-	Ui.legend(col, "Accesibilidad")
-	_switch("Movimiento reducido", &"reduced_motion", "Sin sacudidas, destellos ni lámparas intermitentes.")
-	var arcade := _switch("Modo Fácil Arcade", &"arcade", "Navegación espacial con WASD sin gravedad (con inercia) y aterrizaje directo ajustando trayectoria con motores WASD.")
-	var assist := _switch("Modo asistido", &"assist", "Menos averías, más kits, corredores más anchos y navegación asistida (N). El contrato paga un 15 % menos.")
+	super(tr("Ajustes"))
+	Ui.legend(col, tr("Audio"))
+	_slider(tr("General"), &"master")
+	_slider(tr("Música"), &"music")
+	_slider(tr("Efectos"), &"sfx")
+	Ui.legend(col, tr("Idioma"))
+	_language_row()
+	Ui.legend(col, tr("Accesibilidad"))
+	_switch(tr("Movimiento reducido"), &"reduced_motion", tr("Sin sacudidas, destellos ni lámparas intermitentes."))
+	var arcade := _switch(tr("Modo Fácil Arcade"), &"arcade", tr("Navegación espacial con WASD sin gravedad (con inercia) y aterrizaje directo ajustando trayectoria con motores WASD."))
+	var assist := _switch(tr("Modo asistido"), &"assist", tr("Menos averías, más kits, corredores más anchos y navegación asistida (N). El contrato paga un 15 % menos."))
 	# Con un contrato en curso no se cambia: se podria volar asistido y cobrar el pago completo.
 	if Router.current != &"title" and Router.current != &"hangar":
 		arcade.disabled = true
 		assist.disabled = true
-		var hint := Ui.label(col, "El modo asistido se cambia en el hangar, no con un contrato en curso.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+		var hint := Ui.label(col, tr("El modo asistido se cambia en el hangar, no con un contrato en curso."), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	add_back()
 	closed.connect(Settings.save)
+
+
+## Selector de idioma: una tecla por idioma, la activa marcada. Solo se cambia en el titulo o el hangar:
+## ahi la pantalla se reconstruye entera y no se ven textos mezclados ni se reinicia una fase.
+func _language_row() -> void:
+	var can_change := Router.current == &"title" or Router.current == &"hangar"
+	var row := Ui.hbox(col, 6)
+	for code: String in Settings.LANGUAGES:
+		var b := Ui.button(row, LANGUAGE_NAMES[code], _pick_language.bind(code))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.disabled = not can_change
+		Ui.mark_selected(b, code == Settings.language)
+	if not can_change:
+		var hint := Ui.label(col, tr("El idioma se cambia en el título o en el hangar, no con un contrato en curso."), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+
+func _pick_language(code: String) -> void:
+	if Router.is_busy() or not Settings.set_language(code):
+		return
+	Settings.save()
+	# Se recarga la pantalla actual (los contratos viven en el Profile, no se vuelven a sortear) y se
+	# reabre este panel ya en el idioma nuevo.
+	Events.phase_changed.connect(func(_id: StringName) -> void: SettingsPanel.show_panel(), CONNECT_ONE_SHOT)
+	Router.go(Router.current)
 
 
 func _slider(text: String, key: StringName) -> void:
@@ -61,7 +91,7 @@ func _switch(text: String, key: StringName, tip: String) -> Button:
 	lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var paint := func() -> void:
 		var on: bool = Profile.get(key)
-		lamp.text = ("Activo" if on else "Apagado").to_upper()
+		lamp.text = (tr("Activo") if on else tr("Apagado")).to_upper()
 		lamp.state = Lamp.GO if on else Lamp.OFF
 	var button := Ui.button(row, text, func() -> void:
 		Profile.set(key, not Profile.get(key))

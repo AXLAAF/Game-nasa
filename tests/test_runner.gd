@@ -7,6 +7,10 @@ extends SceneTree
 func _initialize() -> void:
 	await process_frame
 	root.get_node("Profile").persistence_enabled = false
+	# Idioma fijo para que las pruebas no dependan del ajuste guardado: las comprobaciones de texto de
+	# las suites estan escritas contra el texto original, en espanol. Se usa TranslationServer y no
+	# Settings.language: asi un Settings.save() de las pruebas no pisa la eleccion del jugador.
+	TranslationServer.set_locale("es")
 	var broken := _compile("res://game")
 	var suite: Script = load("res://tests/sim_tests.gd")
 	if suite == null:

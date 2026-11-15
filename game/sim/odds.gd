@@ -17,7 +17,7 @@ static func fog(chance: float, scanned: bool) -> Vector2:
 
 static func fog_text(chance: float, scanned: bool) -> String:
 	if chance >= 1.0:
-		return "Seguro"
+		return Loc.t("Seguro")
 	var span := fog(chance, scanned)
 	if is_equal_approx(span.x, span.y):
 		return "%d %%" % int(round(chance * 100.0))

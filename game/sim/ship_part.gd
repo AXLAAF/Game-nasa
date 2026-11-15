@@ -79,12 +79,12 @@ func output() -> float:
 func health_text(fog: bool = false) -> String:
 	if fog and not inspected and not revealed:
 		return "?"
-	return HEALTH_NAME[health()]
+	return tr(HEALTH_NAME[health()])
 
 
 func status_bbcode() -> String:
 	var h := health()
-	return "[color=%s]%s[/color]   %s,   %s,   %s" % [HEALTH_COLOR[h], HEALTH_NAME[h], def.display_name, quality_text(), HEALTH_NOTE[h]]
+	return "[color=%s]%s[/color]   %s,   %s,   %s" % [HEALTH_COLOR[h], tr(HEALTH_NAME[h]), def.display_name, quality_text(), tr(HEALTH_NOTE[h])]
 
 
 func fail_chance(stress: float) -> float:
@@ -112,7 +112,7 @@ func price() -> int:
 
 func quality_text() -> String:
 	if revealed or inspected:
-		return NAMES[hidden_quality]
+		return tr(NAMES[hidden_quality])
 	return "?"
 
 

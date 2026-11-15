@@ -73,21 +73,21 @@ func tick(commands: Array[PlayerCommand] = []) -> void:
 			state.pitch += steer * float(design.turn_rate) * DT
 			if steer != 0.0 and absf(state.pitch - target_pitch()) < float(design.corridor_tolerance):
 				state.steered = true
-				_record("Orientaste el motor dentro del corredor de ascenso.")
+				_record(tr("Orientaste el motor dentro del corredor de ascenso."))
 				_enter("ascent")
 		"maxq":
 			if state.throttle <= float(design.q_throttle):
 				state.maxq_done = true
-				_record("Redujiste potencia para limitar la carga aerodinámica.")
+				_record(tr("Redujiste potencia para limitar la carga aerodinámica."))
 				_enter("power_restore")
 		"power_restore":
 			if state.throttle >= float(design.restore_throttle):
-				_record("Recuperaste potencia para sostener el ascenso tras el aviso preventivo.")
+				_record(tr("Recuperaste potencia para sostener el ascenso tras el aviso preventivo."))
 				_enter("ascent")
 		"upper_power":
 			if state.throttle >= float(design.upper_throttle) and ship.thrust() > 0.0:
 				state.upper_verified = true
-				_record("Confirmaste motor y combustible de la segunda etapa.")
+				_record(tr("Confirmaste motor y combustible de la segunda etapa."))
 				_enter("ascent", true)
 		"ascent":
 			_ascent(steer)
@@ -100,10 +100,10 @@ func tick(commands: Array[PlayerCommand] = []) -> void:
 			var acc := ship.burn(state.throttle, DT)
 			state.flight.vx = maxf(0.0, state.flight.vx - acc * DT)
 			if ship.stage_fuel(ship.active_stage()) <= float(design.fuel_epsilon):
-				_fail("Gastaste la reserva antes de terminar el frenado retrógrado.")
+				_fail(tr("Gastaste la reserva antes de terminar el frenado retrógrado."))
 			elif state.flight.vx <= RocketMath.orbit_speed(body) * float(design.deorbit_speed_fraction):
 				state.throttle = 0.0
-				_record("Frenaste contra el movimiento para iniciar el regreso.")
+				_record(tr("Frenaste contra el movimiento para iniciar el regreso."))
 				_enter("entry", true)
 		"entry":
 			state.entry_angle = clampf(state.entry_angle + axis * DT * float(design.entry_rate), -30.0, -1.0)
@@ -131,14 +131,14 @@ func _act(command: PlayerCommand) -> void:
 			&"confirm":
 				if assembly().ready:
 					state.battery = Thermal.battery_capacity(ship)
-					_record("Montaste dos etapas con tanques independientes y protección de regreso.")
+					_record(tr("Montaste dos etapas con tanques independientes y protección de regreso."))
 					_enter("countdown", true)
 				else:
-					state.message = "Completa el montaje y la revisión antes de despegar."
+					state.message = tr("Completa el montaje y la revisión antes de despegar.")
 		return
 	if command.action == &"repair" and phase() == "jammed":
 		state.repair_done = true
-		_record("Reparaste el cierre atascado antes de reintentar la separación.")
+		_record(tr("Reparaste el cierre atascado antes de reintentar la separación."))
 		_enter("stage_repaired")
 	elif command.action == &"parachute":
 		_deploy()
@@ -146,7 +146,7 @@ func _act(command: PlayerCommand) -> void:
 		match phase():
 			"countdown":
 				if state.countdown > 0.0:
-					state.message = "Espera a T-0. Encender antes aumenta el esfuerzo del arranque."
+					state.message = tr("Espera a T-0. Encender antes aumenta el esfuerzo del arranque.")
 				else:
 					_enter("ascent", true)
 			"ascent", "stage_ready", "stage_repaired":
@@ -156,19 +156,19 @@ func _act(command: PlayerCommand) -> void:
 				_enter("retrograde", true)
 			"entry":
 				if state.entry_angle < float(design.entry_min) or state.entry_angle > float(design.entry_max):
-					state.message = "Ángulo fuera del corredor: ajusta antes de entrar."
+					state.message = tr("Ángulo fuera del corredor: ajusta antes de entrar.")
 				else:
 					var speed := float(state.flight.vx)
 					state.flight.h = RocketMath.atmosphere_top(body)
 					state.flight.vx = speed * cos(deg_to_rad(state.entry_angle))
 					state.flight.vy = speed * sin(deg_to_rad(state.entry_angle))
 					state.pitch = 0.0
-					_record("Elegiste un corredor de entrada dentro del margen de práctica.")
+					_record(tr("Elegiste un corredor de entrada dentro del margen de práctica."))
 					_enter("descent", true)
 
 func _separate() -> void:
 	if not can_separate():
-		state.message = "Espera: la etapa activa conserva combustible o la siguiente no tiene motor y tanque operativos. Mira combustible ACTIVO, no total."
+		state.message = tr("Espera: la etapa activa conserva combustible o la siguiente no tiene motor y tanque operativos. Mira combustible ACTIVO, no total.")
 		return
 	if not state.jam_triggered:
 		_enter("stage_ready", true)
@@ -178,7 +178,7 @@ func _separate() -> void:
 		ship.drop_stage()
 		state.separated = true
 		state.throttle = 0.0
-		_record("Descartaste la etapa vacía sin perder el combustible superior.")
+		_record(tr("Descartaste la etapa vacía sin perder el combustible superior."))
 		_enter("upper_power")
 
 func _ascent(steer: float) -> void:
@@ -193,7 +193,7 @@ func _ascent(steer: float) -> void:
 		if can_separate():
 			_enter("stage_ready", true)
 		else:
-			_fail("Sin combustible en la etapa activa antes de alcanzar órbita.")
+			_fail(tr("Sin combustible en la etapa activa antes de alcanzar órbita."))
 		return
 	if steer == 0.0:
 		state.pitch = target_pitch()
@@ -204,28 +204,28 @@ func _ascent(steer: float) -> void:
 	if phase() == "failed":
 		return
 	if state.flight.h < 0.0:
-		_fail("La nave perdió altura. Mantén suficiente potencia y sigue el corredor.")
+		_fail(tr("La nave perdió altura. Mantén suficiente potencia y sigue el corredor."))
 	elif state.flight.h >= RocketMath.atmosphere_top(body) * float(design.orbit_height_fraction) and state.flight.vx >= RocketMath.orbit_speed(body) * float(design.orbit_speed_fraction) and state.flight.vy > float(design.orbit_min_vy):
 		if state.separated and state.upper_verified:
 			state.throttle = 0.0
-			_record("Alcanzaste órbita con reserva para el regreso.")
+			_record(tr("Alcanzaste órbita con reserva para el regreso."))
 			_enter("orbit", true)
 
 func _deploy() -> void:
 	var speed := Vector2(state.flight.vx, state.flight.vy).length()
 	if phase() not in ["descent", "drogue_ready", "main_ready"]:
-		state.message = "El paracaídas se usa durante el descenso, dentro de su ventana segura."
+		state.message = tr("El paracaídas se usa durante el descenso, dentro de su ventana segura.")
 		return
 	if state.chute == 0 and speed <= float(design.drogue_speed):
 		state.chute = 1
-		_record("Abriste el freno dentro de su límite de velocidad.")
+		_record(tr("Abriste el freno dentro de su límite de velocidad."))
 		_enter("descent", true)
 	elif state.chute == 1 and speed <= float(design.main_speed) and state.flight.h <= float(design.main_height):
 		state.chute = 2
-		_record("Desplegaste el principal con velocidad y altura seguras.")
+		_record(tr("Desplegaste el principal con velocidad y altura seguras."))
 		_enter("descent", true)
 	else:
-		state.message = "Todavía no: abrir fuera de la ventana segura puede romper el paracaídas."
+		state.message = tr("Todavía no: abrir fuera de la ventana segura puede romper el paracaídas.")
 
 func _descent() -> void:
 	var speed := Vector2(state.flight.vx, state.flight.vy).length()
@@ -244,7 +244,7 @@ func _descent() -> void:
 			part.ablative -= absorbed
 			heat -= absorbed
 	if heat > 0.0:
-		_fail("Se agotó el escudo térmico durante la entrada. Repite desde el corredor.")
+		_fail(tr("Se agotó el escudo térmico durante la entrada. Repite desde el corredor."))
 		return
 	_power()
 	if phase() == "failed":
@@ -252,15 +252,15 @@ func _descent() -> void:
 	if state.flight.h <= 0.0:
 		state.flight.h = 0.0
 		if speed <= float(design.safe_landing_speed) and state.chute == 2:
-			_record("Aterrizaste a %.1f m/s [DIS]. Reserva final: %.1f t de combustible." % [speed, ship.fuel_total()])
+			_record(tr("Aterrizaste a %.1f m/s [DIS]. Reserva final: %.1f t de combustible.") % [speed, ship.fuel_total()])
 			_enter("complete")
 		else:
-			_fail("Impacto demasiado rápido. Despliega las dos fases del paracaídas en sus ventanas.")
+			_fail(tr("Impacto demasiado rápido. Despliega las dos fases del paracaídas en sus ventanas."))
 
 func _power() -> void:
 	state.battery = clampf(state.battery + (Thermal.power_gen(1.0, ship) - Thermal.power_use(ship)) * DT * float(design.power_time_scale), 0.0, Thermal.battery_capacity(ship))
 	if state.battery <= 0.0:
-		_fail("Sin energía para la electrónica. Revisa generación y batería.")
+		_fail(tr("Sin energía para la electrónica. Revisa generación y batería."))
 
 func _fail(reason: String) -> void:
 	_enter("failed")
