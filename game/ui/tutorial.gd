@@ -100,6 +100,7 @@ func _ready() -> void:
 	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.add_child(_backdrop)
 	_panel = PanelContainer.new()
+	Ui.glass(_panel)
 	_panel.custom_minimum_size = Vector2(700, 0)
 	_root.add_child(_panel)
 	var panel := _panel

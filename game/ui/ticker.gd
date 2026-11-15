@@ -18,7 +18,7 @@ func push(text: String, color: Color = Ui.IVORY) -> void:
 	line.text = _garble(text)
 	line.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
 	line.add_theme_color_override("font_color", color)
-	line.add_theme_stylebox_override("normal", Ui.box(Color(Ui.BAKELITE, 0.9), color, 0, 3))
+	line.add_theme_stylebox_override("normal", Ui.box(Color(Ui.BAKELITE, 0.75), color, 0, 6))
 	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	line.custom_minimum_size = Vector2(360, 0)
 	add_child(line)

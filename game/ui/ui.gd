@@ -22,6 +22,11 @@ const LAMP_WARNING := Color("e8604a") ## terracota encendido: pasa 4.5:1 como te
 const LAMP_OFF := Color("1e2d47")
 const MYSTERY := Color("b48cf2")
 const BG := Color("080c16")
+## Vidrio: opacidad del tinte de un panel (el resto es fondo desenfocado) y filo de luz.
+const GLASS_TINT := 0.6
+const KEY_TINT := 0.62 ## teclas translucidas sobre el vidrio
+const RIM := Color(0.957, 0.922, 0.851, 0.22) ## IVORY al 22 %
+const GLASS_SHADER: Shader = preload("res://game/shaders/glass.gdshader")
 const RARITY: Array[Color] = [IVORY, MYSTERY, LAMP_CAUTION]
 const RARITY_NAMES: Array[String] = ["Común", "Rara", "Legendaria"]
 
@@ -38,6 +43,7 @@ const SIZE_HERO := 36
 static var _theme: Theme
 static var _legend: FontVariation
 static var _mono: FontVariation
+static var _glass: ShaderMaterial
 
 
 static func sans() -> Font:
@@ -83,20 +89,28 @@ static func box(bg: Color, border: Color, width: int = 1, radius: int = 4) -> St
 	return style
 
 
-## Bastidor oscuro de borde fino: el panel por defecto. accent lo recalca (tarjetas flotantes).
-static func bezel(accent: Color = BAKELITE_EDGE) -> StyleBoxFlat:
-	var style := box(BAKELITE, accent, 1, 6)
-	style.border_width_top = 3
+## Panel de vidrio por defecto: tinte translucido y filo de luz, mas marcado arriba.
+## accent lo recalca (tarjetas flotantes). Sin sombra: en el vidrio la sombra se veria como fondo.
+static func bezel(accent: Color = RIM) -> StyleBoxFlat:
+	var style := box(Color(BAKELITE, GLASS_TINT), accent, 1, 12)
+	style.border_width_top = 2
 	style.set_content_margin_all(14)
-	style.shadow_color = Color(0, 0, 0, 0.45)
-	style.shadow_size = 6
-	style.shadow_offset = Vector2(0, 3)
 	return style
+
+
+## Vidrio liquido: el control desenfoca lo que tiene detras y lo tine con su estilo.
+## Solo en paneles de primer nivel; los anidados ya quedan translucidos sobre el vidrio del padre.
+static func glass(c: Control) -> Control:
+	if _glass == null:
+		_glass = ShaderMaterial.new()
+		_glass.shader = GLASS_SHADER
+	c.material = _glass
+	return c
 
 
 ## Banda elevada (consola, placas) con filo cian a la izquierda.
 static func enamel() -> StyleBoxFlat:
-	var style := box(ENAMEL, ENAMEL_LIGHT, 0, 3)
+	var style := box(Color(ENAMEL, 0.55), ENAMEL_LIGHT, 0, 8)
 	style.border_width_left = 3
 	style.set_content_margin_all(10)
 	return style
@@ -104,7 +118,7 @@ static func enamel() -> StyleBoxFlat:
 
 ## Hueco de lectura hundido en la chapa.
 static func well_box() -> StyleBoxFlat:
-	var style := box(BG, ENAMEL_SHADE, 0, 3)
+	var style := box(Color(BG, 0.55), ENAMEL_SHADE, 0, 6)
 	style.border_width_top = 3
 	style.content_margin_top = 5
 	return style
@@ -126,10 +140,10 @@ static func theme() -> Theme:
 	_theme = Theme.new()
 	_theme.default_font = sans()
 	_theme.default_font_size = SIZE_TEXT
-	_theme.set_stylebox("normal", "Button", _key(BAKELITE_RAISED, BAKELITE_EDGE))
-	_theme.set_stylebox("hover", "Button", _key(BAKELITE_EDGE, IVORY_DIM))
-	_theme.set_stylebox("pressed", "Button", _key(ENAMEL_SHADE, IVORY_DIM, true))
-	_theme.set_stylebox("disabled", "Button", _key(BAKELITE, BAKELITE_RAISED))
+	_theme.set_stylebox("normal", "Button", _key(Color(BAKELITE_RAISED, KEY_TINT), RIM))
+	_theme.set_stylebox("hover", "Button", _key(Color(BAKELITE_EDGE, 0.8), IVORY_DIM))
+	_theme.set_stylebox("pressed", "Button", _key(Color(ENAMEL_SHADE, 0.8), IVORY_DIM, true))
+	_theme.set_stylebox("disabled", "Button", _key(Color(BAKELITE, 0.45), Color(BAKELITE_RAISED, 0.6)))
 	var focus := box(Color.TRANSPARENT, IVORY, 2, 6)
 	focus.draw_center = false
 	focus.set_expand_margin_all(3)
@@ -184,10 +198,10 @@ static func primary(b: Button) -> Button:
 
 ## Tecla baja para la consola de vuelo: caben tres filas en CONSOLE_H.
 static func compact(b: Button) -> Button:
-	b.add_theme_stylebox_override("normal", _key(BAKELITE_RAISED, BAKELITE_EDGE, false, 3))
-	b.add_theme_stylebox_override("hover", _key(BAKELITE_EDGE, IVORY_DIM, false, 3))
-	b.add_theme_stylebox_override("pressed", _key(ENAMEL_SHADE, IVORY_DIM, true, 3))
-	b.add_theme_stylebox_override("disabled", _key(BAKELITE, BAKELITE_RAISED, false, 3))
+	b.add_theme_stylebox_override("normal", _key(Color(BAKELITE_RAISED, KEY_TINT), RIM, false, 3))
+	b.add_theme_stylebox_override("hover", _key(Color(BAKELITE_EDGE, 0.8), IVORY_DIM, false, 3))
+	b.add_theme_stylebox_override("pressed", _key(Color(ENAMEL_SHADE, 0.8), IVORY_DIM, true, 3))
+	b.add_theme_stylebox_override("disabled", _key(Color(BAKELITE, 0.45), Color(BAKELITE_RAISED, 0.6), false, 3))
 	b.add_theme_font_size_override("font_size", SIZE_LEGEND)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return b
@@ -228,7 +242,7 @@ static func console_gauge(grid: GridContainer, title: String, color: Color) -> G
 ## Linea de teclas justo encima de la consola, abajo a la izquierda.
 static func keys(root: Control, text: String) -> Label:
 	var l := label(root, text, SIZE_LEGEND, IVORY)
-	l.add_theme_stylebox_override("normal", box(Color(BAKELITE, 0.9), BAKELITE_EDGE, 0, 3))
+	l.add_theme_stylebox_override("normal", box(Color(BAKELITE, 0.75), BAKELITE_EDGE, 0, 6))
 	l.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	l.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	l.offset_left = 12
@@ -280,7 +294,7 @@ static func annunciator(root: Control) -> Annunciator:
 ## Opcion elegida en un selector (seguro, calidad): borde marfil y negrita.
 static func mark_selected(b: Button, on: bool) -> Button:
 	if on:
-		var style := _key(BAKELITE_RAISED, IVORY)
+		var style := _key(Color(BAKELITE_RAISED, KEY_TINT), IVORY)
 		style.set_border_width_all(2)
 		style.border_width_bottom = 4
 		b.add_theme_stylebox_override("normal", style)
@@ -339,14 +353,14 @@ static func readout(parent: Node, legend_text: String, unit: String = "", min_wi
 static func console(root: Control) -> HBoxContainer:
 	var p := PanelContainer.new()
 	var style := enamel()
+	style.bg_color = Color(ENAMEL, 0.72) # mas tinte que un panel: va sobre el cielo claro del despegue
 	style.border_width_left = 0
 	style.border_width_top = 2
 	style.set_corner_radius_all(0)
 	style.content_margin_left = 16
 	style.content_margin_right = 16
-	style.shadow_color = Color(0, 0, 0, 0.5)
-	style.shadow_size = 8
 	p.add_theme_stylebox_override("panel", style)
+	glass(p)
 	p.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
 	p.offset_top = -CONSOLE_H
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -392,6 +406,7 @@ static func button(parent: Node, text: String, callback: Callable) -> Button:
 
 static func panel(parent: Node) -> PanelContainer:
 	var p := PanelContainer.new()
+	glass(p)
 	parent.add_child(p)
 	return p
 

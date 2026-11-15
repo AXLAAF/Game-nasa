@@ -44,6 +44,19 @@ Exo 2 y Space Mono (SIL OFL, `assets/fonts/`). Pixelta solo para el rotulo "Marg
 - `Ui.title_font()` Pixelta, el rotulo de marca en el titulo y en la cabecera del hangar.
 - Escala: 13 leyenda, 15 texto, 18 subtitulo, 24 lectura, 36 lectura principal. Nada por debajo de 13.
 
+## Vidrio
+
+Los paneles son de vidrio liquido (`game/shaders/glass.gdshader`, `Ui.glass`): desenfocan lo que
+tienen detras, le suben un poco la saturacion y lo tinen con su color de estilo. El alfa del
+estilo es la opacidad del tinte (`Ui.GLASS_TINT`, 0.6; la consola de vuelo 0.72 porque va sobre
+el cielo claro del despegue). El filo `Ui.RIM` hace de reflejo, mas marcado arriba. Sin sombras.
+
+- Solo los paneles de primer nivel llevan el shader: `Ui.panel`, `Ui.console`, la matriz de
+  lamparas, cartas, modales, tutorial, el catalogo del montaje y el panel interior de la nave.
+  Godot copia la pantalla una vez por capa, asi que un vidrio dentro de otro no veria a su padre.
+- Lo anidado (teclas, huecos de lectura, placas, fichas de contrato) es translucido sin shader.
+- La tecla principal y las lamparas siguen opacas: son lo que hay que leer de un vistazo.
+
 ## Maquetacion
 
 - Las pantallas de menu se montan con contenedores, no con posiciones a mano. La columna de

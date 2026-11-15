@@ -238,6 +238,7 @@ func _ready() -> void:
 func _build_left(root: Control) -> void:
 	var zone := DropZone.new()
 	zone.phase = self
+	Ui.glass(zone)
 	zone.set_anchors_preset(Control.PRESET_LEFT_WIDE)
 	zone.offset_left = 10
 	zone.offset_right = 340
@@ -754,6 +755,7 @@ func _on_launch() -> void:
 
 func _build_hover_card(root: Control) -> void:
 	_hover_card = PanelContainer.new()
+	Ui.glass(_hover_card)
 	_hover_card.visible = false
 	_hover_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hover_card.custom_minimum_size = Vector2(310, 0)

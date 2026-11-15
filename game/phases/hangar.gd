@@ -62,7 +62,8 @@ func _fit() -> void:
 ## Marca a la izquierda, lecturas del perfil a la derecha, todo centrado en vertical.
 func _build_header(page: Node) -> Control:
 	var band := Ui.panel(page)
-	var style := Ui.box(Ui.BAKELITE, Ui.BAKELITE_EDGE, 1, 6)
+	var style := Ui.box(Color(Ui.BAKELITE, Ui.GLASS_TINT), Ui.RIM, 1, 12)
+	style.border_width_top = 2
 	style.content_margin_left = 16
 	style.content_margin_right = 16
 	style.content_margin_top = 8
@@ -221,8 +222,8 @@ func _contract_card(contract: Contract) -> PanelContainer:
 	var risky := contract.hidden_hazard != &""
 	var card := PanelContainer.new()
 	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var rest_style := Ui.box(Ui.BAKELITE_RAISED, Ui.BAKELITE_EDGE, 1, 4)
-	var hover_style := Ui.box(Ui.BAKELITE_EDGE, Ui.INFO, 1, 4)
+	var rest_style := Ui.box(Color(Ui.BAKELITE_RAISED, 0.5), Ui.RIM, 1, 8)
+	var hover_style := Ui.box(Color(Ui.BAKELITE_EDGE, 0.75), Ui.INFO, 1, 8)
 	for style: StyleBoxFlat in [rest_style, hover_style]:
 		style.content_margin_left = 0
 		style.content_margin_right = 14

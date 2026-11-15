@@ -65,7 +65,8 @@ func _ready() -> void:
 	add_child(_panel)
 	_shift_lamps()
 	var bg := ColorRect.new()
-	bg.color = Color(0.03, 0.04, 0.06, 0.94)
+	bg.color = Color(Ui.BAKELITE, Ui.GLASS_TINT)
+	Ui.glass(bg)
 	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_panel.add_child(bg)

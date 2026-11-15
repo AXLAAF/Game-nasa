@@ -42,6 +42,7 @@ func _init(title: String) -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	root.add_child(center)
 	_panel = PanelContainer.new()
+	Ui.glass(_panel)
 	_panel.custom_minimum_size.x = 440
 	center.add_child(_panel)
 	col = Ui.vbox(_panel, 10)

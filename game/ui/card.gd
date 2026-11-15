@@ -252,6 +252,7 @@ func _ready() -> void:
 		center.offset_right = -300.0
 	_root.add_child(center)
 	_panel = PanelContainer.new()
+	Ui.glass(_panel)
 	_panel.custom_minimum_size = Vector2(600, 0)
 	if coop:
 		_panel.mouse_filter = Control.MOUSE_FILTER_STOP

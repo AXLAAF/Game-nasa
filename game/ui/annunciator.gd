@@ -24,6 +24,7 @@ static func toggle_detail() -> void:
 
 
 func _ready() -> void:
+	Ui.glass(self)
 	current = self
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	process_mode = Node.PROCESS_MODE_ALWAYS # las cartas pausan el arbol; las lamparas siguen informando
