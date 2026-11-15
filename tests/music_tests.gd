@@ -68,6 +68,10 @@ func _test_chaos_without_flight() -> void:
 
 
 func _test_launch_mix() -> void:
+	var saved_music := Settings.music
+	var saved_sfx := Settings.sfx
+	Settings.music = 1.0
+	Settings.sfx = 1.0
 	check(Music.launch_mix(true, false) == Vector2(0.0, -12.0), "despegue prioriza la musica")
 	check(Music.launch_mix(false, false) == Vector2(-3.0, 0.0), "fuera de despegue la mezcla vuelve")
 	check(Music.launch_mix(true, true) == Vector2(-3.0, 0.0), "en pausa no se entierran los efectos")
@@ -82,6 +86,18 @@ func _test_launch_mix() -> void:
 	Music._duck(10.0)
 	near(AudioServer.get_bus_volume_db(sfx), 0.0, 0.05, "SFX restaurado")
 	near(AudioServer.get_bus_volume_db(music), -3.0, 0.05, "Music restaurado")
+	Settings.music = 0.5
+	Music._duck(10.0)
+	near(AudioServer.get_bus_volume_db(music), -3.0 + linear_to_db(0.5), 0.05, "Music respeta el volumen elegido")
+	var tree := (Engine.get_main_loop() as SceneTree)
+	tree.paused = true
+	Music._duck(10.0)
+	near(AudioServer.get_bus_volume_db(music), -3.0 + linear_to_db(0.5), 0.05, "Music no cambia al pausar")
+	near(AudioServer.get_bus_volume_db(AudioServer.get_bus_index(&"MusicDuck")), -10.0, 0.05, "MusicDuck aplica la pausa")
+	tree.paused = false
+	Settings.music = saved_music
+	Settings.sfx = saved_sfx
+	Music._duck(10.0)
 
 
 func _test_playback() -> void:

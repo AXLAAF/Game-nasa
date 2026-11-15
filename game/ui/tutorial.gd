@@ -8,7 +8,7 @@ const ORDER: Array[StringName] = [&"hangar", &"assembly", &"launch", &"space", &
 const STEPS: Dictionary = {
 	&"hangar": [
 		["Contratos", "Elige un contrato y pulsa Aceptar contrato. El adelanto se suma a tu presupuesto y el plazo marca los días límite para cobrar completo."],
-		["Seguro y modo asistido", "El seguro devuelve parte del costo si pierdes la nave. Activa Modo asistido si quieres menos averías y ayuda al pilotar."],
+		["Seguro y modo asistido", "El seguro devuelve parte del costo si pierdes la nave. En Ajustes (arriba a la izquierda o Esc) puedes activar Modo asistido: menos averías y ayuda al pilotar."],
 	],
 	&"assembly": [
 		["Arma tu nave", "Pasa el cursor sobre cada pieza para ver su función y si te sirve en esta misión. Motor abajo, cápsula arriba y paneles o antenas a los lados."],
@@ -49,6 +49,10 @@ var _chapter_buttons: Dictionary = {}
 var _panel: PanelContainer
 var _root: Control
 var _backdrop: ColorRect
+
+
+static func busy() -> bool:
+	return _open != null and is_instance_valid(_open)
 
 
 static func offer(phase: StringName) -> void:

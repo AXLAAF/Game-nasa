@@ -17,7 +17,6 @@ var _p2_lamp: Lamp
 var _p2_hint: Label
 var _join_button: Button
 var _first_focus: Control
-var _reset_armed: bool = false
 var _time: float = 0.0
 var _home: Planet
 var _moon: Planet
@@ -58,9 +57,6 @@ func _ready() -> void:
 	_build_player_slots(col)
 	Ui.legend(col, "Seguro de la nave")
 	_insurance_box = Ui.hbox(col, 4)
-	Ui.legend(col, "Ajustes")
-	_switch(col, "Modo asistido", Profile.assist, _toggle_assist).tooltip_text = "Menos averías, más kits, corredores más anchos y navegación asistida (N). El contrato paga un 15 % menos."
-	_switch(col, "Movimiento reducido", Profile.reduced_motion, _toggle_motion).tooltip_text = "Sin sacudidas, destellos ni lámparas intermitentes."
 	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
 	Ui.legend(col, "Lecciones")
 	if Profile.lessons.is_empty():
@@ -72,14 +68,6 @@ func _ready() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(300, 0)
 	Ui.label(col, "Inventario: %d piezas guardadas" % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
-	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
-	reset.pressed.connect(func() -> void:
-		if _reset_armed:
-			Profile.reset()
-			Router.go(&"hangar")
-		else:
-			_reset_armed = true
-			reset.text = "¿Seguro? Pulsa otra vez para borrar todo")
 	var right := Ui.panel(root)
 	right.set_anchors_preset(Control.PRESET_TOP_WIDE)
 	right.offset_left = 400
@@ -205,19 +193,6 @@ func _focus_menu() -> void:
 		_join_button.grab_focus()
 
 
-## Interruptor: tecla con su lampara de estado al lado.
-func _switch(parent: Node, text: String, on: bool, callback: Callable) -> Button:
-	var row := Ui.hbox(parent, 6)
-	var b := Ui.button(row, text, callback)
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	var lamp := Lamp.new("Activo" if on else "Apagado", Lamp.GO if on else Lamp.OFF)
-	lamp.custom_minimum_size = Vector2(84, 26)
-	lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(lamp)
-	return b
-
-
 func _planet_icon(body: BodyDef) -> Control:
 	if body == null:
 		var blank := Control.new()
@@ -229,25 +204,11 @@ func _planet_icon(body: BodyDef) -> Control:
 	return icon
 
 
-func _toggle_motion() -> void:
-	Profile.reduced_motion = not Profile.reduced_motion
-	Profile.save_profile()
-	Router.go(&"hangar")
-
-
 func _set_insurance(level: int) -> void:
 	Profile.insurance = level
 	Profile.save_profile()
 	_refresh()
 	_focus_menu()
-
-
-func _toggle_assist() -> void:
-	Profile.assist = not Profile.assist
-	Profile.save_profile()
-	Synth.play(&"beep")
-	Events.toast.emit("Modo asistido %s" % ("activado" if Profile.assist else "desactivado"), Ui.LAMP_GO if Profile.assist else Ui.IVORY_DIM)
-	Router.go(&"hangar")
 
 
 func _toggle_join_button() -> void:

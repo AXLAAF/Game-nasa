@@ -7,6 +7,8 @@ func run(scene_tree: SceneTree) -> void:
 	tree = scene_tree
 	Profile.reset()
 	tree.root.add_child(load("res://game/main.tscn").instantiate())
+	await _until(&"title")
+	_phase()._start()
 	await _until(&"hangar")
 	_phase()._accept(Profile.board(Run.rng)[0])
 	await _until(&"assembly")

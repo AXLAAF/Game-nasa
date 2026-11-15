@@ -16,6 +16,7 @@ const LAYER_IN: Dictionary = {
 	&"tex": Vector2(0.52, 0.90),
 }
 const PHASE_CUE: Dictionary = {
+	&"title": &"1_planeacion",
 	&"hangar": &"1_planeacion",
 	&"assembly": &"2_taller",
 	&"launch": &"3_despegue",
@@ -308,11 +309,11 @@ func _duck(delta: float) -> void:
 	var music := AudioServer.get_bus_index(&"Music")
 	if music >= 0:
 		var music_now := AudioServer.get_bus_volume_db(music)
-		AudioServer.set_bus_volume_db(music, lerpf(music_now, mix.x, weight))
+		AudioServer.set_bus_volume_db(music, lerpf(music_now, mix.x + gain_db(Settings.music), weight))
 	var sfx := AudioServer.get_bus_index(&"SFX")
 	if sfx >= 0:
 		var sfx_now := AudioServer.get_bus_volume_db(sfx)
-		AudioServer.set_bus_volume_db(sfx, lerpf(sfx_now, mix.y, weight))
+		AudioServer.set_bus_volume_db(sfx, lerpf(sfx_now, mix.y + gain_db(Settings.sfx), weight))
 
 
 func _fade_out(player: AudioStreamPlayer) -> void:

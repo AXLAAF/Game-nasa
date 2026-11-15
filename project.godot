@@ -25,11 +25,13 @@ _mcp_game_helper="*res://addons/godot_ai/runtime/game_helper.gd"
 Events="*res://game/autoload/events.gd"
 Catalog="*res://game/autoload/catalog.gd"
 Profile="*res://game/autoload/profile.gd"
+Settings="*res://game/autoload/settings.gd"
 Run="*res://game/autoload/run.gd"
 Synth="*res://game/autoload/synth.gd"
 Music="*res://game/autoload/music.gd"
 Juice="*res://game/autoload/juice.gd"
 Router="*res://game/autoload/router.gd"
+Pause="*res://game/autoload/pause.gd"
 Controls="*res://game/autoload/controls.gd"
 
 [display]

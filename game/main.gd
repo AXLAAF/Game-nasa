@@ -22,4 +22,4 @@ func _ready() -> void:
 	world_env.environment = env
 	add_child(world_env)
 	Router.mount(self)
-	Router.go(&"hangar")
+	Router.go(&"title")

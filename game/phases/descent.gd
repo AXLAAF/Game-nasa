@@ -137,7 +137,7 @@ func _build_hud() -> void:
 	Ui.compact(Ui.button(buttons, "Eyectar (E)", _eject))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(12, 12, 380, 200))
+	Ui.place(ticker, Rect2(44, 12, 380, 200))
 	root.add_child(ticker)
 	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
 	_prompt = Ui.keys(root, "")
