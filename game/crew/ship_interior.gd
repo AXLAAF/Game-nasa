@@ -7,6 +7,7 @@ const EXTERIOR: Array[StringName] = [&"solar", &"radiator", &"antenna", &"sensor
 const PANEL_W := 280.0
 const HATCH_REACH := 28.0
 const HULL_OUT := 14.0
+const HULL_RADIUS := 24.0
 const REPAIR_REACH := 40.0
 const MAP_SCRIPT := preload("res://game/crew/room_map.gd")
 const CREW_SCRIPT := preload("res://game/crew/crew_body.gd")
@@ -107,134 +108,141 @@ func interact(at: Vector2) -> void:
 
 
 func stick_to_hull(at: Vector2) -> Vector2:
-	var box := ShipRenderer.bounds(Run.ship.parts)
-	var x := clampf(at.x, box.position.x, box.end.x)
-	var y := clampf(at.y, box.position.y, box.end.y)
-	var dl := at.x - box.position.x
-	var dr := box.end.x - at.x
-	var dt := at.y - box.position.y
-	var db := box.end.y - at.y
-	if box.has_point(at) or (is_equal_approx(x, at.x) and is_equal_approx(y, at.y)):
-		var m := minf(minf(dl, dr), minf(dt, db))
-		if is_equal_approx(m, dl):
-			x = box.position.x
-		elif is_equal_approx(m, dr):
-			x = box.end.x
-		elif is_equal_approx(m, dt):
-			y = box.position.y
-		else:
-			y = box.end.y
-	var edge := Vector2(x, y)
-	return edge + _outward_normal(edge, box) * HULL_OUT
+	return hull_point(hull_param(at))
 
 
-## Avanza por el perímetro. En la esquina sigue de largo: la otra cara deja de quedar aislada.
+## Avanza por el perímetro redondeado. En la esquina la tangente gira y el paso sigue.
 func slide_hull(from: Vector2, delta: Vector2) -> Vector2:
-	var box := ShipRenderer.bounds(Run.ship.parts)
-	if _hull_span(box) < 1.0:
+	var geom := _hull_geom()
+	if float(geom["span"]) < 1.0:
 		return from
-	var t := _hull_t(box, from)
-	return _hull_point(box, t + delta.dot(_hull_tangent(t, box)))
+	var s := _hull_param_geom(geom, from)
+	var here: Dictionary = _hull_sample(geom, s)
+	var tangent: Vector2 = here["tangent"]
+	var nxt: Dictionary = _hull_sample(geom, s + delta.dot(tangent))
+	return nxt["point"]
 
 
-func _outward_normal(edge: Vector2, box: Rect2) -> Vector2:
-	var dl := absf(edge.x - box.position.x)
-	var dr := absf(edge.x - box.end.x)
-	var dt := absf(edge.y - box.position.y)
-	var db := absf(edge.y - box.end.y)
-	var nearest := minf(minf(dl, dr), minf(dt, db))
-	if is_equal_approx(nearest, dl):
-		return Vector2.LEFT
-	if is_equal_approx(nearest, dr):
-		return Vector2.RIGHT
-	if is_equal_approx(nearest, dt):
-		return Vector2.UP
-	return Vector2.DOWN
+func hull_point(s: float) -> Vector2:
+	var sample: Dictionary = _hull_sample(_hull_geom(), s)
+	return sample["point"]
 
 
-func _hull_span(box: Rect2) -> float:
-	return 2.0 * (box.size.x + box.size.y)
+func hull_normal(s: float) -> Vector2:
+	var sample: Dictionary = _hull_sample(_hull_geom(), s)
+	return sample["normal"]
 
 
-func _hull_tangent(t: float, box: Rect2) -> Vector2:
-	var w := box.size.x
-	var h := box.size.y
-	var p := fposmod(t, _hull_span(box))
-	if p < w:
-		return Vector2.RIGHT
-	if p < w + h:
-		return Vector2.DOWN
-	if p < w + h + w:
-		return Vector2.LEFT
-	return Vector2.UP
+func hull_param(at: Vector2) -> float:
+	return _hull_param_geom(_hull_geom(), at)
 
 
-func _hull_edge(box: Rect2, t: float) -> Vector2:
-	var w := box.size.x
-	var h := box.size.y
-	var p := fposmod(t, _hull_span(box))
-	if p < w:
-		return Vector2(box.position.x + p, box.position.y)
-	p -= w
-	if p < h:
-		return Vector2(box.end.x, box.position.y + p)
-	p -= h
-	if p < w:
-		return Vector2(box.end.x - p, box.end.y)
-	p -= w
-	return Vector2(box.position.x, box.end.y - p)
+func _hull_geom() -> Dictionary:
+	var rect := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT)
+	var rad := minf(HULL_RADIUS, minf(rect.size.x, rect.size.y) * 0.5)
+	var sw := maxf(rect.size.x - rad * 2.0, 0.0)
+	var sh := maxf(rect.size.y - rad * 2.0, 0.0)
+	var arc := PI * 0.5 * rad
+	return {"rect": rect, "rad": rad, "sw": sw, "sh": sh, "arc": arc, "span": sw * 2.0 + sh * 2.0 + arc * 4.0}
 
 
-func _hull_point(box: Rect2, t: float) -> Vector2:
-	var tangent := _hull_tangent(t, box)
-	return _hull_edge(box, t) + Vector2(tangent.y, -tangent.x) * HULL_OUT
-
-
-func _hull_t(box: Rect2, at: Vector2) -> float:
-	var w := box.size.x
-	var h := box.size.y
-	var dl := at.x - box.position.x
-	var dr := box.end.x - at.x
-	var dt := at.y - box.position.y
-	var db := box.end.y - at.y
-	var x := clampf(at.x, box.position.x, box.end.x)
-	var y := clampf(at.y, box.position.y, box.end.y)
-	var side := 3
-	if dl < 0.0 or dr < 0.0 or dt < 0.0 or db < 0.0:
-		var best := 0.0
-		var chosen := false
-		if dl < 0.0:
-			best = dl
-			side = 3
-			chosen = true
-		if dr < 0.0 and (not chosen or dr < best):
-			best = dr
-			side = 1
-			chosen = true
-		if dt < 0.0 and (not chosen or dt < best):
-			best = dt
-			side = 0
-			chosen = true
-		if db < 0.0 and (not chosen or db < best):
-			best = db
-			side = 2
-	else:
-		var m := minf(minf(dl, dr), minf(dt, db))
-		if is_equal_approx(m, dt):
-			side = 0
-		elif is_equal_approx(m, dr):
-			side = 1
-		elif is_equal_approx(m, db):
-			side = 2
-	match side:
+func _hull_sample(geom: Dictionary, s: float) -> Dictionary:
+	var rect: Rect2 = geom["rect"]
+	var rad: float = geom["rad"]
+	var sw: float = geom["sw"]
+	var sh: float = geom["sh"]
+	var arc: float = geom["arc"]
+	var span: float = geom["span"]
+	var p := fposmod(s, maxf(span, 0.001))
+	var left := rect.position.x
+	var top := rect.position.y
+	var right := rect.end.x
+	var bottom := rect.end.y
+	var lens: Array[float] = [sw, arc, sh, arc, sw, arc, sh, arc]
+	var idx := 0
+	for i: int in lens.size():
+		idx = i
+		if p <= lens[i] or i == lens.size() - 1:
+			break
+		p -= lens[i]
+	var point := Vector2.ZERO
+	var normal := Vector2.UP
+	var denom := maxf(rad, 0.001)
+	match idx:
 		0:
-			return x - box.position.x
+			point = Vector2(left + rad + p, top)
+			normal = Vector2.UP
 		1:
-			return w + (y - box.position.y)
+			normal = Vector2.from_angle(-PI * 0.5 + p / denom)
+			point = Vector2(right - rad, top + rad) + normal * rad
 		2:
-			return w + h + (box.end.x - x)
+			point = Vector2(right, top + rad + p)
+			normal = Vector2.RIGHT
+		3:
+			normal = Vector2.from_angle(p / denom)
+			point = Vector2(right - rad, bottom - rad) + normal * rad
+		4:
+			point = Vector2(right - rad - p, bottom)
+			normal = Vector2.DOWN
+		5:
+			normal = Vector2.from_angle(PI * 0.5 + p / denom)
+			point = Vector2(left + rad, bottom - rad) + normal * rad
+		6:
+			point = Vector2(left, bottom - rad - p)
+			normal = Vector2.LEFT
 		_:
-			return w + h + w + (box.end.y - y)
+			normal = Vector2.from_angle(PI + p / denom)
+			point = Vector2(left + rad, top + rad) + normal * rad
+	return {"point": point, "normal": normal, "tangent": normal.rotated(PI * 0.5)}
+
+
+func _hull_param_geom(geom: Dictionary, at: Vector2) -> float:
+	var rect: Rect2 = geom["rect"]
+	var rad: float = geom["rad"]
+	var sw: float = geom["sw"]
+	var sh: float = geom["sh"]
+	var arc: float = geom["arc"]
+	var left := rect.position.x
+	var top := rect.position.y
+	var right := rect.end.x
+	var bottom := rect.end.y
+	var best := [INF, 0.0]
+	var x := clampf(at.x, left + rad, right - rad)
+	_hull_closer(best, Vector2(x, top), x - (left + rad), at)
+	var y := clampf(at.y, top + rad, bottom - rad)
+	_hull_closer(best, Vector2(right, y), sw + arc + (y - (top + rad)), at)
+	x = clampf(at.x, left + rad, right - rad)
+	_hull_closer(best, Vector2(x, bottom), sw + arc + sh + arc + (right - rad - x), at)
+	y = clampf(at.y, top + rad, bottom - rad)
+	_hull_closer(best, Vector2(left, y), sw * 2.0 + arc * 3.0 + sh + (bottom - rad - y), at)
+	if rad > 0.5:
+		_hull_arc(best, at, Vector2(right - rad, top + rad), -PI * 0.5, 0.0, rad, sw)
+		_hull_arc(best, at, Vector2(right - rad, bottom - rad), 0.0, PI * 0.5, rad, sw + arc + sh)
+		_hull_arc(best, at, Vector2(left + rad, bottom - rad), PI * 0.5, PI, rad, sw * 2.0 + arc * 2.0 + sh)
+		_hull_arc(best, at, Vector2(left + rad, top + rad), PI, PI + PI * 0.5, rad, sw * 2.0 + arc * 3.0 + sh * 2.0)
+	return float(best[1])
+
+
+func _hull_arc(best: Array, at: Vector2, center: Vector2, a0: float, a1: float, rad: float, base: float) -> void:
+	var ang := _wrap_near((at - center).angle(), (a0 + a1) * 0.5)
+	ang = clampf(ang, a0, a1)
+	var direction := Vector2.from_angle(ang)
+	_hull_closer(best, center + direction * rad, base + (ang - a0) * rad, at)
+
+
+func _hull_closer(best: Array, point: Vector2, s: float, at: Vector2) -> void:
+	var dist := point.distance_squared_to(at)
+	if dist < float(best[0]):
+		best[0] = dist
+		best[1] = s
+
+
+func _wrap_near(ang: float, ref: float) -> float:
+	while ang - ref > PI:
+		ang -= TAU
+	while ref - ang > PI:
+		ang += TAU
+	return ang
 
 
 ## Las lamparas de la nave viven en la misma esquina. Se corren para no tapar el corte.
@@ -370,7 +378,23 @@ func paint_map(canvas: Node2D) -> void:
 	if on_hull:
 		var door := hatch_point()
 		canvas.draw_arc(door, 12.0, 0.0, TAU, 20, Color(0.45, 1.3, 1.5, 0.95), 2.5)
-		canvas.draw_rect(ShipRenderer.bounds(Run.ship.parts), Color(0.55, 0.85, 1.0, 0.45), false, 1.5)
+		_paint_route(canvas)
+
+
+func _paint_route(canvas: Node2D) -> void:
+	var geom := _hull_geom()
+	var span: float = geom["span"]
+	if span < 1.0:
+		return
+	var steps := 48
+	var first: Dictionary = _hull_sample(geom, 0.0)
+	var prev: Vector2 = first["point"]
+	var ink := Color(0.55, 0.85, 1.0, 0.55)
+	for i: int in steps:
+		var step: Dictionary = _hull_sample(geom, span * float(i + 1) / float(steps))
+		var nxt: Vector2 = step["point"]
+		canvas.draw_line(prev, nxt, ink, 1.5)
+		prev = nxt
 
 
 func _paint_damage(canvas: Node2D, part: ShipPart, rect: Rect2, pulse: float, urgent: bool) -> void:
@@ -453,7 +477,7 @@ func _refresh_hint() -> void:
 func _fit() -> void:
 	if _rooms == null or _panel == null or Run.ship.parts.is_empty():
 		return
-	var box := ShipRenderer.bounds(Run.ship.parts).grow(18.0)
+	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 96.0)
 	var avail := _panel.size - Vector2(16.0, 78.0)
 	if avail.x < 40.0 or avail.y < 40.0:
 		avail = Vector2(PANEL_W - 16.0, 420.0)
