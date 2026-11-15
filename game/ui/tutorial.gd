@@ -11,8 +11,9 @@ const STEPS: Dictionary = {
 		["Seguro y modo asistido", "El seguro devuelve parte del costo si pierdes la nave. En Ajustes (arriba a la izquierda o Esc) puedes activar Modo asistido: menos averías y ayuda al pilotar."],
 	],
 	&"assembly": [
-		["Arma tu nave", "Pasa el cursor sobre cada pieza para ver su función y si te sirve en esta misión. Motor abajo, cápsula arriba y paneles o antenas a los lados."],
-		["Semáforo antes de volar", "Comprueba a la derecha presupuesto, Delta-v y lámparas en verde antes de despegar. Chatarra es barata, pero falla más."],
+		["Sigue la lista de despegue", "A la derecha, Siguiente paso te dice qué le falta a la nave y por qué. Cuando la lista queda en verde, pulsa Despegar."],
+		["Clic y se coloca sola", "Haz clic en una pieza del catálogo y cae en su sitio: motor abajo, tanque encima y cápsula arriba. La lámpara de cada pieza dice si te sirve en esta misión; pasa el cursor para ver por qué."],
+		["Calidad y presupuesto", "Chatarra y Usada cuestan menos, pero fallan más. Arrastra una pieza para moverla y usa clic derecho para quitarla y recuperar su precio."],
 	],
 	&"launch": [
 		["Ignición en T-0", "Pulsa Espacio cuando la aguja entre en la zona verde del reloj. Retroceso aborta el lanzamiento y te devuelve el presupuesto."],

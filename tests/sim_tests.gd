@@ -10,6 +10,8 @@ func run(tree_root: Window) -> int:
 	root = tree_root
 	rng.seed = 7
 	_test_catalog()
+	_test_auto_index()
+	_test_checklist()
 	_test_ship_math()
 	_test_staging()
 	_test_reliability()
@@ -69,6 +71,64 @@ func _test_catalog() -> void:
 	check(not catalog.encounters_for(&"signal", 2).is_empty(), "legendary signal encounter")
 	check(not catalog.encounters_for(&"derelict", 1).is_empty(), "pirate cache rarity")
 	check(not catalog.encounters_for(&"comet", 1).is_empty(), "crystal comet")
+
+
+func _test_auto_index() -> void:
+	var ship := ShipModel.new()
+	var add_auto := func(def: PartDef) -> void:
+		ship.parts.insert(ship.auto_index(def), ShipPart.create(def, ShipPart.Quality.NEW, rng))
+	add_auto.call(_catalog().part(&"capsula"))
+	add_auto.call(_catalog().part(&"motor_trueno"))
+	add_auto.call(_catalog().part(&"tanque_largo"))
+	check(ship.parts.map(func(part: ShipPart) -> StringName: return part.def.kind) == [&"engine", &"tank", &"capsule"], "auto index starter stack")
+	add_auto.call(_catalog().part(&"paracaidas"))
+	add_auto.call(_catalog().part(&"escudo_termico"))
+	check(ship.parts.map(func(part: ShipPart) -> StringName: return part.def.kind) == [&"engine", &"tank", &"heatshield", &"capsule", &"parachute"], "auto index landing stack")
+	add_auto.call(_catalog().part(&"desacoplador"))
+	add_auto.call(_catalog().part(&"motor_susurro"))
+	add_auto.call(_catalog().part(&"tanque_corto"))
+	check(ship.parts.map(func(part: ShipPart) -> StringName: return part.def.kind) == [&"engine", &"tank", &"decoupler", &"engine", &"tank", &"heatshield", &"capsule", &"parachute"], "auto index second stage")
+	check(ship.can_stage() and ship.stage_thrust(ship.stages().back()) > 0.0, "auto index creates active upper stage")
+	var radial: PartDef = _catalog().part(&"panel_solar")
+	check(ship.auto_index(radial) == ship.parts.size(), "auto index radial goes last")
+
+
+func _test_checklist() -> void:
+	var assembly_script: GDScript = load("res://game/phases/assembly.gd")
+	var c := Contract.new()
+	c.target = &"luna"
+	c.dv_estimate = 3500.0
+	var luna: BodyDef = _catalog().body(&"luna")
+	var rubra: BodyDef = _catalog().body(&"rubra")
+	var empty := ShipModel.new()
+	var rows: Array[Dictionary] = assembly_script.checklist(empty, c, luna, 0)
+	check(String(rows[0].label) == "Cápsula" and int(rows[0].state) == Lamp.WARNING and bool(rows[0].blocks), "checklist capsule blocks")
+	var lift: Dictionary = {}
+	for row: Dictionary in rows:
+		if row.label == "Levanta el vuelo":
+			lift = row
+	check(int(lift.state) == Lamp.OFF, "checklist lift waits for propulsion")
+	var over: Array[Dictionary] = assembly_script.checklist(empty, c, luna, -1)
+	var budget: Dictionary = {}
+	for row: Dictionary in over:
+		if row.label == "Presupuesto":
+			budget = row
+	check(bool(budget.blocks), "checklist budget blocks")
+	var ready := ShipModel.new()
+	for id: StringName in [&"capsula", &"motor_trueno", &"tanque_largo"]:
+		var def: PartDef = _catalog().part(id)
+		ready.parts.insert(ready.auto_index(def), ShipPart.create(def, ShipPart.Quality.NEW, rng))
+	var ready_rows: Array[Dictionary] = assembly_script.checklist(ready, c, luna, 0)
+	var blocked := false
+	for row: Dictionary in ready_rows:
+		blocked = blocked or bool(row.blocks)
+	check(not blocked, "checklist starter ship can launch")
+	var rubra_rows: Array[Dictionary] = assembly_script.checklist(ready, c, rubra, 0)
+	var shield: Dictionary = {}
+	for row: Dictionary in rubra_rows:
+		if row.label == "Escudo térmico":
+			shield = row
+	check(int(shield.state) == Lamp.WARNING and String(shield.hint) != "", "checklist atmosphere explains heat shield")
 
 
 func _test_ship_math() -> void:

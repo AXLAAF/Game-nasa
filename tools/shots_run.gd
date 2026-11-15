@@ -19,6 +19,12 @@ func run(scene_tree: SceneTree) -> void:
 	await _wait(1.0)
 	await _shot("1_hangar")
 	Run.debug_setup()
+	var built: Array[ShipPart] = Run.ship.parts.duplicate()
+	Run.ship.parts.clear()
+	await _go(&"assembly")
+	await _wait(1.5)
+	await _shot("2_assembly_vacio")
+	Run.ship.parts.assign(built)
 	for phase: StringName in [&"assembly", &"launch", &"space"]:
 		await _go(phase)
 		await _wait(2.5)
