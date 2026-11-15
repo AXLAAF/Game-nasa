@@ -4683,3 +4683,28 @@ msgstr "Common"
 #: game/ui/ui.gd:24
 msgid "Rara"
 msgstr "Rare"
+
+#: game/crew/ship_interior.gd
+msgid "Prueba"
+msgstr "Trial"
+
+#: game/crew/ship_interior.gd
+msgid "Enter sobre una pieza del casco para probarla. El anillo cian vuelve adentro."
+msgstr "Press Enter on a hull part to test it. The cyan ring goes back inside."
+
+#: game/crew/ship_interior.gd
+msgid "Enter sobre una pieza sana para probarla. Si fallas, se rompe. La cápsula sale al casco."
+msgstr "Press Enter on a healthy part to test it. If you fail, it breaks. The capsule goes out to the hull."
+
+#: game/crew/ship_interior.gd
+msgid "%s queda al %d %%. Quedó más justa."
+msgstr "%s is at %d %%. It is running tighter."
+
+#: game/crew/ship_interior.gd
+msgid "La prueba rompió %s."
+msgstr "The test broke %s."
+
+#: game/phases/minigame.gd
+msgid "Si fallas, se rompe. A confirma."
+msgstr "If you fail, it breaks. A confirms."
+

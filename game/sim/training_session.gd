@@ -4,7 +4,7 @@ extends RefCounted
 ## Sesión aislada: no conoce Run, Profile, Catalog, nodos ni reloj de pared.
 ## Las ecuaciones existentes se ejecutan con un paso fijo de 30 Hz.
 const DT := 1.0 / 30.0
-const PART_FIELDS := ["quality", "hidden_quality", "condition", "wear", "broken", "inspected", "revealed", "owned", "paid", "fuel", "ablative", "thrust_mult", "boost", "deployed", "mount", "side"]
+const PART_FIELDS := ["quality", "hidden_quality", "condition", "wear", "broken", "inspected", "revealed", "owned", "paid", "fuel", "ablative", "thrust_mult", "boost", "tuned", "deployed", "mount", "side"]
 
 var design: Dictionary
 var body: BodyDef

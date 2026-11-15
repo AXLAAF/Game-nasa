@@ -29,6 +29,7 @@ const PART_GAME := {
 var mode: StringName = &"asteroids"
 var on_done: Callable
 var for_crew: bool = false
+var experimental: bool = false
 var _view: Control
 var _time: float = 0.0
 var _done: bool = false
@@ -62,11 +63,12 @@ static func for_part(kind: StringName) -> StringName:
 	return &"seal"
 
 
-static func start(game_mode: StringName, callback: Callable, crew: bool = false) -> void:
+static func start(game_mode: StringName, callback: Callable, crew: bool = false, trial: bool = false) -> void:
 	var game := Minigame.new()
 	game.mode = game_mode
 	game.on_done = callback
 	game.for_crew = crew
+	game.experimental = trial
 	(Engine.get_main_loop() as SceneTree).root.add_child(game)
 
 
@@ -76,6 +78,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_rng.seed = Run.rng.randi()
 	_pace = _rng.randf_range(0.72, 1.4)
+	if experimental:
+		_pace *= 1.15
 	_phase = _rng.randf() * TAU
 	_flip = -1.0 if _rng.randf() < 0.5 else 1.0
 	var root := Ui.root(self, 90)
@@ -90,10 +94,11 @@ func _ready() -> void:
 		_view.clip_contents = true
 		var vp := get_viewport().get_visible_rect().size
 		if _repair():
+			# A la izquierda del corte, sin escala: encima de la nave la tapaba y parecia encogerla.
 			_view.scale = Vector2.ONE
+			_view.rotation = 0.0
 			_view.size = Vector2(276, 368)
-			_view.position = Vector2(vp.x - 284.0, 68.0)
-			Kinetic.enter(_view, 0.0, {"slide": true, "slide_offset": Vector2(28.0, -6.0), "scale": Vector2(0.92, 0.88), "tilt": -0.024, "beam": true, "beam_color": Color(0.55, 0.85, 1.0, 0.24), "duration": 0.26})
+			_view.position = Vector2(maxf(vp.x - ShipInterior.panel_width() - 292.0, 12.0), 68.0)
 		else:
 			_view.custom_minimum_size = AREA
 			_view.size = AREA
@@ -254,10 +259,14 @@ func _draw_view() -> void:
 		_view.draw_rect(Rect2(Vector2.ZERO, _view.size), Color(0.02, 0.04, 0.08, 0.94))
 		_view.draw_rect(BOX, Color(0.04, 0.06, 0.1))
 		_view.draw_rect(BOX, Ui.INFO, false, 2.0)
-		_view.draw_string(font, Vector2(10, 22), str(_repair_titles().get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
+		var title := str(_repair_titles().get(mode, ""))
+		if experimental:
+			title = tr("Prueba") + " · " + title
+		_view.draw_string(font, Vector2(10, 22), title, HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.LAMP_CAUTION if experimental else Ui.IVORY)
 		_draw_repair(font)
 		if not _done:
-			_view.draw_string(font, Vector2(10, 360), tr("Palanca, cruceta o flechas. A."), HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.INFO)
+			var hint := tr("Si fallas, se rompe. A confirma.") if experimental else tr("Palanca, cruceta o flechas. A.")
+			_view.draw_string(font, Vector2(10, 360), hint, HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.LAMP_CAUTION if experimental else Ui.INFO)
 		if _done:
 			_view.draw_string(font, Vector2(10, 352), _msg, HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
 		return

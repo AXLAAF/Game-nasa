@@ -27,6 +27,7 @@ var fuel: float = 0.0
 var ablative: float = 0.0
 var thrust_mult: float = 1.0
 var boost: float = 1.0
+var tuned: bool = false
 var deployed: int = 0 ## paracaidas: 0 guardado, 1 frenado, 2 principal
 var mount: float = 0.5 ## 0 = base del bloque ancla, 1 = cima (solo radiales)
 var side: int = 0 ## -1 izquierda, 0 ambos lados, 1 derecha
@@ -132,10 +133,33 @@ func reveal() -> bool:
 	return true
 
 
+## Una prueba del segundo jugador. [juego] +20 % de rendimiento, tope 1.45, y la pieza queda más justa.
+const EXPERIMENT_MULT := 1.2
+const EXPERIMENT_CAP := 1.45
+
+
+func can_experiment() -> bool:
+	return not broken and not tuned
+
+
+## Acierto: sube el rendimiento y el desgaste. Fallo: la pieza se rompe. No crea combustible.
+func apply_experiment(ok: bool) -> void:
+	tuned = true
+	if not ok:
+		broken = true
+		wear = minf(wear + 0.25, 1.0)
+		return
+	var before := boost
+	boost = minf(boost * EXPERIMENT_MULT, EXPERIMENT_CAP)
+	wear = minf(wear + 0.08, 0.4)
+	if def.ablative > 0.0 and before > 0.0 and boost > before:
+		ablative = minf(ablative * (boost / before), def.ablative * boost)
+
+
 func to_dict() -> Dictionary:
 	return {
 		"id": String(def.id), "q": quality, "hq": hidden_quality, "c": condition,
-		"w": wear, "i": inspected, "r": revealed, "b": boost,
+		"w": wear, "i": inspected, "r": revealed, "b": boost, "t": tuned,
 		"m": mount, "s": side,
 	}
 
@@ -153,6 +177,7 @@ static func from_dict(data: Dictionary) -> ShipPart:
 	part.inspected = bool(data.get("i", false))
 	part.revealed = bool(data.get("r", true))
 	part.boost = float(data.get("b", 1.0))
+	part.tuned = bool(data.get("t", false))
 	part.mount = float(data.get("m", 0.5))
 	part.side = int(data.get("s", 0))
 	part.owned = true
