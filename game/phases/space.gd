@@ -73,7 +73,7 @@ func _ready() -> void:
 	_cam.make_current()
 	_stars = Starfield.new()
 	add_child(_stars)
-	_stars.set_sky(Color(0.005, 0.008, 0.02), 1.0)
+	_stars.set_sky(Color(0.015, 0.022, 0.058), 1.0)
 	_build_hud()
 	Synth.play(&"chime")
 
@@ -814,18 +814,38 @@ func _draw() -> void:
 	var t: float = st.t
 	var star := Catalog.star()
 	var rot := sqrt(star.mu / pow((BELT.x + BELT.y) * 0.5, 3.0)) * t
+	var belt_mid := (BELT.x + BELT.y) * 0.5
+	var belt_w := BELT.y - BELT.x
+	draw_arc(Vector2.ZERO, belt_mid, 0.0, TAU, 160, Color(0.28, 0.36, 0.55, 0.065), belt_w)
+	draw_arc(Vector2.ZERO, belt_mid + belt_w * 0.12, 0.0, TAU, 160, Color(0.55, 0.48, 0.42, 0.045), belt_w * 0.45)
 	for rock: Vector3 in _belt_rocks:
 		var a := rock.y + rot
-		draw_circle(Vector2(cos(a), sin(a)) * rock.x, rock.z * maxf(px, 1.0), Color(0.5, 0.45, 0.4, 0.6))
+		draw_circle(Vector2(cos(a), sin(a)) * rock.x, rock.z * maxf(px, 1.0), Color(0.58, 0.52, 0.46, 0.65))
 	for body: BodyDef in bodies:
 		if body.is_star:
 			continue
 		var parent := Catalog.body(body.parent_id)
-		draw_arc(Gravity.body_pos(parent, t), body.orbit_radius, 0.0, TAU, 128, Color(body.color, 0.18), px)
+		draw_arc(Gravity.body_pos(parent, t), body.orbit_radius, 0.0, TAU, 128, Color(body.color, 0.25), px)
 	var flaring := flare_warn >= 0.0 and int(Time.get_ticks_msec() / 200.0) % 2 == 0
-	for k: int in 5:
-		draw_circle(Vector2.ZERO, star.radius * (1.0 + k * 0.6), Color(star.color.r, star.color.g * 0.8, star.color.b * 0.5, 0.12 if not flaring else 0.22))
-	draw_circle(Vector2.ZERO, star.radius, star.color)
+	var now_s := Time.get_ticks_msec() * 0.001
+	var pulse := 1.0 + 0.08 * sin(now_s * 3.0)
+	var mist := Ui.mist_texture()
+	var halo_r := star.radius * 5.2 * pulse
+	draw_texture_rect(mist, Rect2(-halo_r, -halo_r, halo_r * 2.0, halo_r * 2.0), false, Color(1.4, 0.72, 0.24, 0.22 if not flaring else 0.34))
+	for ray: int in 8:
+		var ang := ray * TAU / 8.0 + now_s * 0.06
+		var dir_r := Vector2.from_angle(ang)
+		var perp := dir_r.orthogonal() * (star.radius * 0.38)
+		var len_r := star.radius * (4.4 + 1.1 * sin(now_s * 1.3 + float(ray) * 1.7))
+		draw_colored_polygon(PackedVector2Array([dir_r * star.radius * 0.7 + perp, dir_r * len_r, dir_r * star.radius * 0.7 - perp]), Color(1.5, 0.85, 0.3, 0.08 if not flaring else 0.16))
+	for k: int in 6:
+		var frac := float(k) / 5.0
+		var ring_r := star.radius * (1.28 + k * 0.68) * pulse
+		var ring_col := Color(1.35, 0.68, 0.24, 0.14 if not flaring else 0.24).lerp(Color(1.0, 0.35, 0.1, 0.03), frac)
+		draw_circle(Vector2.ZERO, ring_r, ring_col)
+	draw_circle(Vector2.ZERO, star.radius * 1.12, Color(1.85, 1.05, 0.38, 0.85))
+	draw_circle(Vector2.ZERO, star.radius, Color(2.2, 1.55, 0.75))
+	draw_circle(Vector2.ZERO, star.radius * 0.62, Color(2.5, 2.05, 1.35))
 	for body: BodyDef in bodies:
 		if not body.is_star:
 			_draw_body(body, Gravity.body_pos(body, t), px)
@@ -835,19 +855,27 @@ func _draw() -> void:
 	if target != null:
 		var tp := _target_pos(t, target)
 		var r: float = (target.radius * 2.6) if target is BodyDef else POI_RADIUS
-		draw_arc(tp, maxf(r, 10.0 * px), 0.0, TAU, 48, Color(Ui.LAMP_GO, 0.7), 1.5 * px)
+		draw_arc(tp, maxf(r, 10.0 * px), 0.0, TAU, 48, Color(Ui.LAMP_GO, 0.75), 1.6 * px)
 	_draw_prediction(px)
 	_draw_ship(px)
 
 
 func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
-	var r := maxf(body.radius, 3.0 * px)
+	var r := maxf(body.radius, 3.5 * px)
+	var atmo := body.atmo_color if body.atmosphere > 0.0 else body.color
+	var mist := Ui.mist_texture()
 	if body.atmosphere > 0.0:
-		draw_arc(pos, r * 1.15, 0.0, TAU, 48, Color(body.atmo_color, 0.35), r * 0.12)
+		var hr := r * 1.55
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, 0.22))
+	elif body.id == &"ignea":
+		var hr_lava := r * 1.5
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr_lava, hr_lava), Vector2(hr_lava * 2.0, hr_lava * 2.0)), false, Color(1.5, 0.55, 0.16, 0.22))
 	if body.radius * 2.0 * zoom < PLANET_MIN_PX:
-		draw_circle(pos, r, body.color)
+		var hr_dot := r * 2.2
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, 0.3))
+		draw_circle(pos, r * 1.05, Color(body.color.r * 1.5, body.color.g * 1.5, body.color.b * 1.5))
 	if body.hazards.has(&"radiation"):
-		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.25), 2.0 * px)
+		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.32), 2.0 * px)
 	if body.landable:
 		draw_arc(pos, body.radius * 2.6, 0.0, TAU, 48, Color(1, 1, 1, 0.12), px)
 	_text(pos + Vector2(r * 1.25 + 6.0 * px, -4.0 * px), body.display_name, Ui.IVORY if body == Run.target() else Ui.IVORY_DIM, px)
@@ -902,6 +930,7 @@ func _draw_ship(px: float) -> void:
 	if burning:
 		var flick := 1.0 + randf() * 0.4
 		var flame_len := s * (2.0 + overdrive * 2.0) * flick
+		draw_line(pos - dir * s * 0.8, pos - dir * (s * 4.5 + flame_len * 1.6), Color(1.2, 2.2, 3.0, 0.28), 2.4 * px)
 		draw_colored_polygon(PackedVector2Array([pos - dir * s * 0.6 + side * s * 0.4, pos - dir * (s * 0.6 + flame_len), pos - dir * s * 0.6 - side * s * 0.4]), Color(3.0, 1.6 + overdrive, 0.5, 0.9))
 	draw_colored_polygon(PackedVector2Array([pos + dir * s, pos - dir * s * 0.7 + side * s * 0.6, pos - dir * s * 0.4, pos - dir * s * 0.7 - side * s * 0.6]), Color(0.95, 0.97, 1.0))
 	var frame := Gravity.dominant(pos, st.t, bodies)

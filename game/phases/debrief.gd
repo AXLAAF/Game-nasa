@@ -41,6 +41,7 @@ func _ready() -> void:
 	_total_label = Ui.label(total_col, "", Ui.SIZE_HERO, Ui.IVORY)
 	_total_label.add_theme_font_override("font", Ui.mono())
 	_total_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	Kinetic.enter.call_deferred(panel, 0.02, {"scale": Vector2(0.88, 0.84), "tilt": -0.028, "elastic": true, "beam": true, "duration": 0.34})
 	_play()
 
 
@@ -136,22 +137,26 @@ func _play() -> void:
 		var title := Ui.label(row, str(line[0]), 15, line[2])
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var amount := Ui.label(row, "", 15, Ui.IVORY if int(line[1]) >= 0 else Ui.LAMP_WARNING)
+		Kinetic.enter(row, 0.0, {"scale": Vector2(0.94, 0.88), "tilt": -0.016, "duration": 0.24})
 		var target := int(line[1])
 		var tween := create_tween()
-		tween.tween_method(func(v: float) -> void: amount.text = Ui.money(int(v)) if target != 0 else "", 0.0, float(target), 0.35)
+		tween.tween_method(func(v: float) -> void: amount.text = Ui.money(int(v)) if target != 0 else "", 0.0, float(target), 0.35).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 		_shown_total += target
 		_total_label.text = Ui.money(int(_shown_total))
+		Kinetic.pop(_total_label, Vector2(1.06, 0.92), 0.20)
 		Synth.play(&"coin" if target > 0 else (&"deny" if target < 0 else &"tick"), -4.0, 1.0 + _list.get_child_count() * 0.05)
 		if target > 500:
 			Juice.shake(0.15)
 		await get_tree().create_timer(0.45).timeout
 	_total_label.text = Ui.money(_total)
+	Kinetic.pop(_total_label, Vector2(1.12, 0.88), 0.28)
 	Synth.play(&"jackpot" if _total > 2000 else (&"win" if _total > 0 else &"lose"))
 	Juice.flash(Ui.IVORY if _total > 0 else Ui.LAMP_WARNING, 0.3)
 	if Run.boxes > 0:
 		await _open_boxes()
 	Ui.label(_col, "Créditos: %s" % Ui.money(Profile.credits), Ui.SIZE_TEXT, Ui.IVORY)
 	var back := Ui.primary(Ui.button(_col, "Volver al hangar", func() -> void: Router.go(&"hangar")))
+	Kinetic.enter(back, 0.04, {"scale": Vector2(0.92, 0.86), "elastic": true, "beam": true, "duration": 0.30})
 	back.grab_focus()
 
 
@@ -163,6 +168,7 @@ func _open_boxes() -> void:
 		reel.custom_minimum_size = Vector2(190, 40)
 		reel.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_reels.append(reel)
+	Kinetic.cascade(_reels, 0.04, 0.12, {"elastic": true, "duration": 0.26})
 	for box: int in Run.boxes:
 		var prize := _box_prize()
 		var reel: Label = _reels[box % 3]
@@ -173,6 +179,7 @@ func _open_boxes() -> void:
 			await get_tree().create_timer(0.04 + k * 0.012).timeout
 		reel.text = prize[0]
 		reel.add_theme_color_override("font_color", prize[1])
+		Kinetic.pop(reel, Vector2(1.16, 0.84), 0.30)
 		Synth.play(&"jackpot" if prize[1] == Ui.IVORY else &"coin")
 		Juice.flash(prize[1], 0.25)
 	Profile.save_profile()

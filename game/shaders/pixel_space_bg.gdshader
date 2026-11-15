@@ -2,11 +2,13 @@ shader_type canvas_item;
 
 uniform float pixel_size = 2.0;
 uniform vec2 scroll_offset = vec2(0.0, 0.0);
-uniform float nebula_intensity = 0.40;
+uniform vec2 nebula_shift = vec2(0.0, 0.0);
+uniform float nebula_intensity = 0.72;
 uniform float stars = 1.0; // 0 = cielo de dia: sin estrellas ni nebulosa
-uniform vec4 bg_void : source_color = vec4(0.024, 0.039, 0.071, 1.0);
-uniform vec4 nebula_col : source_color = vec4(0.086, 0.15, 0.27, 1.0);
-uniform vec4 nebula_accent : source_color = vec4(0.14, 0.24, 0.42, 1.0);
+uniform vec4 bg_void : source_color = vec4(0.024, 0.039, 0.085, 1.0);
+uniform vec4 nebula_col : source_color = vec4(0.09, 0.17, 0.34, 1.0);
+uniform vec4 nebula_accent : source_color = vec4(0.14, 0.42, 0.54, 1.0);
+uniform vec4 nebula_warm : source_color = vec4(0.28, 0.12, 0.34, 1.0);
 
 float hash21(vec2 p) {
 	p = fract(p * vec2(234.34, 435.345));
@@ -61,52 +63,78 @@ float bayer4(vec2 px) {
 void fragment() {
 	vec2 res = 1.0 / SCREEN_PIXEL_SIZE;
 	vec2 px = floor((UV * res) / max(pixel_size, 1.0));
-	vec2 coord = px * 0.0075 + scroll_offset * 0.0018;
+	vec2 coord = px * 0.0075 + scroll_offset * 0.0018 + nebula_shift;
 
-	// Nebulosa PixelSpace cuantizada con trama ordenada Bayer 4x4 (pin_11 + pin_14)
+	// Nebulosa PixelSpace cuantizada con trama ordenada Bayer 4x4, niebla suave y nucleos HDR
 	float neb = fbm(coord * 1.45);
+	float neb_warm = fbm(coord * 1.15 + vec2(11.3, -7.1) - nebula_shift * 0.35);
+	float mist_a = fbm(coord * 0.72 + vec2(TIME * 0.014, -TIME * 0.009));
+	float mist_b = fbm(coord * 0.95 + vec2(-TIME * 0.011 + 4.2, TIME * 0.012));
+	float mist_mask = smoothstep(0.32, 0.84, mist_a * 0.6 + mist_b * 0.4);
 	float dither = bayer4(px);
-	float band = smoothstep(0.42, 0.88, neb);
-	vec3 col = bg_void.rgb;
-	if (band > 0.58 + dither * 0.34) {
-		col = mix(bg_void.rgb, nebula_accent.rgb, nebula_intensity * stars);
-	} else if (band > 0.24 + dither * 0.34) {
-		col = mix(bg_void.rgb, nebula_col.rgb, nebula_intensity * 0.78 * stars);
+	float band = smoothstep(0.32, 0.86, neb);
+	float warm_band = smoothstep(0.44, 0.90, neb_warm);
+	vec3 mist_tint = mix(nebula_col.rgb, nebula_accent.rgb, smoothstep(0.35, 0.75, mist_b));
+	vec3 col = mix(bg_void.rgb, mist_tint * 1.15, mist_mask * 0.48 * nebula_intensity * stars);
+	if (band > 0.72 + dither * 0.24) {
+		col = mix(col, nebula_accent.rgb * 2.35, nebula_intensity * stars);
+	} else if (band > 0.50 + dither * 0.30) {
+		col = mix(col, nebula_accent.rgb * 1.45, nebula_intensity * stars);
+	} else if (band > 0.18 + dither * 0.32) {
+		col = mix(col, nebula_col.rgb * 1.18, nebula_intensity * 0.85 * stars);
+	}
+	if (warm_band > 0.66 + dither * 0.26) {
+		col = mix(col, nebula_warm.rgb * 2.15, nebula_intensity * 0.78 * stars);
+	} else if (warm_band > 0.42 + dither * 0.32) {
+		col = mix(col, nebula_warm.rgb * 1.35, nebula_intensity * 0.65 * stars);
 	}
 
-	// Capa 1: estrellas de fondo lejanas con paralaje lento
+	// Capa 1: estrellas de fondo lejanas con paralaje lento y tinte espectral
 	vec2 px_far = px + floor(scroll_offset * 0.18);
 	float s_far = hash21(px_far);
-	if (s_far > 0.9975) {
-		col = mix(col, vec3(0.55, 0.61, 0.71), 0.65 * stars);
+	if (s_far > 0.9968) {
+		float hue_pick = hash21(px_far + vec2(3.7, 9.1));
+		vec3 far_col = hue_pick > 0.65 ? vec3(0.68, 0.88, 1.22) : (hue_pick < 0.25 ? vec3(1.18, 0.92, 0.68) : vec3(0.88, 0.95, 1.08));
+		col = mix(col, far_col, 0.78 * stars);
 	}
 
-	// Capa 2: estrellas cercanas con paralaje medio y parpadeo
+	// Capa 2: estrellas cercanas con paralaje medio, color espectral y brillo HDR para bloom
 	vec2 px_near = px + floor(scroll_offset * 0.42);
 	float s_near = hash21(px_near + vec2(17.0, 31.0));
-	if (s_near > 0.9986) {
-		float twinkle = 0.72 + 0.28 * sin(TIME * 2.4 + s_near * 120.0);
-		col = mix(col, vec3(0.957, 0.922, 0.851), twinkle * stars);
+	if (s_near > 0.9983) {
+		float twinkle = 0.75 + 0.25 * sin(TIME * 2.4 + s_near * 120.0);
+		float sp = hash21(px_near + vec2(51.0, 19.0));
+		vec3 near_col = sp > 0.7 ? vec3(0.85, 1.22, 1.60) : (sp < 0.28 ? vec3(1.52, 1.12, 0.68) : vec3(1.42, 1.36, 1.22));
+		col = mix(col, near_col, twinkle * stars);
 	}
 
-	// Capa 3: estrellas en cruz de 4 puntas (pin_11 + pin_15)
+	// Capa 3: estrellas en cruz de 4 puntas (pin_11 + pin_15) con nucleo HDR
 	vec2 cell = floor(px_near / 28.0);
 	vec2 local_p = mod(px_near, 28.0);
 	float c_hash = hash21(cell + vec2(91.3, 47.7));
-	if (c_hash > 0.91) {
+	if (c_hash > 0.90) {
 		vec2 star_pos = vec2(
 			6.0 + floor(hash21(cell + vec2(3.1, 7.2)) * 16.0),
 			6.0 + floor(hash21(cell + vec2(11.4, 2.9)) * 16.0)
 		);
 		vec2 delta = abs(local_p - star_pos);
-		float arm = c_hash > 0.965 ? 3.0 : 2.0;
+		float arm = c_hash > 0.962 ? 3.0 : 2.0;
 		bool is_center = delta.x < 0.5 && delta.y < 0.5;
 		bool is_arm = (delta.x < 0.5 && delta.y <= arm) || (delta.y < 0.5 && delta.x <= arm);
 		if (is_center || is_arm) {
-			float tw = 0.75 + 0.25 * sin(TIME * 3.0 + c_hash * 90.0);
-			vec3 star_col = c_hash > 0.96 ? vec3(0.22, 0.74, 0.97) : vec3(0.957, 0.922, 0.851);
-			col = mix(col, star_col, (is_center ? tw : tw * 0.68) * stars);
+			float tw = 0.78 + 0.22 * sin(TIME * 3.0 + c_hash * 90.0);
+			vec3 star_col = c_hash > 0.965 ? vec3(0.75, 1.35, 1.85) : (c_hash < 0.925 ? vec3(1.75, 1.25, 0.72) : vec3(1.60, 1.50, 1.35));
+			col = mix(col, star_col, (is_center ? tw : tw * 0.6) * stars);
 		}
+	}
+
+	// Capa 4: motas de polvo cosmico flotando lentamente
+	vec2 px_dust = px + floor(scroll_offset * 0.65 + vec2(TIME * 2.2, -TIME * 1.1));
+	float s_dust = hash21(px_dust + vec2(73.1, 13.7));
+	if (s_dust > 0.9978) {
+		float drift = 0.32 + 0.30 * sin(TIME * 1.5 + s_dust * 60.0);
+		vec3 dust_col = mix(nebula_accent.rgb, nebula_warm.rgb, fract(s_dust * 37.0)) * 1.55;
+		col = mix(col, dust_col, drift * stars);
 	}
 
 	COLOR = vec4(col, 1.0);

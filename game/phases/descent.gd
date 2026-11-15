@@ -521,6 +521,8 @@ func _show_surface() -> void:
 		Ui.button(col, "Terminar la misión en casa", _go_home)
 	elif not at_target:
 		Ui.button(col, "Abandonar y pedir rescate", _abandon)
+	Kinetic.enter.call_deferred(_panel, 0.0, {"scale": Vector2(0.88, 0.82), "tilt": -0.032, "elastic": true, "beam": true, "duration": 0.32})
+	Kinetic.cascade(col.get_children(), 0.028, 0.16, {"scale": Vector2(0.95, 0.90), "duration": 0.24})
 
 
 func _deliver() -> void:
@@ -604,7 +606,7 @@ func _update_view(delta: float) -> void:
 	var target_scale := clampf(320.0 / maxf(ground, 40.0), 0.004, 6.0)
 	_scale = lerpf(_scale, target_scale, minf(delta * 3.0, 1.0))
 	var density := clampf(RocketMath.density(body, h) / 1.225 * 4.0, 0.0, 1.0) if body.atmosphere > 0.0 else 0.0
-	var sky := Color(0.01, 0.015, 0.04).lerp(Color(body.atmo_color.r, body.atmo_color.g, body.atmo_color.b), density * 0.8)
+	var sky := Color(0.015, 0.022, 0.058).lerp(Color(body.atmo_color.r, body.atmo_color.g, body.atmo_color.b), density * 0.82)
 	_stars.set_sky(sky, 1.0 - density)
 	_stars.set_view(Vector2(x, -h) * 0.002)
 	var flying := state == State.ENTRY or state == State.FLIGHT
@@ -702,8 +704,23 @@ func _draw() -> void:
 			var b := _to_screen(p + PAD_HALF, terrain(p))
 			draw_line(a, b, Ui.LAMP_GO if body == Run.target() else Ui.IVORY, maxf(3.0, 1.0 * _scale))
 			var blink := 0.5 + 0.5 * sin(Time.get_ticks_msec() / 150.0)
-			draw_circle(a, 3.0, Color(2.0, 0.3, 0.2, blink))
-			draw_circle(b, 3.0, Color(2.0, 0.3, 0.2, blink))
+			draw_circle(a, 3.5, Color(2.4, 0.45, 0.25, blink))
+			draw_circle(b, 3.5, Color(2.4, 0.45, 0.25, blink))
+			if agl() < 2600.0:
+				draw_line((a + b) * 0.5, (a + b) * 0.5 + Vector2(0.0, -90.0), Color(0.35, 1.4, 0.85, 0.14 * (0.4 + 0.6 * blink)), 6.0)
+	if body.atmosphere > 0.0:
+		var density := clampf(RocketMath.density(body, h) / 1.225 * 3.5, 0.0, 1.0)
+		if density > 0.04:
+			var now_s := Time.get_ticks_msec() * 0.001
+			var fog_col := body.atmo_color.lerp(body.color, 0.35)
+			var base_y := minf(ground_y - 10.0, view.y * 0.32)
+			var mist := Ui.mist_texture()
+			for i: int in 6:
+				var fx := fposmod(float(i) * 320.0 + now_s * (18.0 + wind * 2.2) - x * 0.08, view.x * 1.6) - view.x * 0.8
+				var fy := base_y - float(i % 3) * 62.0 + sin(now_s * 0.7 + float(i)) * 12.0
+				var rx := 260.0 + float(i % 2) * 90.0
+				var ry := 70.0 + float(i % 3) * 25.0
+				draw_texture_rect(mist, Rect2(fx - rx, fy - ry, rx * 2.0, ry * 2.0), false, Color(fog_col.r, fog_col.g, fog_col.b, 0.28 * density))
 	if Run.ship.parts.is_empty():
 		return
 	var ship_scale := clampf(_scale * 0.12, 0.16, 0.7)
@@ -727,7 +744,8 @@ func _draw_corridor(view: Vector2) -> void:
 	var length := minf(view.x, view.y) * 0.38
 	var horizon := view.y * 0.42
 	draw_rect(Rect2(-view.x, horizon, view.x * 2.0, view.y), Color(body.color.r, body.color.g, body.color.b, 0.35))
-	draw_line(Vector2(-view.x, horizon), Vector2(view.x, horizon), Color(body.atmo_color, 0.9), 4.0)
+	draw_line(Vector2(-view.x, horizon), Vector2(view.x, horizon), Color(body.atmo_color.r * 1.9, body.atmo_color.g * 1.9, body.atmo_color.b * 2.1, 0.92), 5.0)
+	draw_rect(Rect2(-view.x, horizon - 46.0, view.x * 2.0, 46.0), Color(body.atmo_color.r * 1.3, body.atmo_color.g * 1.3, body.atmo_color.b * 1.4, 0.16))
 	for angle: float in [c.x, c.y]:
 		draw_line(origin, origin + Vector2.from_angle(deg_to_rad(-angle)) * length, Color(Ui.LAMP_GO, 0.55), 2.0)
 	var band := PackedVector2Array([origin, origin + Vector2.from_angle(deg_to_rad(-c.x)) * length, origin + Vector2.from_angle(deg_to_rad(-c.y)) * length])

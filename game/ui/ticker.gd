@@ -25,12 +25,25 @@ func push(text: String, color: Color = Ui.IVORY) -> void:
 	move_child(line, 0)
 	while get_child_count() > MAX_LINES:
 		get_child(get_child_count() - 1).free()
-	line.modulate = Color(2, 2, 2, 1)
+	Kinetic.sync_pivot(line)
+	if not Kinetic.is_reduced():
+		line.modulate = Color(1.7, 1.7, 1.8, 0.0)
+		line.scale = Vector2(0.92, 0.86)
+		line.rotation = -0.028
 	var tween := line.create_tween()
-	tween.tween_property(line, "modulate", Color(1, 1, 1, 1), 0.25)
-	tween.tween_interval(5.0)
-	tween.tween_property(line, "modulate:a", 0.0, 1.0)
-	tween.tween_callback(line.queue_free)
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	if Kinetic.is_reduced():
+		tween.tween_interval(5.0)
+		tween.tween_property(line, "modulate:a", 0.0, 0.5)
+	else:
+		tween.set_parallel(true)
+		tween.tween_property(line, "modulate", Color(1, 1, 1, 1), 0.26).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		tween.tween_property(line, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tween.tween_property(line, "rotation", 0.0, 0.28).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		tween.chain().tween_interval(4.8)
+		tween.chain().tween_property(line, "modulate:a", 0.0, 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tween.parallel().tween_property(line, "scale", Vector2(0.96, 0.90), 0.55).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tween.chain().tween_callback(line.queue_free)
 
 
 func _garble(text: String) -> String:

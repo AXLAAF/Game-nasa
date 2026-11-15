@@ -21,7 +21,7 @@ func _ready() -> void:
 	_rng.randomize()
 	var stars := Starfield.new()
 	add_child(stars)
-	stars.set_sky(Color(0.01, 0.015, 0.04), 1.0)
+	stars.set_sky(Color(0.016, 0.024, 0.06), 1.0)
 	_build_backdrop()
 	var root := Ui.root(self)
 	var maker := Ui.panel(root)
@@ -84,6 +84,9 @@ func _ready() -> void:
 	Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
 	_board = Ui.vbox(board_col, 10)
 	_refresh()
+	Kinetic.enter.call_deferred(maker, 0.0, {"slide": true, "slide_offset": Vector2(-24.0, -14.0), "scale": Vector2(0.95, 0.90), "tilt": -0.015, "beam": true, "duration": 0.34})
+	Kinetic.enter.call_deferred(left, 0.05, {"slide": true, "slide_offset": Vector2(-28.0, 16.0), "scale": Vector2(0.94, 0.90), "tilt": -0.022, "duration": 0.34})
+	Kinetic.enter.call_deferred(right, 0.09, {"slide": true, "slide_offset": Vector2(-22.0, 20.0), "scale": Vector2(0.95, 0.91), "tilt": 0.016, "beam": true, "duration": 0.36})
 	Synth.play(&"chime", -6.0)
 
 
@@ -100,14 +103,24 @@ func _refresh() -> void:
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
 		child.queue_free()
+	var cards: Array = []
 	for contract: Contract in Profile.board(_rng):
-		_contract_card(contract)
+		cards.append(_contract_card(contract))
+	Kinetic.cascade(cards, 0.045, 0.24, {"scale": Vector2(0.93, 0.86), "elastic": true, "beam": true, "duration": 0.32})
 
 
-func _contract_card(contract: Contract) -> void:
+func _contract_card(contract: Contract) -> PanelContainer:
 	var body := contract.body()
 	var card := PanelContainer.new()
-	card.add_theme_stylebox_override("panel", Ui.box(Ui.BAKELITE_RAISED, Ui.BAKELITE_EDGE, 1, 4))
+	var rest_style := Ui.box(Ui.BAKELITE_RAISED, Ui.BAKELITE_EDGE, 1, 4)
+	var hover_style := Ui.box(Color(0.20, 0.21, 0.24), Ui.INFO, 1, 4)
+	card.add_theme_stylebox_override("panel", rest_style)
+	Kinetic.sync_pivot(card)
+	card.mouse_entered.connect(func() -> void:
+		card.add_theme_stylebox_override("panel", hover_style)
+		Kinetic.pop(card, Vector2(1.015, 1.015), 0.16))
+	card.mouse_exited.connect(func() -> void:
+		card.add_theme_stylebox_override("panel", rest_style))
 	_board.add_child(card)
 	var row := Ui.hbox(card, 16)
 	row.add_child(_planet_icon(body))
@@ -126,6 +139,7 @@ func _contract_card(contract: Contract) -> void:
 	var accept := Ui.primary(Ui.button(row, "Aceptar contrato", _accept.bind(contract)))
 	accept.custom_minimum_size = Vector2(170, 44)
 	accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	return card
 
 
 ## Interruptor: tecla con su lampara de estado al lado.
@@ -146,8 +160,8 @@ func _planet_icon(body: BodyDef) -> Control:
 		var blank := Control.new()
 		blank.custom_minimum_size = Vector2(56, 56)
 		return blank
-	var icon := Planet.make(body, 56.0)
-	icon.custom_minimum_size = Vector2(56, 56)
+	var icon := Planet.make(body, 46.0)
+	icon.custom_minimum_size = Vector2(58, 58)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return icon
 
@@ -215,5 +229,9 @@ func _draw() -> void:
 	var moon := center + Vector2(cos(a), sin(a) * 0.35) * 420.0
 	_moon.position = moon - _moon.size * 0.5
 	_moon.visible = sin(a) < 0.0 or absf(moon.x - center.x) > 280.0
+	for k: int in 4:
+		var ta := -a * 2.3 + float(k + 1) * 0.08
+		var trail := center + Vector2(cos(ta), sin(ta) * 0.3) * 320.0
+		draw_circle(trail, 2.2 - float(k) * 0.35, Color(1.4, 1.9, 2.6, 0.45 - float(k) * 0.1))
 	var ship := center + Vector2(cos(-a * 2.3), sin(-a * 2.3) * 0.3) * 320.0
 	draw_circle(ship, 3.0, Color(3.0, 2.4, 1.6))

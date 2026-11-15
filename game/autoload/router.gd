@@ -16,6 +16,7 @@ const DEBUG_KEYS: Dictionary = {
 var host: Node
 var current: StringName = &""
 var _fade: ColorRect
+var _wipe_mat: ShaderMaterial
 var _busy: bool = false
 
 
@@ -32,6 +33,11 @@ func mount(node: Node) -> void:
 	_fade.color = Color(0.0, 0.0, 0.0, 0.0)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_fade.set_anchors_preset(Control.PRESET_FULL_RECT)
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://game/shaders/underground_wipe.gdshader")
+	mat.set_shader_parameter("progress", 0.0)
+	_wipe_mat = mat
+	_fade.material = mat
 	layer.add_child(_fade)
 
 
@@ -41,10 +47,29 @@ func go(phase_id: StringName) -> void:
 	_busy = true
 	var tween := create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
-	tween.tween_property(_fade, "color:a", 1.0, 0.22 if current != &"" else 0.0)
+	if Kinetic.is_reduced():
+		_fade.material = null
+		tween.tween_property(_fade, "color:a", 1.0, 0.16 if current != &"" else 0.0)
+		tween.tween_callback(_swap.bind(phase_id))
+		tween.tween_property(_fade, "color:a", 0.0, 0.20)
+		tween.tween_callback(func() -> void: _busy = false)
+		return
+	_fade.material = _wipe_mat
+	_fade.color = Color.WHITE
+	if current != &"":
+		tween.tween_method(_set_wipe, 0.0, 1.0, 0.22).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_IN)
+	else:
+		_set_wipe(1.0)
 	tween.tween_callback(_swap.bind(phase_id))
-	tween.tween_property(_fade, "color:a", 0.0, 0.3)
-	tween.tween_callback(func() -> void: _busy = false)
+	tween.tween_method(_set_wipe, 1.0, 2.0, 0.34).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tween.tween_callback(func() -> void:
+		_set_wipe(0.0)
+		_busy = false)
+
+
+func _set_wipe(v: float) -> void:
+	if _wipe_mat != null:
+		_wipe_mat.set_shader_parameter("progress", v)
 
 
 func _swap(phase_id: StringName) -> void:

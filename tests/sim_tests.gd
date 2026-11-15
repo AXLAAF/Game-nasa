@@ -17,6 +17,9 @@ func run(tree_root: Window) -> int:
 	_test_assist_and_time()
 	_test_nav_burn()
 	_test_tutorial()
+	_test_part_viability()
+	_test_starfield_palettes()
+	_test_kinetic()
 	_test_thermal()
 	_test_gravity()
 	_test_odds()
@@ -200,7 +203,7 @@ func _test_tutorial() -> void:
 		total += steps.size()
 		for step: Array in steps:
 			check(String(step[0]).length() > 0 and String(step[1]).length() > 40, "tutorial step has text")
-	check(total >= 18, "tutorial covers the whole loop")
+	check(total >= 10 and total <= 14, "tutorial covers the whole loop concisely")
 	var seen: Array[String] = Profile.tutorial_seen.duplicate()
 	Tutorial.replay()
 	var panel := Tutorial._open as Tutorial
@@ -211,6 +214,10 @@ func _test_tutorial() -> void:
 		check(text.contains("1 / "), "step counter is visible")
 		panel._advance()
 		check(_tutorial_text(panel).contains("Seguro"), "next step explains insurance")
+		panel._back()
+		check(_tutorial_text(panel).contains("Contratos"), "tutorial can step back")
+		panel._jump_to(&"descent")
+		check(_tutorial_text(panel).contains("Corredor"), "tutorial can jump to chapter")
 		panel.get_parent().remove_child(panel)
 		panel.free()
 	Tutorial._open = null
@@ -229,6 +236,86 @@ func _test_tutorial() -> void:
 	Tutorial.offer(&"hangar")
 	check(Tutorial._open == null, "a finished chapter does not reopen")
 	Profile.tutorial_seen = seen
+
+
+func _test_part_viability() -> void:
+	var run := root.get_node("Run")
+	var profile := root.get_node("Profile")
+	var old_credits := int(profile.credits)
+	var old_contract: Contract = run.contract
+	var old_parts: Array[ShipPart] = run.ship.parts.duplicate()
+	var assembly_script: GDScript = load("res://game/phases/assembly.gd")
+	var asm: Node = assembly_script.new()
+	var c := Contract.new()
+	c.target = &"luna"
+	c.dv_estimate = 3500.0
+	c.payout = 1000
+	c.advance = 300
+	run.begin(c)
+	profile.credits = 2000
+	var chute: PartDef = _catalog().part(&"paracaidas")
+	var v_luna: Dictionary = asm.part_viability(chute)
+	check(v_luna.badge == "NO NECESARIA" and v_luna.affordable, "parachute not needed on airless moon")
+	c.target = &"rubra"
+	var v_rubra: Dictionary = asm.part_viability(chute)
+	check(v_rubra.badge == "NECESARIA" and v_rubra.affordable, "parachute needed on Rubra")
+	c.target = &"hielo"
+	var solar: PartDef = _catalog().part(&"panel_solar")
+	var v_ice: Dictionary = asm.part_viability(solar)
+	check(v_ice.badge == "POCO VIABLE", "solar panel warned on distant ice moon")
+	run.spent = profile.budget(c)
+	var rtg: PartDef = _catalog().part(&"rtg")
+	var v_broke: Dictionary = asm.part_viability(rtg)
+	check(v_broke.badge == "NO VIABLE" and not v_broke.affordable, "over-budget part flagged non-viable")
+	asm.free()
+	profile.credits = old_credits
+	run.contract = old_contract
+	run.ship.parts = old_parts
+
+
+func _test_starfield_palettes() -> void:
+	var seen_idx := {}
+	for i: int in 7:
+		var c := Contract.new()
+		c.title = "Misión %d" % i
+		c.cargo = "Carga %d" % i
+		c.payout = 1000 + i * 250
+		c.target = [&"luna", &"ignea", &"rubra", &"glacia", &"hielo", &"ceniza", &"terra"][i]
+		var p := Starfield.palette_for(c, i)
+		check(p.col is Color and p.accent is Color and p.warm is Color, "palette %d returns colors" % i)
+		seen_idx[int(p.index)] = true
+	check(seen_idx.size() >= 3, "mission starfield palettes vary across contracts")
+
+
+func _test_kinetic() -> void:
+	var was_reduced := bool(Profile.reduced_motion)
+	Profile.reduced_motion = false
+	var pos := 0.0
+	var vel := 0.0
+	for _i: int in 45:
+		var step := Kinetic.spring_step(pos, vel, 1.0, 0.016)
+		pos = step.x
+		vel = step.y
+	check(absf(pos - 1.0) < 0.05 and absf(vel) < 0.25, "kinetic spring converges toward target")
+	Profile.reduced_motion = true
+	var snap := Kinetic.spring_step(0.0, 4.0, 1.0, 0.016)
+	check(is_equal_approx(snap.x, 1.0) and is_equal_approx(snap.y, 0.0), "reduced_motion snaps spring immediately")
+	var btn := Button.new()
+	var panel := PanelContainer.new()
+	root.add_child(panel)
+	root.add_child(btn)
+	Kinetic.bind_button(btn)
+	Kinetic.enter(panel, 0.0, {"beam": true})
+	check(panel.visible and is_equal_approx(panel.modulate.a, 1.0), "reduced_motion enter shows panel cleanly")
+	Kinetic.fold_toggle(panel, false)
+	check(not panel.visible, "reduced_motion fold_toggle hides immediately")
+	Kinetic.fold_toggle(panel, true)
+	check(panel.visible, "reduced_motion fold_toggle reveals immediately")
+	root.remove_child(btn)
+	btn.free()
+	root.remove_child(panel)
+	panel.free()
+	Profile.reduced_motion = was_reduced
 
 
 func _test_assist_and_time() -> void:
