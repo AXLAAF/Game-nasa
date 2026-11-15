@@ -15,6 +15,7 @@ static var _watch: FaultWatch
 var data: Dictionary = {}
 var on_done: Callable
 var _root: Control
+var _dim: ColorRect
 var _panel: PanelContainer
 var _body: VBoxContainer
 var _choices_box: VBoxContainer
@@ -238,11 +239,11 @@ func _ready() -> void:
 	_scanned = bool(data.get("scanned", false))
 	_root = Ui.root(self, 50)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
-	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.0 if coop else 0.65)
-	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
-	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
-	_root.add_child(dim)
+	_dim = ColorRect.new()
+	_dim.color = Color(0, 0, 0, 0.0 if (coop or not Kinetic.is_reduced()) else 0.65)
+	_dim.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
+	_dim.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.add_child(_dim)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
@@ -260,13 +261,20 @@ func _ready() -> void:
 		var tip := Ui.label(_body, "Elige una opción. V o Y la apura con peores probabilidades.", Ui.SIZE_LEGEND, Ui.LAMP_CAUTION)
 		tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		tip.custom_minimum_size = Vector2(560, 0)
-	_panel.modulate.a = 0.0
-	_panel.scale = Vector2(0.9, 0.9)
-	_panel.pivot_offset = Vector2(300, 150)
-	var tween := create_tween()
-	tween.set_parallel(true)
-	tween.tween_property(_panel, "modulate:a", 1.0, 0.18)
-	tween.tween_property(_panel, "scale", Vector2.ONE, 0.25).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	Kinetic.sync_pivot(_panel)
+	if not Kinetic.is_reduced():
+		if not coop:
+			var dt := create_tween()
+			dt.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+			dt.tween_property(_dim, "color:a", 0.65, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		Kinetic.enter(_panel, 0.0, {
+			"scale": Vector2(0.86, 0.82),
+			"tilt": -0.038,
+			"elastic": true,
+			"duration": 0.34,
+			"beam": true,
+			"beam_color": Color(_accent().r, _accent().g, _accent().b, 0.26),
+		})
 
 
 func _accent() -> Color:
@@ -314,6 +322,7 @@ func _build() -> void:
 	elif not _scanned and _has_risk(choices):
 		var scan := Ui.button(_body, "Escanear probabilidades (gasta 15 % de batería)", _scan)
 		scan.disabled = Run.battery < 0.15 * Thermal.battery_capacity(Run.ship)
+	Kinetic.cascade(_choices_box.get_children(), 0.032, 0.16, {"scale": Vector2(0.95, 0.90), "duration": 0.24})
 
 
 func _has_risk(choices: Array) -> bool:
@@ -357,6 +366,8 @@ func _scan() -> void:
 	_scanned = true
 	Synth.play(&"beep")
 	_build()
+	Kinetic.pop(_panel, Vector2(1.03, 0.97), 0.22)
+	Kinetic.sweep(_panel, Color(Ui.INFO, 0.30), 0.34)
 
 
 func _choose(index: int) -> void:
@@ -477,20 +488,25 @@ func _resolve(choice: ChoiceDef, success: bool) -> void:
 	var verdict := choice.win_text if success else choice.lose_text
 	if verdict == "":
 		verdict = "Salió bien." if success else "Salió mal."
-	Ui.label(_body, ("Éxito. " if success else "Fallo. ") + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
+	var revealed: Array = []
+	var verdict_lbl := Ui.label(_body, ("Éxito. " if success else "Fallo. ") + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
+	revealed.append(verdict_lbl)
 	var summary := Run.describe(effects)
 	if summary != "":
-		Ui.label(_body, summary, Ui.SIZE_TEXT, Ui.IVORY)
+		revealed.append(Ui.label(_body, summary, Ui.SIZE_TEXT, Ui.IVORY))
 	if risky and success:
-		Ui.label(_body, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY)
+		revealed.append(Ui.label(_body, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY))
 	var done := Ui.primary(Ui.button(_body, "Continuar", _close.bind(success)))
+	revealed.append(done)
+	Kinetic.cascade(revealed, 0.036, 0.15, {"scale": Vector2(0.94, 0.88), "elastic": true, "duration": 0.28})
+	Kinetic.sweep(_panel, Color((Ui.LAMP_GO if success else Ui.LAMP_WARNING), 0.28), 0.36)
 	done.grab_focus()
 
 
 func _close(success: bool) -> void:
-	_open = null
+	if _open == self:
+		_open = null
 	var callback := on_done
-	queue_free()
 	if _queue.is_empty():
 		get_tree().paused = false
 		if Run.crew >= 2:
@@ -500,6 +516,20 @@ func _close(success: bool) -> void:
 		show_card(next[0], next[1])
 	if callback.is_valid():
 		callback.call(success)
+	if Kinetic.is_reduced() or DisplayServer.get_name() == "headless" or _panel == null:
+		queue_free()
+	else:
+		_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		Kinetic.sync_pivot(_panel)
+		var tw := create_tween()
+		tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+		tw.set_parallel(true)
+		if _dim != null:
+			tw.tween_property(_dim, "color:a", 0.0, 0.15)
+		tw.tween_property(_panel, "modulate:a", 0.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+		tw.tween_property(_panel, "scale", Vector2(0.86, 0.82), 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+		tw.tween_property(_panel, "rotation", 0.032, 0.16)
+		tw.chain().tween_callback(queue_free)
 
 
 class FaultWatch extends CanvasLayer:
@@ -523,6 +553,7 @@ class FaultWatch extends CanvasLayer:
 		_label.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
 		_label.add_theme_color_override("font_color", Ui.LAMP_WARNING)
 		add_child(_label)
+		Kinetic.sweep(bg, Color(Ui.LAMP_WARNING, 0.28), 0.36)
 
 	func _process(_delta: float) -> void:
 		Card._service_faults()

@@ -2,6 +2,7 @@ shader_type canvas_item;
 
 uniform int planet_type : hint_range(0, 4) = 0;
 uniform float pixels = 96.0;
+uniform float halo_scale = 1.28;
 uniform float seed = 4.2;
 uniform vec2 light_dir = vec2(-0.707, -0.707);
 uniform float spin_speed = 0.04;
@@ -64,7 +65,7 @@ float bayer4(vec2 px) {
 void fragment() {
 	vec2 px = floor(UV * pixels);
 	vec2 uv = (px + 0.5) / pixels;
-	vec2 d = (uv - 0.5) * 2.0;
+	vec2 d = (uv - 0.5) * 2.0 * halo_scale;
 	float r2 = dot(d, d);
 	float r_lim = 1.0;
 
@@ -80,9 +81,12 @@ void fragment() {
 		} else {
 			float dist = sqrt(r2);
 			float dither = bayer4(px);
-			float rim = smoothstep(1.14, 0.98, dist);
-			float quant = step(dither * 0.65, rim);
-			COLOR = vec4(col_atmo.rgb, col_atmo.a * quant * 0.42);
+			float rim = smoothstep(halo_scale - 0.03, 0.96, dist);
+			float quant = rim > 0.001 ? step(dither * 0.56, rim) : 0.0;
+			float sun_side = smoothstep(-0.35, 0.72, dot(normalize(d + vec2(0.0001)), normalize(light_dir)));
+			vec3 halo_col = col_atmo.rgb * mix(0.8, 1.85, sun_side);
+			float halo_alpha = col_atmo.a * quant * mix(0.28, 0.72, sun_side);
+			COLOR = vec4(halo_col, halo_alpha);
 		}
 	} else {
 		float nr2 = clamp(r2 / max(r_lim, 0.001), 0.0, 1.0);
@@ -142,18 +146,37 @@ void fragment() {
 
 		vec3 lit = col_night.rgb;
 		if (ndl > 0.68 + dither * 0.14) {
-			lit = surf * 1.10;
+			lit = surf * 1.12;
 		} else if (ndl > 0.36 + dither * 0.16) {
-			lit = surf * 0.78;
+			lit = surf * 0.88;
 		} else if (ndl > 0.15 + dither * 0.16) {
-			lit = mix(col_night.rgb, surf * 0.45, 0.85);
+			lit = mix(col_night.rgb, surf * 0.54, 0.85);
 		} else {
-			lit = mix(col_night.rgb, surf * 0.18, 0.35);
+			lit = mix(col_night.rgb, surf * 0.22, 0.40);
 		}
 
+		// Fisuras incandescentes en mundos volcanicos (col_c HDR > 1.0) visibles incluso de noche
+		float lava_glow = max(max(col_c.r, col_c.g), col_c.b);
+		if (planet_type == 2 && lava_glow > 1.05 && n > 0.78) {
+			lit = max(lit, col_c.rgb * 1.65);
+		}
+
+		// Reflejo solar especular sobre oceanos (planet_type 0)
+		vec3 view_dir = normalize(l3 + vec3(0.0, 0.0, 1.0));
+		float spec = pow(max(dot(normal, view_dir), 0.0), 16.0);
+		if (planet_type == 0 && n <= 0.46) {
+			lit += vec3(0.65, 0.95, 1.25) * spec * smoothstep(0.2, 0.8, ndl);
+		}
+
+		// Limbo luminoso HDR (atmosferico en planetas con aire; mineral tenue en lunas sin aire)
 		if (planet_type != 4) {
-			float fresnel = pow(1.0 - z, 2.4) * smoothstep(-0.08, 0.55, ndl);
-			lit = mix(lit, col_atmo.rgb, clamp(fresnel * col_atmo.a * 1.5, 0.0, 0.75));
+			float fresnel = pow(1.0 - z, 2.2) * smoothstep(-0.08, 0.55, ndl);
+			if (col_atmo.a > 0.02) {
+				float glow_amt = clamp(fresnel * max(col_atmo.a, 0.35) * 1.65, 0.0, 0.85);
+				lit = mix(lit, col_atmo.rgb * 1.75, glow_amt);
+			} else {
+				lit = mix(lit, col_c.rgb * 1.35, clamp(fresnel * 0.55, 0.0, 0.45));
+			}
 		}
 
 		COLOR = vec4(lit, 1.0);

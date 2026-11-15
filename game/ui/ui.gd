@@ -245,6 +245,9 @@ static func mark_selected(b: Button, on: bool) -> Button:
 		style.border_width_bottom = 4
 		b.add_theme_stylebox_override("normal", style)
 		b.add_theme_font_override("font", bold())
+	else:
+		b.remove_theme_stylebox_override("normal")
+		b.remove_theme_font_override("font")
 	b.add_theme_color_override("font_color", IVORY if on else IVORY_DIM)
 	return b
 
@@ -309,6 +312,7 @@ static func console(root: Control) -> HBoxContainer:
 	p.offset_top = -CONSOLE_H
 	p.mouse_filter = Control.MOUSE_FILTER_STOP
 	root.add_child(p)
+	Kinetic.enter_deferred(p, 0.02, {"slide": true, "slide_offset": Vector2(-18.0, 36.0), "scale": Vector2(0.98, 0.94), "tilt": 0.0, "beam": true, "duration": 0.32})
 	return hbox(p, 14)
 
 
@@ -342,6 +346,7 @@ static func button(parent: Node, text: String, callback: Callable) -> Button:
 	b.mouse_entered.connect(func() -> void:
 		if not b.disabled:
 			Synth.play(&"tick", -16.0))
+	Kinetic.bind_button(b)
 	parent.add_child(b)
 	return b
 
@@ -377,6 +382,26 @@ static func toggle_status(host: Node) -> void:
 	if Annunciator.current == null or not is_instance_valid(Annunciator.current):
 		annunciator(root(host, 30))
 	Annunciator.toggle_detail()
+
+
+static var _mist_tex: GradientTexture2D
+
+
+static func mist_texture() -> GradientTexture2D:
+	if _mist_tex != null:
+		return _mist_tex
+	var g := Gradient.new()
+	g.offsets = PackedFloat32Array([0.0, 0.45, 0.8, 1.0])
+	g.colors = PackedColorArray([Color(1, 1, 1, 1.0), Color(1, 1, 1, 0.55), Color(1, 1, 1, 0.14), Color(1, 1, 1, 0.0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.width = 64
+	tex.height = 64
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(0.5, 0.0)
+	_mist_tex = tex
+	return _mist_tex
 
 
 static func money(amount: int) -> String:

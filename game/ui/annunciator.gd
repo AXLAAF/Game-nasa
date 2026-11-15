@@ -17,7 +17,10 @@ var _test_left: float = LAMP_TEST
 
 static func toggle_detail() -> void:
 	if current != null and is_instance_valid(current):
-		current._detail.visible = not current._detail.visible
+		var want := not current._detail.visible or current._detail.modulate.a < 0.5
+		Kinetic.fold_toggle(current._detail, want, 0.22)
+		if want:
+			Kinetic.pop(current, Vector2(1.03, 0.97), 0.2)
 
 
 func _ready() -> void:
@@ -36,6 +39,7 @@ func _ready() -> void:
 	_detail.visible = false
 	if Profile.reduced_motion:
 		_test_left = 0.0
+	Kinetic.enter_deferred(self, 0.08, {"scale": Vector2(0.92, 0.88), "tilt": 0.025, "elastic": true, "duration": 0.30})
 
 
 func _process(delta: float) -> void:

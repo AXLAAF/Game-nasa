@@ -7,6 +7,7 @@ extends Control
 var title: String = ""
 var value: float = 0.0
 var shown: float = 0.0
+var _vel: float = 0.0
 var text: String = ""
 var color: Color = Ui.INFO
 var band: Vector2 = Vector2(-1, -1)
@@ -28,7 +29,9 @@ func set_value(v: float, label_text: String = "", is_danger: bool = false) -> vo
 
 
 func _process(delta: float) -> void:
-	shown = lerpf(shown, value, minf(delta * 8.0, 1.0))
+	var step := Kinetic.spring_step(shown, _vel, value, delta)
+	shown = clampf(step.x, 0.0, 1.05)
+	_vel = step.y
 	queue_redraw()
 
 

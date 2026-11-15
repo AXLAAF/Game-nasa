@@ -83,6 +83,7 @@ func _ready() -> void:
 	_rooms = Node2D.new()
 	_panel.add_child(_rooms)
 	_rebuild(false)
+	Kinetic.enter_deferred(_panel, 0.02, {"slide": true, "slide_offset": Vector2(34.0, -8.0), "scale": Vector2(0.95, 0.94), "tilt": -0.02, "beam": true, "beam_color": Color(0.45, 0.92, 1.0, 0.24), "duration": 0.30})
 
 
 func _process(_delta: float) -> void:
@@ -289,6 +290,9 @@ func _rebuild(hull: bool) -> void:
 	_refresh_hint()
 	_rooms.add_child(_crew)
 	_fit()
+	if is_node_ready():
+		Kinetic.pop(_panel, Vector2(1.03, 0.97), 0.22)
+		Kinetic.sweep(_panel, Color(0.45, 0.95, 1.0, 0.26), 0.28)
 
 
 func _refresh_hint() -> void:

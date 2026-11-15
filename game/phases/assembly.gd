@@ -28,6 +28,13 @@ var _risk_label: Label
 var _part_box: VBoxContainer
 var _launch: Button
 var _contract_label: Label
+var _hover_card: PanelContainer
+var _hover_title: Label
+var _hover_badge: Lamp
+var _hover_role: Label
+var _hover_reason: Label
+var _hover_stats: Label
+var _hover_owner: Control
 
 
 class PartButton extends Button:
@@ -36,6 +43,8 @@ class PartButton extends Button:
 	var stock: ShipPart
 
 	func _get_drag_data(_at: Vector2) -> Variant:
+		if phase != null:
+			phase.hide_part_hover(null)
 		var preview := Label.new()
 		preview.text = "  + " + def.display_name
 		preview.add_theme_color_override("font_color", Ui.IVORY)
@@ -207,11 +216,12 @@ func _ready() -> void:
 			_inventory.append(part)
 	var stars := Starfield.new()
 	add_child(stars)
-	stars.set_sky(Color(0.01, 0.015, 0.035), 0.4)
+	stars.set_sky(Color(0.014, 0.02, 0.052), 0.65)
 	var root := Ui.root(self)
 	_build_left(root)
 	_build_center(root)
 	_build_right(root)
+	_build_hover_card(root)
 	_refresh()
 
 
@@ -246,6 +256,7 @@ func _build_left(root: Control) -> void:
 	_catalog = Ui.vbox(scroll, 4)
 	_catalog.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_fill_catalog()
+	Kinetic.enter_deferred(zone, 0.02, {"slide": true, "slide_offset": Vector2(-30.0, 16.0), "scale": Vector2(0.95, 0.92), "tilt": -0.016, "duration": 0.34})
 
 
 func _fill_catalog() -> void:
@@ -259,29 +270,39 @@ func _fill_catalog() -> void:
 		for part: ShipPart in _inventory:
 			_catalog_button(part.def, "%s  [%s]" % [part.def.display_name, part.quality_text()], part)
 	var box := Ui.button(_catalog, "Caja misteriosa  %s" % Ui.money(BOX_COST), _buy_box)
-	box.tooltip_text = "Una pieza al azar de calidad oculta. Puede ser legendaria. O basura."
 	box.add_theme_color_override("font_color", Ui.MYSTERY)
+	box.mouse_entered.connect(_show_box_hover.bind(box))
+	box.mouse_exited.connect(hide_part_hover.bind(box))
+	box.focus_entered.connect(_show_box_hover.bind(box))
+	box.focus_exited.connect(hide_part_hover.bind(box))
+	var added: Array = []
 	for group: Array in GROUPS:
-		Ui.legend(_catalog, String(group[0]))
+		added.append(Ui.legend(_catalog, String(group[0])))
 		for def: PartDef in Catalog.part_list():
 			if (group[1] as Array).has(def.kind):
 				var price := int(round(def.cost * ShipPart.PRICE[_quality]))
-				_catalog_button(def, "%s  %s" % [def.display_name, Ui.money(price)], null)
+				added.append(_catalog_button(def, "%s  %s" % [def.display_name, Ui.money(price)], null))
+	Kinetic.cascade(added, 0.012, 0.22, {"scale": Vector2(0.94, 0.88), "tilt": -0.012, "duration": 0.24})
 
 
-func _catalog_button(def: PartDef, text: String, stock: ShipPart) -> void:
+func _catalog_button(def: PartDef, text: String, stock: ShipPart) -> PartButton:
 	var b := PartButton.new()
 	b.phase = self
 	b.def = def
 	b.stock = stock
 	b.text = text
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	b.tooltip_text = "%s\n%s" % [def.description, stats_text(def)]
 	b.add_theme_font_size_override("font_size", 13)
+	b.mouse_entered.connect(show_part_hover.bind(b, def, stock))
+	b.mouse_exited.connect(hide_part_hover.bind(b))
+	b.focus_entered.connect(show_part_hover.bind(b, def, stock))
+	b.focus_exited.connect(hide_part_hover.bind(b))
 	b.pressed.connect(func() -> void:
 		Synth.play(&"click")
 		add_part(def, Run.ship.parts.size(), stock))
+	Kinetic.bind_button(b, 0.7, 1.025)
 	_catalog.add_child(b)
+	return b
 
 
 func _build_center(root: Control) -> void:
@@ -289,6 +310,7 @@ func _build_center(root: Control) -> void:
 	_view.phase = self
 	Ui.place(_view, Rect2(350, 10, 580, 700))
 	root.add_child(_view)
+	Kinetic.enter_deferred(_view, 0.05, {"scale": Vector2(0.93, 0.90), "tilt": -0.012, "beam": true, "duration": 0.36})
 
 
 func _build_right(root: Control) -> void:
@@ -324,6 +346,7 @@ func _build_right(root: Control) -> void:
 	Ui.button(col, "Volver al hangar", func() -> void:
 		Run.ship.parts.clear()
 		Router.go(&"hangar"))
+	Kinetic.enter_deferred(panel, 0.08, {"slide": true, "slide_offset": Vector2(24.0, 14.0), "scale": Vector2(0.95, 0.92), "tilt": 0.016, "beam": true, "duration": 0.34})
 
 
 func _unhandled_input(_event: InputEvent) -> void:
@@ -371,6 +394,7 @@ func add_part(def: PartDef, index: int, stock: ShipPart = null, mount: float = 0
 	Run.ship.parts.insert(clampi(index, 0, Run.ship.parts.size()), part)
 	_selected = Run.ship.parts.find(part)
 	Synth.play(&"thud", -6.0, 1.4)
+	Kinetic.pop(_view, Vector2(1.02, 0.985), 0.20)
 	_refresh()
 
 
@@ -500,6 +524,12 @@ func _refresh() -> void:
 	_risk_label.add_theme_color_override("font_color", Odds.risk_color((rel.x + rel.y) * 0.5))
 	_refresh_part()
 	_launch.disabled = not ship.has_kind(&"capsule") or ship.thrust() <= 0.0 or remaining < 0
+	if _hover_card != null and _hover_card.visible and is_instance_valid(_hover_owner):
+		if _hover_owner is PartButton:
+			var pb := _hover_owner as PartButton
+			show_part_hover(pb, pb.def, pb.stock)
+		else:
+			_show_box_hover(_hover_owner)
 
 
 func _refresh_part() -> void:
@@ -539,3 +569,332 @@ func _on_launch() -> void:
 	Profile.save_profile()
 	Synth.play(&"ignite", -6.0)
 	Router.go(&"launch")
+
+
+func _build_hover_card(root: Control) -> void:
+	_hover_card = PanelContainer.new()
+	_hover_card.visible = false
+	_hover_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_card.custom_minimum_size = Vector2(310, 0)
+	_hover_card.add_theme_stylebox_override("panel", Ui.bezel(Ui.INFO))
+	root.add_child(_hover_card)
+	var col := Ui.vbox(_hover_card, 6)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var head := Ui.hbox(col, 8)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_title = Ui.label(head, "", 16, Ui.IVORY)
+	_hover_title.add_theme_font_override("font", Ui.bold())
+	_hover_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_hover_title.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_badge = Lamp.new("", Lamp.OFF)
+	_hover_badge.custom_minimum_size = Vector2(126, 24)
+	_hover_badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(_hover_badge)
+	_hover_role = Ui.label(col, "", 13, Ui.IVORY)
+	_hover_role.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hover_role.custom_minimum_size = Vector2(286, 0)
+	_hover_role.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_reason = Ui.label(col, "", 13, Ui.INFO)
+	_hover_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hover_reason.custom_minimum_size = Vector2(286, 0)
+	_hover_reason.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_hover_stats = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_hover_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_hover_stats.custom_minimum_size = Vector2(286, 0)
+	_hover_stats.add_theme_font_override("font", Ui.mono())
+	_hover_stats.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+
+func show_part_hover(anchor: Control, def: PartDef, stock: ShipPart = null) -> void:
+	if _hover_card == null or def == null:
+		return
+	_hover_owner = anchor
+	var v := part_viability(def, stock)
+	_hover_title.text = "%s (%s)" % [def.display_name, "gratis" if stock != null else Ui.money(int(v.price))]
+	_hover_badge.text = String(v.badge)
+	_hover_badge.state = int(v.tone)
+	var accent := Lamp.color_of(int(v.tone)) if int(v.tone) != Lamp.OFF else Ui.INFO
+	_hover_card.add_theme_stylebox_override("panel", Ui.bezel(accent))
+	_hover_role.text = String(v.role)
+	_hover_reason.text = String(v.reason)
+	_hover_reason.add_theme_color_override("font_color", Ui.LAMP_WARNING if not bool(v.affordable) else (Ui.LAMP_GO if int(v.tone) == Lamp.GO else (Ui.LAMP_CAUTION if int(v.tone) == Lamp.CAUTION else Ui.INFO)))
+	_hover_stats.text = stats_text(def)
+	_present_hover_card(anchor, accent)
+
+
+func _show_box_hover(anchor: Control) -> void:
+	if _hover_card == null:
+		return
+	_hover_owner = anchor
+	var need := BOX_COST + _premium(BOX_COST)
+	var affordable := _remaining() >= need
+	_hover_title.text = "Caja misteriosa (%s)" % Ui.money(BOX_COST)
+	_hover_badge.text = "APUESTA" if affordable else "SIN SALDO"
+	_hover_badge.state = Lamp.CAUTION if affordable else Lamp.WARNING
+	var accent := Ui.MYSTERY if affordable else Ui.LAMP_WARNING
+	_hover_card.add_theme_stylebox_override("panel", Ui.bezel(accent))
+	_hover_role.text = "Entrega una pieza aleatoria de calidad oculta."
+	_hover_reason.text = "Viable si quieres arriesgar para ahorrar o sacar piezas raras." if affordable else "No viable: supera el presupuesto libre (%s)." % Ui.money(_remaining())
+	_hover_reason.add_theme_color_override("font_color", accent)
+	_hover_stats.text = "Costo %s (+ prima %s)" % [Ui.money(BOX_COST), Ui.money(_premium(BOX_COST))]
+	_present_hover_card(anchor, accent)
+
+
+func _present_hover_card(anchor: Control, accent: Color) -> void:
+	if _hover_card == null:
+		return
+	var was_open := _hover_card.visible and _hover_card.modulate.a > 0.35
+	_hover_card.visible = true
+	_place_hover_card.call_deferred(anchor, was_open, accent)
+
+
+func hide_part_hover(anchor: Control) -> void:
+	if _hover_card == null:
+		return
+	if anchor == null or anchor == _hover_owner:
+		_hover_owner = null
+		if anchor == null:
+			_hover_card.visible = false
+		else:
+			Kinetic.fold_toggle(_hover_card, false, 0.14)
+
+
+func _place_hover_card(anchor: Control, was_open: bool = false, accent: Color = Ui.INFO) -> void:
+	if _hover_card == null or not _hover_card.visible or not is_instance_valid(anchor):
+		return
+	var vp := get_viewport().get_visible_rect().size
+	var h := _hover_card.get_combined_minimum_size().y
+	var y := clampf(anchor.global_position.y - 10.0, 12.0, maxf(12.0, vp.y - h - 12.0))
+	var dest := Vector2(348.0, y)
+	_hover_card.set_meta("_kinetic_rest_pos", dest)
+	if Kinetic.is_reduced():
+		_hover_card.position = dest
+		_hover_card.modulate.a = 1.0
+		_hover_card.scale = Vector2.ONE
+		_hover_card.rotation = 0.0
+		return
+	if not was_open:
+		_hover_card.position = dest
+		Kinetic.enter(_hover_card, 0.0, {
+			"slide": true,
+			"slide_offset": Vector2(-20.0, 12.0),
+			"target_pos": dest,
+			"scale": Vector2(0.90, 0.84),
+			"tilt": -0.028,
+			"elastic": true,
+			"duration": 0.24,
+			"beam": true,
+			"beam_color": Color(accent.r, accent.g, accent.b, 0.24),
+		})
+	else:
+		Kinetic.sync_pivot(_hover_card)
+		var tw := _hover_card.create_tween()
+		tw.tween_property(_hover_card, "position", dest, 0.14).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+		Kinetic.pop(_hover_card, Vector2(1.025, 0.96), 0.16)
+
+
+## Resume funcion y viabilidad de una pieza para el contrato y nave actuales.
+func part_viability(def: PartDef, stock: ShipPart = null) -> Dictionary:
+	var ship := Run.ship
+	var target := Run.target()
+	var price := 0 if stock != null else int(round(def.cost * ShipPart.PRICE[_quality]))
+	var total_cost := price + _premium(price)
+	var affordable := _remaining() >= total_cost
+	var role := def.description
+	var badge := "OPCIONAL"
+	var tone := Lamp.OFF
+	var reason := "Suma capacidad adicional a la nave."
+
+	var r := target.orbit_radius if target != null else Thermal.HOME_R
+	if target != null and target.parent_id != &"" and Catalog.body(target.parent_id) != null and not Catalog.body(target.parent_id).is_star:
+		r = Catalog.body(target.parent_id).orbit_radius
+	var f_target := Thermal.flux(r)
+	var f_min := minf(f_target, 1.0)
+	var f_max := maxf(f_target, 1.0)
+	var t_hot := Thermal.equilibrium(f_max, ship)
+	var t_cold := Thermal.equilibrium(f_min, ship)
+	var power_deficit := Thermal.power_gen(f_min, ship) < Thermal.power_use(ship)
+	var dv_missing := Run.contract != null and ship.delta_v() < Run.contract.dv_estimate * 0.9
+
+	match def.kind:
+		&"capsule":
+			if not ship.has_kind(&"capsule"):
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "Obligatoria: centro de mando sin el cual no puedes despegar."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Ya llevas cápsula; otra añade masa extra y consumo eléctrico."
+		&"engine":
+			var home := Catalog.home()
+			var twr := ship.twr(home.surface_gravity) if home != null else 0.0
+			if ship.thrust() <= 0.0:
+				if def.id == &"motor_susurro":
+					badge = "POCO VIABLE"
+					tone = Lamp.CAUTION
+					reason = "Empuje muy bajo para despegar desde Terra; úsalo arriba tras un motor grande."
+				else:
+					badge = "NECESARIA"
+					tone = Lamp.GO
+					reason = "Indispensable para tener empuje en el despegue."
+			elif twr < 1.2 and def.thrust >= 300.0:
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Tu empuje inicial aún es justo (TWR %.2f); este motor ayuda a despegar." % twr
+			elif def.id == &"motor_susurro" and ship.can_stage():
+				badge = "VIABLE ARRIBA"
+				tone = Lamp.GO
+				reason = "Muy eficiente en el vacío para segunda etapa y ahorro de combustible."
+			else:
+				badge = "VIABLE"
+				reason = "Añade empuje para etapa superior o aterrizaje en cuerpos sin aire."
+		&"tank":
+			if dv_missing:
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "Te falta Delta-v (%d / %d m/s); agrega propelente." % [int(ship.delta_v()), int(Run.contract.dv_estimate)]
+			else:
+				badge = "OPCIONAL"
+				reason = "Ya cubres el Delta-v del contrato; más masa baja el TWR al despegar."
+		&"decoupler":
+			if ship.of_kind(&"engine").size() >= 1 and ship.of_kind(&"tank").size() >= 1 and not ship.can_stage():
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Separa los tanques vacíos del despegue para ganar mucho Delta-v."
+			else:
+				badge = "VIABLE"
+				reason = "Útil si quieres dividir la nave en dos etapas independientes."
+		&"heatshield":
+			if target != null and target.atmosphere > 0.0:
+				if not ship.has_kind(&"heatshield"):
+					badge = "NECESARIA"
+					tone = Lamp.GO
+					reason = "%s tiene atmósfera: sin escudo te quemas al reentrar." % target.display_name
+				else:
+					badge = "YA CUBIERTA"
+					reason = "Ya tienes protección térmica de entrada."
+			else:
+				badge = "NO NECESARIA"
+				tone = Lamp.CAUTION
+				reason = "Este destino no tiene atmósfera; el escudo solo suma peso muerto."
+		&"parachute":
+			if target != null and target.atmosphere > 0.0:
+				if not ship.has_kind(&"parachute"):
+					badge = "NECESARIA"
+					tone = Lamp.GO
+					reason = "%s tiene aire: frena la caída gratis sin gastar combustible." % target.display_name
+				else:
+					badge = "YA CUBIERTA"
+					reason = "Ya llevas paracaídas para el descenso."
+			else:
+				badge = "NO NECESARIA"
+				tone = Lamp.CAUTION
+				reason = "Sin atmósfera no abre el paracaídas; necesitarás motor en la última etapa."
+		&"legs":
+			if not ship.has_kind(&"legs"):
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Suaviza el golpe al tocar suelo y evita que se dañe el motor al aterrizar."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Ya llevas tren de aterrizaje instalado."
+		&"solar":
+			if f_max > 2.5:
+				badge = "RIESGOSA"
+				tone = Lamp.CAUTION
+				reason = "Cerca del Sol (%s) puede sobrecalentarse; considera RTG o radiador." % (target.display_name if target != null else "destino")
+			elif f_min < 0.2:
+				badge = "POCO VIABLE"
+				tone = Lamp.CAUTION
+				reason = "Tan lejos del Sol rinde menos del 20 %; conviene usar un RTG."
+			elif power_deficit:
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "Genera energía barata para cubrir la electrónica en ruta."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Tu generación eléctrica actual ya alcanza en ruta."
+		&"rtg":
+			if f_min < 0.25 or power_deficit:
+				badge = "MUY VIABLE"
+				tone = Lamp.GO
+				reason = "Energía continua sin depender del Sol; ideal para viajes lejanos o sombra."
+			else:
+				badge = "VIABLE"
+				reason = "Cara en presupuesto, pero nunca falla por falta de luz solar."
+		&"battery":
+			if ship.sum_stat(&"battery") < 0.5:
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Da reserva eléctrica para usar el escáner y cruzar zonas de sombra."
+			else:
+				badge = "OPCIONAL"
+				reason = "Ya llevas buena reserva de batería."
+		&"radiator":
+			if t_hot >= Thermal.HOT:
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "La ruta sobrecalienta la nave (%d %%): sin radiador fallarán piezas." % int(t_hot * 100.0)
+			else:
+				badge = "OPCIONAL"
+				reason = "No pasas el límite térmico en esta ruta, salvo que te acerques al Sol."
+		&"insulation":
+			if t_cold <= Thermal.COLD:
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "Ruta muy fría (%d %%): evita que la nave se congele." % int(t_cold * 100.0)
+			else:
+				badge = "OPCIONAL"
+				reason = "La temperatura mínima en esta ruta sigue dentro de rango."
+		&"shielding":
+			if target != null and target.hazards.has(&"radiation") and ship.sum_stat(&"rad_resist") < 0.5:
+				badge = "NECESARIA"
+				tone = Lamp.GO
+				reason = "%s tiene radiación alta; sin blindaje se fríe la electrónica." % target.display_name
+			else:
+				badge = "OPCIONAL"
+				reason = "Protege frente a llamaradas solares, aunque añade bastante masa."
+		&"sensor":
+			if not ship.has_kind(&"sensor"):
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Avisa antes de llamaradas solares y muestra probabilidades de eventos."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Ya llevas sensores activos."
+		&"antenna":
+			if not ship.has_kind(&"antenna"):
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Evita que los mensajes y alertas de vuelo lleguen cortados."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Ya tienes enlace de comunicaciones."
+		&"computer":
+			if not ship.has_kind(&"computer"):
+				badge = "RECOMENDADA"
+				tone = Lamp.GO
+				reason = "Mantiene precisa la línea de trayectoria en el mapa espacial."
+			else:
+				badge = "YA CUBIERTA"
+				reason = "Ya llevas computadora de navegación."
+		&"rcs":
+			badge = "ÚTIL"
+			reason = "Mejora el giro y la estabilidad cuando la nave es larga o pesada."
+		&"escape":
+			badge = "SEGURIDAD"
+			reason = "Permite abortar el despegue salvando la cápsula si algo sale mal."
+
+	if not affordable:
+		badge = "NO VIABLE"
+		tone = Lamp.WARNING
+		reason = "Supera tu presupuesto libre (%s). Prueba calidad Chatarra o quita piezas." % Ui.money(_remaining())
+
+	return {
+		"badge": badge,
+		"tone": tone,
+		"role": role,
+		"reason": reason,
+		"price": price,
+		"affordable": affordable,
+	}

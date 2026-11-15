@@ -446,7 +446,7 @@ func _update_fx() -> void:
 	var zoom := clampf(1.3 - h / 5000.0, 0.55, 1.3)
 	_cam.zoom = _cam.zoom.lerp(Vector2(zoom, zoom), 0.05)
 	var alt := clampf(h / (top * 0.7), 0.0, 1.0)
-	var sky := Color(0.35, 0.58, 0.92).lerp(Color(0.01, 0.015, 0.04), alt)
+	var sky := Color(0.32, 0.58, 0.95).lerp(Color(0.015, 0.022, 0.058), alt)
 	_stars.set_sky(sky, clampf((h - 9000.0) / 15000.0, 0.0, 1.0))
 	_stars.set_view(Vector2(x, -h) * 0.05)
 	var burning := state == State.ASCENT and throttle > 0.0 and Run.ship.stage_fuel(Run.ship.active_stage()) > 0.0
@@ -495,14 +495,27 @@ func _draw() -> void:
 	for c: Vector3 in _clouds:
 		var p := _world(c.x, c.y)
 		if absf(p.x) < view.x and absf(p.y) < view.y:
-			var a := 0.5 * (1.0 - clampf(h / 20000.0, 0.0, 0.8))
+			var a := 0.52 * (1.0 - clampf(h / 20000.0, 0.0, 0.85))
 			for k: int in 4:
-				draw_circle(p + Vector2(k * 40.0 * c.z - 60.0 * c.z, sin(k * 1.7) * 10.0), 34.0 * c.z, Color(1, 1, 1, a))
+				var offset := Vector2(k * 40.0 * c.z - 60.0 * c.z, sin(k * 1.7) * 10.0)
+				draw_circle(p + offset + Vector2(0.0, 6.0), 35.0 * c.z, Color(0.55, 0.68, 0.85, a * 0.35))
+				draw_circle(p + offset, 34.0 * c.z, Color(1, 1, 1, a))
+	if h < 4500.0:
+		var mist_alpha := 0.30 * (1.0 - clampf(h / 4500.0, 0.0, 1.0))
+		var drift := sin(Time.get_ticks_msec() * 0.0004) * 90.0
+		var ground_mist := _world(x, 0.0).y - 12.0
+		var mist := Ui.mist_texture()
+		for m: int in 6:
+			var mx := fposmod(m * 360.0 + drift - x * 0.14, view.x * 2.2) - view.x * 1.1
+			var rx := 290.0 + float(m % 3) * 85.0
+			var ry := 64.0 + float(m % 2) * 28.0
+			var my := ground_mist - float(m % 3) * 28.0
+			draw_texture_rect(mist, Rect2(mx - rx, my - ry, rx * 2.0, ry * 2.0), false, Color(0.82, 0.92, 1.06, mist_alpha))
 	if h > 9000.0:
 		var curve := clampf((h - 9000.0) / 25000.0, 0.0, 1.0)
 		var horizon := view.y * lerpf(0.55, 0.85, curve)
 		draw_rect(Rect2(-view.x, horizon, view.x * 2.0, view.y), Color(0.15, 0.35, 0.75, 0.55 * (1.0 - curve * 0.7)))
-		draw_line(Vector2(-view.x, horizon), Vector2(view.x, horizon), Color(0.55, 0.8, 1.4, 0.7), 3.0)
+		draw_line(Vector2(-view.x, horizon), Vector2(view.x, horizon), Color(0.85, 1.45, 2.4, 0.75), 4.0)
 	for d: Dictionary in _debris:
 		var p := _world(d.x, d.h)
 		var height := 0.0

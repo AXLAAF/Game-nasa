@@ -3,43 +3,32 @@ extends CanvasLayer
 
 ## Capitulos por fase. La primera visita los muestra; el hangar puede repetirlos todos.
 
-const CHAPTER := {&"hangar": "hangar", &"assembly": "ensamblaje", &"launch": "despegue", &"space": "espacio", &"descent": "descenso", &"debrief": "liquidación"}
+const CHAPTER := {&"hangar": "Hangar", &"assembly": "Taller", &"launch": "Despegue", &"space": "Espacio", &"descent": "Descenso", &"debrief": "Pago"}
 const ORDER: Array[StringName] = [&"hangar", &"assembly", &"launch", &"space", &"descent", &"debrief"]
 const STEPS: Dictionary = {
 	&"hangar": [
-		["Contratos", "Elige un contrato y pulsa Aceptar contrato. El adelanto entra en tu presupuesto. El plazo se cuenta en días de vuelo: llegar tarde baja el pago. Un rumor de peligro paga más y aparece al aterrizar."],
-		["Seguro", "Sin seguro no recuperas nada si la nave se pierde. Básico y Premium cobran una prima al despegar y devuelven parte de lo gastado si fracasas."],
-		["Modo asistido", "Actívalo si quieres menos averías, un kit extra, el corredor de entrada más ancho y la navegación encendida. El contrato paga un 15 % menos."],
-		["Lo que se queda", "Creditos, piezas del inventario y lecciones se guardan entre partidas. Reiniciar perfil borra todo eso."],
+		["Contratos", "Elige un contrato y pulsa Aceptar contrato. El adelanto se suma a tu presupuesto y el plazo marca los días límite para cobrar completo."],
+		["Seguro y modo asistido", "El seguro devuelve parte del costo si pierdes la nave. Activa Modo asistido si quieres menos averías y ayuda al pilotar."],
 	],
 	&"assembly": [
-		["La pila", "Arrastra piezas al centro. El motor va abajo y la cápsula arriba. El presupuesto de arriba a la derecha es todo lo que puedes gastar, adelanto incluido."],
-		["Montaje lateral", "Paneles, antenas, sensores y radiadores se sueltan a la izquierda, a la derecha o a ambos lados de un bloque. La altura la marca donde sueltas el ratón."],
-		["Calidad", "Chatarra falla más y rinde peor. Nueva aguanta. Las cajas misteriosas ocultan la calidad hasta que pagas Inspeccionar."],
-		["Despegar", "Hace falta cápsula y motor con empuje. Si el destino tiene aire, lleva escudo térmico y paracaídas. Despegar pasa a la cuenta atrás."],
+		["Arma tu nave", "Pasa el cursor sobre cada pieza para ver su función y si te sirve en esta misión. Motor abajo, cápsula arriba y paneles o antenas a los lados."],
+		["Semáforo antes de volar", "Comprueba a la derecha presupuesto, Delta-v y lámparas en verde antes de despegar. Chatarra es barata, pero falla más."],
 	],
 	&"launch": [
-		["Ignición", "Pulsa Espacio cuando el contador llega a T-0. Muy pronto o muy tarde estresa el motor. Retroceso aborta y devuelve el dinero."],
-		["Cabeceo", "W sube el acelerador, S lo baja. A y D inclinan la nave. Sigue el pitch objetivo: asistido lo acerca solo si no tocas A/D. En Max-Q baja el acelerador."],
-		["Etapas", "Espacio suelta la etapa de abajo cuando se queda sin combustible o sin motor. Un desacoplador trabado se reintenta con Espacio."],
-		["Tiempo", "1 a 4 cambian la velocidad: x0.5, x1, x2 y x4. Sirve para mirar el ascenso con calma."],
+		["Ignición en T-0", "Pulsa Espacio cuando la aguja entre en la zona verde del reloj. Retroceso aborta el lanzamiento y te devuelve el presupuesto."],
+		["Vuelo y etapas", "Usa W/S para potencia, A/D para seguir la zona verde del dial y Espacio para soltar una etapa vacía."],
 	],
 	&"space": [
-		["Pilotaje", "A y D giran. W empuja; Ctrl es empuje fino y Mayús sobrecarga el motor (puede romperse). T mantiene progrado y G retrógrado. La rayita verde es tu velocidad."],
-		["Objetivo", "Tab o un clic elige el objetivo. La línea turquesa es la trayectoria prevista. F escanea un punto cercano y gasta batería."],
-		["Navegación", "N enciende el guiado. La flecha turquesa dice acelera; la ámbar, frena. La consola indica la velocidad a llevar y el empuje que falta. Con el guiado el morro se alinea solo: tú pulsas W."],
-		["Tiempo y averías", "1 a 6 van de x0.5 a x50, también cerca de un planeta. Con el motor encendido o en una llamarada el tiempo no pasa de x0.5. R repara, C muestra el estado de cada pieza. Solo se rompe una cosa a la vez."],
-		["Entrar", "Cuando estés cerca y lento, L (o chocar con el planeta) empieza el descenso. Quedarte sin combustible abre el rescate."],
+		["Navegación y rumbo", "A/D giran, W acelera y 1-6 cambian la velocidad del tiempo. Pulsa N para ver la flecha guía hacia tu destino (Tab cambia objetivo)."],
+		["Energía y emergencias", "Vigila batería y temperatura. Si aparece una llamarada solar, escóndete tras un planeta. R repara piezas rotas y L inicia el descenso al llegar."],
 	],
 	&"descent": [
-		["Ángulo", "W y S mueven el ángulo de entrada. El cono verde es el corredor: más plano rebotas al espacio, más empinado quemas la nave. Espacio confirma."],
-		["Calor", "El escudo absorbe calor y gasta ablativo. Si se agota, el casco se funde. El modo asistido ensancha el corredor y tolera más G."],
-		["Paracaídas", "P suelta el freno por debajo de 450 m/s y el principal por debajo de 120 m/s y de 6 km. Abrirlo demasiado rápido lo desgarra. E eyecta la cápsula."],
-		["Tocar suelo", "W y S son el acelerador, A y D la inclinación, T mantiene el retroceso. 1 a 4 cambian el tiempo. Más suave y sobre la plataforma, mejor nota."],
+		["Corredor de entrada", "Ajusta el ángulo con W/S dentro de la franja verde y pulsa Espacio: muy plano rebotas al espacio y muy empinado te quemas."],
+		["Paracaídas y aterrizaje", "Pulsa P para abrir paracaídas cuando baje la velocidad, frena con W/S y posa la nave suave sobre la plataforma iluminada."],
 	],
 	&"debrief": [
-		["La cuenta", "Aquí se suma el pago, el plazo, la nota de aterrizaje y la racha. El modo asistido resta un 15 %. El botín de las cartas entra en la misma cuenta."],
-		["Despues", "Si pierdes la nave, el seguro cubre una parte y aprendes una leccion. La chatarra va al inventario. Volver al hangar abre contratos nuevos."],
+		["Liquidación", "Aquí cobras el contrato según puntualidad, ciencia extra y seguro. Las piezas recuperadas quedan guardadas gratis en tu inventario."],
+		["Aprender y mejorar", "Si una misión falla, desbloqueas una lección permanente. Vuelve al hangar para elegir un contrato nuevo."],
 	],
 }
 
@@ -52,8 +41,14 @@ var _index: int = 0
 var _title: Label
 var _body: Label
 var _count: Label
+var _hints: Label
+var _prev: Button
 var _next: Button
+var _tabs: HBoxContainer
+var _chapter_buttons: Dictionary = {}
 var _panel: PanelContainer
+var _root: Control
+var _backdrop: ColorRect
 
 
 static func offer(phase: StringName) -> void:
@@ -85,14 +80,19 @@ func _ready() -> void:
 		get_tree().paused = false
 		queue_free()
 		return
-	var root := Control.new()
-	root.set_anchors_preset(Control.PRESET_FULL_RECT)
-	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	root.theme = Ui.theme()
-	add_child(root)
+	_root = Control.new()
+	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.theme = Ui.theme()
+	add_child(_root)
+	_backdrop = ColorRect.new()
+	_backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_backdrop.color = Color(0.02, 0.03, 0.05, 0.58 if Kinetic.is_reduced() else 0.0)
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.add_child(_backdrop)
 	_panel = PanelContainer.new()
-	_panel.custom_minimum_size = Vector2(680, 0)
-	root.add_child(_panel)
+	_panel.custom_minimum_size = Vector2(700, 0)
+	_root.add_child(_panel)
 	var panel := _panel
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 10)
@@ -109,27 +109,90 @@ func _ready() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
 	var skip := Button.new()
-	skip.text = "Saltar tutorial"
+	skip.text = "Saltar (Esc)"
 	skip.pressed.connect(_skip)
+	Kinetic.bind_button(skip)
 	head.add_child(skip)
+	if _all:
+		_tabs = HBoxContainer.new()
+		_tabs.add_theme_constant_override("separation", 4)
+		col.add_child(_tabs)
+		for phase_id: StringName in ORDER:
+			var tab := Button.new()
+			tab.text = CHAPTER[phase_id]
+			tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			tab.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
+			tab.pressed.connect(_jump_to.bind(phase_id))
+			Kinetic.bind_button(tab, 0.8, 1.03)
+			_tabs.add_child(tab)
+			_chapter_buttons[phase_id] = tab
 	_title = Label.new()
 	_title.add_theme_font_size_override("font_size", 22)
 	_title.add_theme_font_override("font", Ui.bold())
 	col.add_child(_title)
 	_body = Label.new()
 	_body.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_body.custom_minimum_size = Vector2(640, 0)
-	_body.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
-	_body.add_theme_constant_override("line_spacing", 5)
+	_body.custom_minimum_size = Vector2(660, 0)
+	_body.add_theme_font_size_override("font_size", 17)
+	_body.add_theme_constant_override("line_spacing", 6)
 	_body.add_theme_color_override("font_color", Ui.IVORY)
 	col.add_child(_body)
+	var nav := HBoxContainer.new()
+	nav.add_theme_constant_override("separation", 8)
+	col.add_child(nav)
+	_prev = Button.new()
+	_prev.text = "Anterior"
+	_prev.custom_minimum_size = Vector2(130, 44)
+	_prev.pressed.connect(_back)
+	Kinetic.bind_button(_prev)
+	nav.add_child(_prev)
 	_next = Button.new()
 	_next.custom_minimum_size = Vector2(0, 44)
+	_next.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	Ui.primary(_next)
 	_next.pressed.connect(_advance)
-	col.add_child(_next)
-	_paint()
-	_place.call_deferred()
+	Kinetic.bind_button(_next)
+	nav.add_child(_next)
+	_hints = Label.new()
+	_hints.text = "Enter / Espacio / Flecha derecha: Siguiente   •   Flecha izquierda: Anterior   •   Esc: Saltar"
+	_hints.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
+	_hints.add_theme_color_override("font_color", Ui.IVORY_DIM)
+	_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	col.add_child(_hints)
+	_paint(false)
+	_animate_open.call_deferred()
+	_next.grab_focus.call_deferred()
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if not event.is_pressed() or event.is_echo():
+		return
+	match (event as InputEventKey).physical_keycode:
+		KEY_ESCAPE:
+			_skip()
+		KEY_LEFT:
+			_back()
+		KEY_RIGHT, KEY_ENTER, KEY_KP_ENTER, KEY_SPACE:
+			_advance()
+	get_viewport().set_input_as_handled()
+
+
+func _animate_open() -> void:
+	_place()
+	if Kinetic.is_reduced() or _panel == null:
+		return
+	var tw := create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.tween_property(_backdrop, "color:a", 0.58, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	Kinetic.enter(_panel, 0.0, {
+		"slide": true,
+		"slide_offset": Vector2(-26.0, 12.0),
+		"scale": Vector2(0.90, 0.86),
+		"tilt": -0.028,
+		"elastic": true,
+		"duration": 0.30,
+		"beam": true,
+	})
 
 
 func _place() -> void:
@@ -137,7 +200,9 @@ func _place() -> void:
 		return
 	var vp := get_viewport().get_visible_rect().size
 	var h := _panel.get_combined_minimum_size().y
-	_panel.position = Vector2((vp.x - 680.0) * 0.5, maxf(16.0, vp.y - h - 28.0))
+	var rest := Vector2((vp.x - 700.0) * 0.5, maxf(16.0, vp.y - h - 28.0))
+	_panel.set_meta("_kinetic_rest_pos", rest)
+	_panel.position = rest
 
 
 func _collect() -> Array[Dictionary]:
@@ -154,12 +219,37 @@ func _collect() -> Array[Dictionary]:
 	return pages
 
 
-func _paint() -> void:
+func _paint(animate: bool = true) -> void:
 	var page := _pages[_index]
-	_count.text = ("Manual de vuelo: %s   %d / %d" % [CHAPTER[page.phase], _index + 1, _pages.size()]).to_upper()
+	_count.text = ("Guía rápida: %s   %d / %d" % [CHAPTER[page.phase], _index + 1, _pages.size()]).to_upper()
 	_title.text = String(page.title)
 	_body.text = String(page.text)
+	_prev.disabled = _index == 0
 	_next.text = "Listo" if _index >= _pages.size() - 1 else "Siguiente"
+	for phase_id: StringName in _chapter_buttons:
+		Ui.mark_selected(_chapter_buttons[phase_id], phase_id == page.phase)
+	_place.call_deferred()
+	if animate and not Kinetic.is_reduced():
+		Kinetic.enter(_title, 0.0, {"scale": Vector2(0.96, 0.90), "tilt": -0.015, "duration": 0.22})
+		Kinetic.enter(_body, 0.03, {"scale": Vector2(0.97, 0.92), "tilt": 0.01, "duration": 0.24})
+		Kinetic.sweep(_panel, Color(0.75, 0.90, 1.0, 0.14), 0.30)
+
+
+func _jump_to(phase_id: StringName) -> void:
+	for i: int in _pages.size():
+		if _pages[i].phase == phase_id:
+			_index = i
+			_paint()
+			Synth.play(&"tick", -8.0)
+			return
+
+
+func _back() -> void:
+	if _index <= 0:
+		return
+	_index -= 1
+	_paint()
+	Synth.play(&"tick", -8.0)
 
 
 func _advance() -> void:
@@ -183,5 +273,18 @@ func _finish(skipped: bool) -> void:
 	if _open == self:
 		_open = null
 	get_tree().paused = false
-	queue_free()
 	Synth.play(&"click")
+	if Kinetic.is_reduced() or DisplayServer.get_name() == "headless" or _panel == null:
+		queue_free()
+		return
+	set_process_unhandled_key_input(false)
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	Kinetic.sync_pivot(_panel)
+	var tw := create_tween()
+	tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tw.set_parallel(true)
+	tw.tween_property(_backdrop, "color:a", 0.0, 0.15)
+	tw.tween_property(_panel, "modulate:a", 0.0, 0.15).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	tw.tween_property(_panel, "scale", Vector2(0.88, 0.84), 0.16).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
+	tw.tween_property(_panel, "rotation", 0.028, 0.16)
+	tw.chain().tween_callback(queue_free)

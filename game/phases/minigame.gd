@@ -87,19 +87,29 @@ func _ready() -> void:
 		_view.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		_view.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		_view.pivot_offset = Vector2.ZERO
+		_view.clip_contents = true
 		var vp := get_viewport().get_visible_rect().size
 		if _repair():
 			_view.scale = Vector2.ONE
 			_view.size = Vector2(276, 368)
 			_view.position = Vector2(vp.x - 284.0, 68.0)
+			Kinetic.enter(_view, 0.0, {"slide": true, "slide_offset": Vector2(28.0, -6.0), "scale": Vector2(0.92, 0.88), "tilt": -0.024, "beam": true, "beam_color": Color(0.55, 0.85, 1.0, 0.24), "duration": 0.26})
 		else:
 			_view.custom_minimum_size = AREA
 			_view.size = AREA
 			_view.scale = Vector2(0.22, 0.22)
 			_view.position = Vector2(vp.x - AREA.x * 0.22 - 12.0, 78.0)
+			Kinetic.sweep(_view, Color(0.55, 0.88, 1.0, 0.24), 0.28)
+			if not Kinetic.is_reduced():
+				_view.modulate.a = 0.0
+				var tw := _view.create_tween()
+				tw.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+				tw.tween_property(_view, "modulate:a", 1.0, 0.22).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	else:
 		root.mouse_filter = Control.MOUSE_FILTER_STOP
 		_view.set_anchors_preset(Control.PRESET_FULL_RECT)
+		_view.clip_contents = true
+		Kinetic.enter_deferred(_view, 0.0, {"scale": Vector2(0.94, 0.90), "tilt": -0.02, "beam": true, "beam_color": Color(0.55, 0.85, 1.0, 0.22), "duration": 0.28})
 	_zone = _new_zone(0.22)
 	if mode == &"dock":
 		_ship = Vector2(80, AREA.y * 0.5 + _rng.randf_range(-120, 120))
