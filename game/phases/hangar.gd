@@ -3,6 +3,7 @@ extends Node2D
 ## Hangar: tablero de contratos, seguro, lecciones e inventario entre partidas.
 
 const REROLL_COST := 100
+const BACKDROP_SUN := Vector2(-0.95, -0.25)
 
 var _rng := RandomNumberGenerator.new()
 var _board: VBoxContainer
@@ -317,9 +318,31 @@ func _draw() -> void:
 	var moon := center + Vector2(cos(a), sin(a) * 0.35) * 420.0
 	_moon.position = moon - _moon.size * 0.5
 	_moon.visible = sin(a) < 0.0 or absf(moon.x - center.x) > 280.0
+	_lit_backdrop(center, moon)
 	for k: int in 4:
 		var ta := -a * 2.3 + float(k + 1) * 0.08
 		var trail := center + Vector2(cos(ta), sin(ta) * 0.3) * 320.0
 		draw_circle(trail, 2.2 - float(k) * 0.35, Color(1.4, 1.9, 2.6, 0.45 - float(k) * 0.1))
 	var ship := center + Vector2(cos(-a * 2.3), sin(-a * 2.3) * 0.3) * 320.0
 	draw_circle(ship, 3.0, Color(3.0, 2.4, 1.6))
+
+
+func _lit_backdrop(center: Vector2, moon: Vector2) -> void:
+	var sun := BACKDROP_SUN.normalized()
+	_home.light_from(sun)
+	_moon.light_from(sun)
+	var rel := moon - center
+	var away := -sun
+	var along := rel.dot(away)
+	var eclipse := 0.0
+	if along > 0.0:
+		var lateral := (rel - away * along).length()
+		var home_r := 280.0
+		var moon_r := 24.0
+		var outer := home_r + moon_r
+		var inner := home_r - moon_r
+		if lateral <= inner:
+			eclipse = 1.0
+		elif lateral < outer:
+			eclipse = 1.0 - (lateral - inner) / (outer - inner)
+	_moon.set_eclipse(eclipse)

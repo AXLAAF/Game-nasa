@@ -61,12 +61,17 @@ var _rescue_button: Button
 var _repair_button: Button
 var _salvage_button: Button
 var _planets: Dictionary = {} ## id de cuerpo -> Planet
+var _shadows: SunShadows
 
 
 func _ready() -> void:
 	if Run.contract == null or Run.ship.parts.is_empty():
 		Run.debug_setup()
 	bodies = Catalog.body_list()
+	_shadows = SunShadows.new()
+	_shadows.bodies = bodies
+	_shadows.show_behind_parent = true
+	add_child(_shadows)
 	for body: BodyDef in bodies:
 		if not body.is_star:
 			var planet := Planet.make(body, body.radius * 2.0)
@@ -401,6 +406,9 @@ func _process(delta: float) -> void:
 ## Los planetas son nodos con shader: se colocan aqui y _draw_body solo anade anillos y nombre.
 ## Por debajo de PLANET_MIN_PX en pantalla no hay grano que mostrar y se dibuja un punto.
 func _place_planets() -> void:
+	var energy := 1.55 if flare_warn >= 0.0 else 1.0
+	_shadows.time = st.t
+	_shadows.queue_redraw()
 	for body: BodyDef in bodies:
 		if body.is_star:
 			continue
@@ -412,6 +420,8 @@ func _place_planets() -> void:
 			planet.fit(body.radius * 2.0, on_screen)
 			planet.position = pos - planet.size * 0.5
 			planet.light_from(-pos)
+			planet.set_eclipse(SunLight.cover(pos, body.radius, bodies, st.t, body.id))
+			planet.set_sun_energy(energy)
 
 
 func _wasd_dir() -> Vector2:
@@ -535,15 +545,8 @@ func _collide(body: BodyDef) -> void:
 
 func _sun_flux() -> float:
 	var pos: Vector2 = st.pos
-	for body: BodyDef in bodies:
-		if body.is_star:
-			continue
-		var bp := Gravity.body_pos(body, st.t)
-		var away := bp.normalized()
-		var d := pos - bp
-		var along := d.dot(away)
-		if along > 0.0 and (d - away * along).length() < body.radius:
-			return 0.0
+	if SunLight.in_umbra(pos, bodies, st.t):
+		return 0.0
 	return Thermal.flux(pos.length())
 
 
@@ -969,7 +972,9 @@ func _draw() -> void:
 	draw_arc(Vector2.ZERO, belt_mid + belt_w * 0.12, 0.0, TAU, 160, Color(0.55, 0.48, 0.42, 0.045), belt_w * 0.45)
 	for rock: Vector3 in _belt_rocks:
 		var a := rock.y + rot
-		draw_circle(Vector2(cos(a), sin(a)) * rock.x, rock.z * maxf(px, 1.0), Color(0.58, 0.52, 0.46, 0.65))
+		var rock_pos := Vector2(cos(a), sin(a)) * rock.x
+		var rock_col := Color(0.16, 0.14, 0.13, 0.45) if SunLight.in_umbra(rock_pos, bodies, t) else Color(0.58, 0.52, 0.46, 0.65)
+		draw_circle(rock_pos, rock.z * maxf(px, 1.0), rock_col)
 	for body: BodyDef in bodies:
 		if body.is_star:
 			continue
@@ -1015,21 +1020,33 @@ func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 	var r := maxf(body.radius, 3.5 * px)
 	var atmo := body.atmo_color if body.atmosphere > 0.0 else body.color
 	var mist := Ui.mist_texture()
+	var eclipsed := SunLight.in_umbra(pos, bodies, st.t, body.id)
+	var to_sun := Vector2.UP if pos.length_squared() <= 1.0 else -pos.normalized()
 	if body.atmosphere > 0.0:
 		var hr := r * 1.55
-		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, 0.22))
+		var mist_a := 0.05 if eclipsed else 0.22
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr, hr), Vector2(hr * 2.0, hr * 2.0)), false, Color(atmo.r * 1.25, atmo.g * 1.25, atmo.b * 1.35, mist_a))
 	elif body.hazards.has(&"heat") and body.atmosphere <= 0.0:
 		var hr_lava := r * 1.5
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr_lava, hr_lava), Vector2(hr_lava * 2.0, hr_lava * 2.0)), false, Color(1.5, 0.55, 0.16, 0.22))
 	# De cerca los anillos los pinta el shader de Planet; este arco solo acompana al punto lejano.
 	if body.id == &"saturno" and body.radius * 2.0 * zoom < PLANET_MIN_PX:
+		var local_sun := to_sun.rotated(0.26)
+		var a0 := local_sun.angle()
+		var width := maxf(2.4 * px, 1.2)
 		draw_set_transform(pos, -0.26, Vector2(2.15, 0.4))
-		draw_arc(Vector2.ZERO, body.radius * 1.55, 0.0, TAU, 64, Color(0.93, 0.84, 0.62, 0.55), maxf(2.4 * px, 1.2))
+		draw_arc(Vector2.ZERO, body.radius * 1.55, a0 - PI * 0.5, a0 + PI * 0.5, 32, Color(1.25, 1.08, 0.72, 0.72), width)
+		draw_arc(Vector2.ZERO, body.radius * 1.55, a0 + PI * 0.5, a0 + PI * 1.5, 32, Color(0.22, 0.16, 0.1, 0.4), width)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if body.radius * 2.0 * zoom < PLANET_MIN_PX:
 		var hr_dot := r * 2.2
-		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, 0.3))
-		draw_circle(pos, r * 1.05, Color(body.color.r * 1.5, body.color.g * 1.5, body.color.b * 1.5))
+		var dot_a := 0.08 if eclipsed else 0.3
+		draw_texture_rect(mist, Rect2(pos - Vector2(hr_dot, hr_dot), Vector2(hr_dot * 2.0, hr_dot * 2.0)), false, Color(atmo.r * 1.35, atmo.g * 1.35, atmo.b * 1.45, dot_a))
+		var night := Color(body.color.r * 0.16, body.color.g * 0.16, body.color.b * 0.22)
+		draw_circle(pos, r * 1.05, night)
+		if not eclipsed:
+			var day := Color(minf(body.color.r * 1.65, 2.2), minf(body.color.g * 1.65, 2.2), minf(body.color.b * 1.65, 2.2))
+			draw_circle(pos + to_sun * r * 0.42, r * 0.58, day)
 	if body.hazards.has(&"radiation"):
 		draw_arc(pos, maxf(body.radius * 8.0, 120.0), 0.0, TAU, 64, Color(Ui.MYSTERY, 0.32), 2.0 * px)
 	if body.landable:
@@ -1091,11 +1108,26 @@ func _draw_ship(px: float) -> void:
 		var flame_len := s * (2.0 + overdrive * 2.0) * flick
 		draw_line(pos - dir * s * 0.8, pos - dir * (s * 4.5 + flame_len * 1.6), Color(1.2, 2.2, 3.0, 0.28), 2.4 * px)
 		draw_colored_polygon(PackedVector2Array([pos - dir * s * 0.6 + side * s * 0.4, pos - dir * (s * 0.6 + flame_len), pos - dir * s * 0.6 - side * s * 0.4]), Color(3.0, 1.6 + overdrive, 0.5, 0.9))
-	draw_colored_polygon(PackedVector2Array([pos + dir * s, pos - dir * s * 0.7 + side * s * 0.6, pos - dir * s * 0.4, pos - dir * s * 0.7 - side * s * 0.6]), Color(0.95, 0.97, 1.0))
+	var hull := PackedVector2Array([pos + dir * s, pos - dir * s * 0.7 + side * s * 0.6, pos - dir * s * 0.4, pos - dir * s * 0.7 - side * s * 0.6])
+	var to_sun := Vector2.UP if pos.length_squared() <= 1.0 else -pos.normalized()
+	var in_shadow := SunLight.in_umbra(pos, bodies, st.t)
+	var cols := PackedColorArray()
+	for vertex: Vector2 in hull:
+		cols.append(_hull_color((vertex - pos).normalized(), to_sun, dir, in_shadow))
+	draw_polygon(hull, cols)
 	var frame := Gravity.dominant(pos, st.t, bodies)
 	var rel: Vector2 = st.vel - Gravity.body_vel(frame, st.t)
 	if rel.length() > 0.01:
 		draw_line(pos + rel.normalized() * s * 1.6, pos + rel.normalized() * s * 2.6, Ui.LAMP_GO, 2.0 * px)
+
+
+func _hull_color(normal: Vector2, to_sun: Vector2, dir: Vector2, in_shadow: bool) -> Color:
+	var nd := clampf(normal.dot(to_sun), 0.0, 1.0)
+	var flare := 1.4 if flare_warn >= 0.0 else 1.0
+	var col := Color(0.10, 0.13, 0.22) if in_shadow else Color(0.40, 0.48, 0.64).lerp(Color(1.35 * flare, 1.22 * flare, 0.9), nd)
+	if burning and normal.dot(dir) < -0.15:
+		col = col.lerp(Color(2.6, 1.2, 0.4), 0.72)
+	return col
 
 
 func _text(pos: Vector2, text: String, color: Color, px: float) -> void:
