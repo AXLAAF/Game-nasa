@@ -477,7 +477,7 @@ func _refresh_hint() -> void:
 func _fit() -> void:
 	if _rooms == null or _panel == null or Run.ship.parts.is_empty():
 		return
-	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 96.0)
+	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 36.0)
 	var avail := _panel.size - Vector2(16.0, 78.0)
 	if avail.x < 40.0 or avail.y < 40.0:
 		avail = Vector2(PANEL_W - 16.0, 420.0)
