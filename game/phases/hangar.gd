@@ -124,6 +124,7 @@ func _build_crew(body: Node) -> Control:
 		else:
 			_reset_armed = true
 			reset.text = tr("Pulsa otra vez para borrar todo"))
+	Ui.button(col, tr("Volver al menú principal"), func() -> void: Router.go(&"title"))
 	return panel
 
 

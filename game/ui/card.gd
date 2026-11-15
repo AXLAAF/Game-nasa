@@ -320,9 +320,13 @@ func _build() -> void:
 	for i: int in choices.size():
 		_add_choice(choices[i], i)
 	if choices.is_empty():
-		Ui.button(_choices_box, tr("Continuar"), _close.bind(true))
+		var cont := Ui.button(_choices_box, tr("Continuar"), _close.bind(true))
+		cont.custom_minimum_size = Vector2(180, 42)
+		cont.size_flags_horizontal = Control.SIZE_SHRINK_END
 	elif not _scanned and _has_risk(choices):
 		var scan := Ui.button(_body, tr("Escanear probabilidades (gasta 15 % de batería)"), _scan)
+		scan.custom_minimum_size.y = 40
+		scan.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		scan.disabled = Run.battery < 0.15 * Thermal.battery_capacity(Run.ship)
 	Kinetic.cascade(_choices_box.get_children(), 0.032, 0.16, {"scale": Vector2(0.95, 0.90), "duration": 0.24})
 
@@ -499,6 +503,8 @@ func _resolve(choice: ChoiceDef, success: bool) -> void:
 	if risky and success:
 		revealed.append(Ui.label(_body, tr("Racha x%.2f") % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY))
 	var done := Ui.primary(Ui.button(_body, tr("Continuar"), _close.bind(success)))
+	done.custom_minimum_size = Vector2(180, 44)
+	done.size_flags_horizontal = Control.SIZE_SHRINK_END
 	revealed.append(done)
 	Kinetic.cascade(revealed, 0.036, 0.15, {"scale": Vector2(0.94, 0.88), "elastic": true, "duration": 0.28})
 	Kinetic.sweep(_panel, Color((Ui.LAMP_GO if success else Ui.LAMP_WARNING), 0.28), 0.36)

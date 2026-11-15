@@ -155,8 +155,15 @@ func _play() -> void:
 	if Run.boxes > 0:
 		await _open_boxes()
 	Ui.label(_col, tr("Créditos: %s") % Ui.money(Profile.credits), Ui.SIZE_TEXT, Ui.IVORY)
-	var back := Ui.primary(Ui.button(_col, tr("Volver al hangar"), func() -> void: Router.go(&"hangar")))
-	Kinetic.enter(back, 0.04, {"scale": Vector2(0.92, 0.86), "elastic": true, "beam": true, "duration": 0.30})
+	var actions := Ui.hbox(_col, 8)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	actions.add_child(spacer)
+	var to_menu := Ui.button(actions, tr("Volver al menú principal"), func() -> void: Router.go(&"title"))
+	to_menu.custom_minimum_size = Vector2(220, 44)
+	var back := Ui.primary(Ui.button(actions, tr("Volver al hangar"), func() -> void: Router.go(&"hangar")))
+	back.custom_minimum_size = Vector2(220, 44)
+	Kinetic.enter(actions, 0.04, {"scale": Vector2(0.92, 0.86), "elastic": true, "beam": true, "duration": 0.30})
 	back.grab_focus()
 
 

@@ -196,6 +196,7 @@ func _build_hud() -> void:
 	if not Profile.arcade:
 		Ui.compact(Ui.button(buttons, tr("Navegación (N)"), _toggle_nav))
 	_rescue_button = Ui.compact(Ui.button(buttons, tr("Pedir rescate"), _stranded_card))
+	Ui.compact(Ui.button(buttons, tr("Pausa"), func() -> void: Pause.open()))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
 	Ui.place(ticker, Ui.TICKER_RECT)

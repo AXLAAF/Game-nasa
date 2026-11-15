@@ -211,9 +211,13 @@ class ShipView extends Control:
 		if not hint.is_empty() and not hint.get("radial", false):
 			draw_line(Vector2(o.x - 120, float(hint.y)), Vector2(o.x + 120, float(hint.y)), Ui.IVORY, 2.0)
 		if Run.ship.parts.is_empty():
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), tr("Empieza por la cápsula, un motor y un tanque."), HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_TEXT, Ui.IVORY_DIM)
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), tr("Haz clic en el catálogo y se colocan solas. Arrastra para moverlas."), HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_LEGEND, Ui.INFO)
-		draw_string(Ui.sans(), Vector2(12, size.y - 16), tr("Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar"), HORIZONTAL_ALIGNMENT_LEFT, size.x - 24, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+			var hint_w := minf(440.0, maxf(size.x - 48.0, 200.0))
+			var hx := o.x - hint_w * 0.5
+			draw_multiline_string(Ui.sans(), Vector2(hx, o.y - 208), tr("Empieza por la cápsula, un motor y un tanque."), HORIZONTAL_ALIGNMENT_CENTER, hint_w, Ui.SIZE_TEXT, -1, Ui.IVORY)
+			draw_multiline_string(Ui.sans(), Vector2(hx, o.y - 178), tr("Haz clic en el catálogo y se colocan solas. Arrastra para moverlas."), HORIZONTAL_ALIGNMENT_CENTER, hint_w, Ui.SIZE_LEGEND, -1, Ui.INFO)
+		var bar_rect := Rect2(8, size.y - 30, size.x - 16, 22)
+		draw_rect(bar_rect, Color(Ui.BAKELITE, 0.88))
+		draw_string(Ui.sans(), Vector2(14, size.y - 14), tr("Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar"), HORIZONTAL_ALIGNMENT_LEFT, size.x - 28, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 
 
 func _ready() -> void:

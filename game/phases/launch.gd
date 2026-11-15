@@ -95,7 +95,7 @@ func _build_hud() -> void:
 	var ticker := Ticker.new()
 	Ui.place(ticker, Ui.TICKER_RECT)
 	root.add_child(ticker)
-	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
+	_banner = Ui.banner(root, Ui.SIZE_HERO, 18)
 	_dial = Control.new()
 	_dial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dial.draw.connect(_draw_dial)

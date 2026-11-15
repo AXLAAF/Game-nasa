@@ -12,11 +12,11 @@ var _froze: bool = false
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var root := Ui.root(self, 85)
-	_gear = Ui.button(root, "", open_settings)
+	_gear = Ui.button(root, "", open)
 	_gear.custom_minimum_size = GEAR_RECT.size
 	_gear.position = GEAR_RECT.position
 	_gear.focus_mode = Control.FOCUS_NONE
-	_gear.tooltip_text = tr("Ajustes")
+	_gear.tooltip_text = tr("Pausa")
 	_gear.visible = false
 	_gear.draw.connect(_draw_gear)
 	Events.phase_changed.connect(_on_phase)
@@ -44,13 +44,18 @@ func open() -> void:
 		return
 	_freeze()
 	var modal := Modal.new(tr("Pausa"))
-	Ui.primary(Ui.button(modal.col, tr("Continuar"), modal.close))
-	Ui.button(modal.col, tr("Ajustes"), func() -> void: SettingsPanel.show_panel())
-	Ui.button(modal.col, tr("Volver al menú principal"), func() -> void:
+	var resume := Ui.primary(Ui.button(modal.col, tr("Continuar"), modal.close))
+	var settings := Ui.button(modal.col, tr("Ajustes"), func() -> void: SettingsPanel.show_panel())
+	var menu := Ui.button(modal.col, tr("Volver al menú principal"), func() -> void:
 		Modal.confirm(tr("¿Volver al menú principal? Se pierde el contrato en curso."), tr("Volver al menú"), func() -> void: Router.go(&"title")))
+	var buttons: Array[Button] = [resume, settings, menu]
 	if not OS.has_feature("web"):
-		Ui.button(modal.col, tr("Salir"), func() -> void:
+		var quit := Ui.button(modal.col, tr("Salir"), func() -> void:
 			Modal.confirm(tr("¿Salir del juego?"), tr("Salir"), func() -> void: get_tree().quit()))
+		buttons.append(quit)
+	for button: Button in buttons:
+		button.custom_minimum_size = Vector2(260, 42)
+		button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	modal.closed.connect(_thaw)
 	modal.open()
 

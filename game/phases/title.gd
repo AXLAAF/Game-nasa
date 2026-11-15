@@ -17,21 +17,26 @@ func _ready() -> void:
 	col.offset_left = 96
 	col.offset_right = 96
 	col.grow_vertical = Control.GROW_DIRECTION_BOTH
-	var head := Ui.vbox(col, 10)
-	head.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	var head := Ui.vbox(col, 0)
+	head.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var logo := TextureRect.new()
-	logo.texture = load("res://assets/logo_orbita_128.png")
-	logo.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	logo.texture = load("res://assets/logo_orbita_256.png")
+	logo.custom_minimum_size = Vector2(204, 134)
+	logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	logo.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var logo_mat := ShaderMaterial.new()
+	logo_mat.shader = load("res://game/shaders/logo_bloom.gdshader")
+	logo_mat.set_shader_parameter("animate", 0.0 if Kinetic.is_reduced() else 1.0)
+	logo.material = logo_mat
 	head.add_child(logo)
 	var title := Ui.label(head, "Margin Zero", Ui.SIZE_HERO * 2, Ui.IVORY)
 	title.add_theme_font_override("font", Ui.title_font())
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	var spacer := Control.new()
-	spacer.custom_minimum_size.y = 18
+	spacer.custom_minimum_size.y = 14
 	col.add_child(spacer)
 	var training := Ui.button(col, tr("Repetir práctica de montaje") if Profile.training_completed else tr("Primera misión: armar la nave"), func() -> void: Router.go(&"training"))
 	if not Profile.training_completed:
@@ -41,11 +46,11 @@ func _ready() -> void:
 	var credits := Ui.button(col, tr("Créditos"), _credits)
 	for button: Button in [training, new_game, settings, credits]:
 		button.custom_minimum_size.x = 260
-		button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		button.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	if not OS.has_feature("web"):
 		var quit := Ui.button(col, tr("Salir"), func() -> void: get_tree().quit())
 		quit.custom_minimum_size.x = 260
-		quit.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		quit.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	(new_game if Profile.training_completed else training).grab_focus.call_deferred()
 	Kinetic.enter_deferred(col, 0.0, {"duration": 0.36})
 	Synth.play(&"chime", -6.0)
@@ -66,12 +71,16 @@ func _new_game() -> void:
 	var arcade_btn := Ui.primary(Ui.button(modal.col, tr("Modo Fácil Arcade (Recomendado)"), func() -> void:
 		modal.close()
 		_start(true)))
+	arcade_btn.custom_minimum_size = Vector2(280, 42)
+	arcade_btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var arcade_note := Ui.label(modal.col, tr("Navegación espacial libre con WASD sin gravedad (con inercia) y descenso directo ajustando tu trayectoria con los motores en WASD."), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	arcade_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	arcade_note.custom_minimum_size = Vector2(460, 0)
-	Ui.button(modal.col, tr("Simulación original"), func() -> void:
+	var sim_btn := Ui.button(modal.col, tr("Simulación original"), func() -> void:
 		modal.close()
 		_start(false))
+	sim_btn.custom_minimum_size = Vector2(280, 42)
+	sim_btn.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	var sim_note := Ui.label(modal.col, tr("Física orbital original."), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	sim_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	sim_note.custom_minimum_size = Vector2(460, 0)

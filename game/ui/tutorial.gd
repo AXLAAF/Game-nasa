@@ -152,13 +152,15 @@ func _ready() -> void:
 	col.add_child(nav)
 	_prev = Button.new()
 	_prev.text = tr("Anterior")
-	_prev.custom_minimum_size = Vector2(130, 44)
+	_prev.custom_minimum_size = Vector2(148, 44)
 	_prev.pressed.connect(_back)
 	Kinetic.bind_button(_prev)
 	nav.add_child(_prev)
+	var nav_spacer := Control.new()
+	nav_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nav.add_child(nav_spacer)
 	_next = Button.new()
-	_next.custom_minimum_size = Vector2(0, 44)
-	_next.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_next.custom_minimum_size = Vector2(148, 44)
 	Ui.primary(_next)
 	_next.pressed.connect(_advance)
 	Kinetic.bind_button(_next)

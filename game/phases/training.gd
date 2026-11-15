@@ -58,6 +58,7 @@ func _build_ui() -> void:
 	_progress = Ui.label(heading, "", 13, Ui.INFO)
 	Ui.button(header, tr("Reiniciar montaje"), func() -> void: _send(&"retry"))
 	Ui.button(header, tr("Salir de práctica"), func() -> void: Router.go(&"hangar"))
+	Ui.button(header, tr("Volver al menú principal"), func() -> void: Router.go(&"title"))
 	var columns := Ui.hbox(page, 14)
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var left := Ui.panel(columns)
@@ -119,10 +120,15 @@ func _build_ui() -> void:
 	_hold_button(_flight_controls, tr("Girar izquierda (%s)") % _binding(&"cmd_steer_left"), -1, true)
 	_hold_button(_flight_controls, tr("Girar derecha (%s)") % _binding(&"cmd_steer_right"), 1, true)
 	var actions := Ui.hbox(footer, 8)
-	_confirm = Ui.primary(Ui.button(actions, "", _on_confirm))
-	_confirm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_repair = Ui.button(actions, tr("Reparar"), func() -> void: _send(&"repair"))
+	_repair.custom_minimum_size.y = 42
 	_chute = Ui.button(actions, tr("Paracaídas"), func() -> void: _send(&"parachute"))
+	_chute.custom_minimum_size.y = 42
+	var actions_spacer := Control.new()
+	actions_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	actions.add_child(actions_spacer)
+	_confirm = Ui.primary(Ui.button(actions, "", _on_confirm))
+	_confirm.custom_minimum_size = Vector2(220, 42)
 	Ui.label(footer, tr("Solo se arma la nave. No gasta créditos ni piezas del perfil."), 12, Ui.IVORY_DIM)
 
 func _hold_button(parent: Node, text: String, direction: float, steering: bool) -> Button:

@@ -61,7 +61,10 @@ func open() -> Modal:
 
 
 func add_back(text: String = tr("Volver")) -> Button:
-	return Ui.button(col, text, close)
+	var button := Ui.button(col, text, close)
+	button.custom_minimum_size = Vector2(148, 40)
+	button.size_flags_horizontal = Control.SIZE_SHRINK_END
+	return button
 
 
 func close() -> void:
@@ -106,10 +109,16 @@ static func confirm(question: String, yes_text: String, on_yes: Callable) -> Mod
 	var label := Ui.label(modal.col, question, Ui.SIZE_TEXT, Ui.IVORY)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size.x = 400
-	Ui.button(modal.col, yes_text, func() -> void:
+	var row := Ui.hbox(modal.col, 8)
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(spacer)
+	var cancel := Ui.button(row, Loc.t("Cancelar"), modal.close)
+	cancel.custom_minimum_size = Vector2(130, 40)
+	var yes := Ui.primary(Ui.button(row, yes_text, func() -> void:
 		modal.close()
-		on_yes.call())
-	var cancel := modal.add_back(Loc.t("Cancelar"))
+		on_yes.call()))
+	yes.custom_minimum_size = Vector2(148, 40)
 	modal.open()
 	cancel.grab_focus.call_deferred()
 	return modal
