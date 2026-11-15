@@ -39,7 +39,7 @@ static func battery_capacity(ship: ShipModel) -> float:
 	return maxf(ship.sum_stat(&"battery"), 0.2)
 
 
-## Lista de requisitos del entorno para un destino: [texto, cumple].
+## Lista de requisitos del entorno para un destino: [texto, cumple, pista].
 static func requirements(ship: ShipModel, target: BodyDef) -> Array:
 	var out: Array = []
 	if target == null:
@@ -52,16 +52,15 @@ static func requirements(ship: ShipModel, target: BodyDef) -> Array:
 	var f_max := maxf(f_target, 1.0)
 	var t_hot := equilibrium(f_max, ship)
 	var t_cold := equilibrium(f_min, ship)
-	out.append(["Calor en ruta (%d %%)" % int(t_hot * 100.0), t_hot < HOT])
-	out.append(["Frío en ruta (%d %%)" % int(t_cold * 100.0), t_cold > COLD])
+	out.append(["Calor en ruta (%d %%)" % int(t_hot * 100.0), t_hot < HOT, "La nave se calienta demasiado en esta ruta. Agrega un radiador."])
+	out.append(["Frío en ruta (%d %%)" % int(t_cold * 100.0), t_cold > COLD, "La nave se enfría demasiado lejos del Sol. Agrega una manta térmica o un RTG."])
 	var gen := power_gen(f_min, ship)
-	out.append(["Energía %.1f / %.1f" % [gen, power_use(ship)], gen >= power_use(ship)])
+	out.append(["Energía %.1f / %.1f" % [gen, power_use(ship)], gen >= power_use(ship), "La electrónica gasta más de lo que generas. Agrega paneles solares o un RTG."])
 	if target.atmosphere > 0.0:
-		out.append(["Escudo térmico", ship.has_kind(&"heatshield")])
-		out.append(["Paracaídas", ship.has_kind(&"parachute")])
+		out.append(["Escudo térmico", ship.has_kind(&"heatshield"), "%s tiene atmósfera: sin escudo la nave se quema al entrar." % target.display_name])
+		out.append(["Paracaídas", ship.has_kind(&"parachute"), "%s tiene aire: el paracaídas frena la caída sin gastar combustible." % target.display_name])
 	else:
-		out.append(["Motor en la ultima etapa (sin aire)", ship.stage_thrust(ship.stages().back()) > 0.0])
-	out.append(["Cápsula", ship.has_kind(&"capsule")])
+		out.append(["Motor en la última etapa", ship.stage_thrust(ship.stages().back()) > 0.0, "Sin aire no hay paracaídas: la última etapa necesita motor y combustible para frenar."])
 	if target.hazards.has(&"radiation"):
-		out.append(["Blindaje antirradiación", ship.sum_stat(&"rad_resist") >= 0.5])
+		out.append(["Blindaje antirradiación", ship.sum_stat(&"rad_resist") >= 0.5, "%s tiene radiación alta: sin blindaje se daña la electrónica." % target.display_name])
 	return out

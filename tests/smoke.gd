@@ -15,6 +15,8 @@ func run(scene_tree: SceneTree) -> void:
 	for id: StringName in [&"motor_trueno", &"tanque_ancho", &"desacoplador", &"motor_susurro", &"tanque_largo", &"escudo_termico", &"capsula", &"paracaidas", &"patas", &"panel_solar"]:
 		Run.ship.parts.append(ShipPart.create(Catalog.part(id), ShipPart.Quality.SCRAP, Run.rng))
 	await _wait(0.3)
+	if (_phase()._launch as Button).get_global_rect().end.y > tree.root.get_visible_rect().size.y:
+		push_error("SMOKE: el boton Despegar queda fuera de pantalla")
 	_phase()._on_launch()
 	await _until(&"launch")
 	await _wait(7.0)

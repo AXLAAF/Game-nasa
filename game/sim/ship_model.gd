@@ -5,8 +5,27 @@ extends RefCounted
 ## y se suelta con ella. Los motores solo beben de los tanques de su etapa.
 
 const G0 := 9.81
+## Rango de abajo a arriba dentro de una etapa; lo que no aparece va en medio (2).
+const STACK_RANK := {&"engine": 0.0, &"tank": 1.0, &"decoupler": 2.5, &"heatshield": 3.0, &"capsule": 4.0, &"parachute": 5.0, &"escape": 6.0}
 
 var parts: Array[ShipPart] = []
+
+
+## Donde cae una pieza al hacer clic en el catalogo: en la etapa superior y en su sitio.
+## El desacoplador queda bajo el bloque escudo/capsula, asi el siguiente motor abre una etapa nueva.
+func auto_index(def: PartDef) -> int:
+	if def.radial:
+		return parts.size()
+	var rank := float(STACK_RANK.get(def.kind, 2.0))
+	var start := 0
+	for i: int in parts.size():
+		if parts[i].def.kind == &"decoupler":
+			start = i + 1
+	for i: int in range(start, parts.size()):
+		var other := parts[i].def
+		if not other.radial and float(STACK_RANK.get(other.kind, 2.0)) > rank:
+			return i
+	return parts.size()
 
 
 func stages() -> Array:

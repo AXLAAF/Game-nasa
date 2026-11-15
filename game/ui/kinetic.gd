@@ -89,7 +89,12 @@ static func enter(control: Control, delay: float = 0.0, opts: Dictionary = {}) -
 	control.modulate.a = 0.0
 	control.scale = start_scale
 	control.rotation = tilt
+	# Mover por position fija los offsets con el tamano de ese instante: un panel anclado que aun
+	# no tenia su tamano final quedaba deformado (el taller perdia el boton Despegar). Se restauran al llegar.
+	var home := PackedFloat32Array()
 	if slide:
+		if target_pos.is_equal_approx(control.position):
+			home = [control.offset_left, control.offset_top, control.offset_right, control.offset_bottom]
 		control.position = target_pos + slide_vec
 
 	var tween := control.create_tween()
@@ -102,9 +107,20 @@ static func enter(control: Control, delay: float = 0.0, opts: Dictionary = {}) -
 	tween.tween_property(control, "rotation", 0.0, duration).set_delay(delay).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	if slide:
 		tween.tween_property(control, "position", target_pos, duration).set_delay(delay).set_trans(trans).set_ease(Tween.EASE_OUT)
+		if not home.is_empty():
+			tween.chain().tween_callback(Callable(Kinetic, &"_restore_offsets").bind(control.get_instance_id(), home))
 	if beam:
 		var beam_color: Color = opts.get("beam_color", Color(0.76, 0.90, 1.0, 0.24))
 		sweep(control, beam_color, 0.36, delay + 0.03)
+
+
+static func _restore_offsets(id: int, home: PackedFloat32Array) -> void:
+	var control := instance_from_id(id) as Control
+	if control != null:
+		control.offset_left = home[0]
+		control.offset_top = home[1]
+		control.offset_right = home[2]
+		control.offset_bottom = home[3]
 
 
 ## Programa una entrada underground segura por instance_id para evitar errores si el nodo se libera antes del frame diferido.

@@ -7,10 +7,13 @@ const INSPECT_COST := 25
 const BOX_COST := 90
 const HAZARD_NAMES := {&"heat": "calor", &"cold": "frío", &"radiation": "radiación", &"dust": "polvo", &"storms": "tormentas"}
 const GROUPS: Array = [
-	["Propulsión", [&"engine", &"tank", &"decoupler", &"rcs"]],
-	["Mando", [&"capsule", &"computer", &"sensor", &"antenna", &"battery"]],
-	["Energía y térmico", [&"solar", &"rtg", &"radiator", &"insulation", &"shielding"]],
-	["Descenso y seguridad", [&"heatshield", &"parachute", &"legs", &"escape"]],
+	["Lo básico", [&"capsule", &"engine", &"tank"]],
+	["Segunda etapa", [&"decoupler"]],
+	["Aterrizaje", [&"heatshield", &"parachute", &"legs"]],
+	["Energía", [&"solar", &"battery", &"rtg"]],
+	["Calor, frío y radiación", [&"radiator", &"insulation", &"shielding"]],
+	["Navegación y control", [&"computer", &"sensor", &"antenna", &"rcs"]],
+	["Seguridad", [&"escape"]],
 ]
 
 var _quality: int = ShipPart.Quality.NEW
@@ -19,6 +22,8 @@ var _inventory: Array[ShipPart] = []
 var _view: ShipView
 var _catalog: VBoxContainer
 var _quality_buttons: Array[Button] = []
+var _part_lamps: Array = []
+var _quality_note: Label
 var _budget_label: Label
 var _dv: Gauge
 var _twr_label: Label
@@ -28,6 +33,8 @@ var _risk_label: Label
 var _part_box: VBoxContainer
 var _launch: Button
 var _contract_label: Label
+var _next_label: Label
+var _launch_note: Label
 var _hover_card: PanelContainer
 var _hover_title: Label
 var _hover_badge: Lamp
@@ -201,8 +208,8 @@ class ShipView extends Control:
 		if not hint.is_empty() and not hint.get("radial", false):
 			draw_line(Vector2(o.x - 120, float(hint.y)), Vector2(o.x + 120, float(hint.y)), Ui.IVORY, 2.0)
 		if Run.ship.parts.is_empty():
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Arrastra piezas aquí (motor abajo, cápsula arriba)", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY_DIM)
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Paneles, antenas y sensores: suelta a lo largo del casco", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.INFO)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Empieza por la cápsula, un motor y un tanque.", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Haz clic en el catálogo y se colocan solas. Arrastra para moverlas.", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.INFO)
 		draw_string(Ui.sans(), Vector2(12, size.y - 12), "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 
 
@@ -249,6 +256,9 @@ func _build_left(root: Control) -> void:
 		b.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 		Ui.mark_selected(b, q == _quality)
 		_quality_buttons.append(b)
+	_quality_note = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_quality_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_quality_note.custom_minimum_size = Vector2(300, 0)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -260,6 +270,7 @@ func _build_left(root: Control) -> void:
 
 
 func _fill_catalog() -> void:
+	_part_lamps.clear()
 	for child: Node in _catalog.get_children():
 		child.queue_free()
 	for i: int in _quality_buttons.size():
@@ -269,29 +280,37 @@ func _fill_catalog() -> void:
 		Ui.legend(_catalog, "Inventario (gratis)")
 		for part: ShipPart in _inventory:
 			_catalog_button(part.def, "%s  [%s]" % [part.def.display_name, part.quality_text()], part)
+	var added: Array = []
+	for group: Array in GROUPS:
+		added.append(Ui.legend(_catalog, String(group[0])))
+		for kind: StringName in group[1]:
+			for def: PartDef in Catalog.part_list():
+				if def.kind == kind:
+					var price := int(round(def.cost * ShipPart.PRICE[_quality]))
+					added.append(_catalog_button(def, "%s  %s" % [def.display_name, Ui.money(price)], null))
+	Ui.legend(_catalog, "Apuesta")
 	var box := Ui.button(_catalog, "Caja misteriosa  %s" % Ui.money(BOX_COST), _buy_box)
 	box.add_theme_color_override("font_color", Ui.MYSTERY)
 	box.mouse_entered.connect(_show_box_hover.bind(box))
 	box.mouse_exited.connect(hide_part_hover.bind(box))
 	box.focus_entered.connect(_show_box_hover.bind(box))
 	box.focus_exited.connect(hide_part_hover.bind(box))
-	var added: Array = []
-	for group: Array in GROUPS:
-		added.append(Ui.legend(_catalog, String(group[0])))
-		for def: PartDef in Catalog.part_list():
-			if (group[1] as Array).has(def.kind):
-				var price := int(round(def.cost * ShipPart.PRICE[_quality]))
-				added.append(_catalog_button(def, "%s  %s" % [def.display_name, Ui.money(price)], null))
+	_quality_note.text = _quality_note_text()
+	_paint_part_lamps()
 	Kinetic.cascade(added, 0.012, 0.22, {"scale": Vector2(0.94, 0.88), "tilt": -0.012, "duration": 0.24})
 
 
 func _catalog_button(def: PartDef, text: String, stock: ShipPart) -> PartButton:
+	var row := Ui.hbox(_catalog, 4)
 	var b := PartButton.new()
 	b.phase = self
 	b.def = def
 	b.stock = stock
 	b.text = text
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	b.clip_text = true
+	b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	b.add_theme_font_size_override("font_size", 13)
 	b.mouse_entered.connect(show_part_hover.bind(b, def, stock))
 	b.mouse_exited.connect(hide_part_hover.bind(b))
@@ -299,10 +318,57 @@ func _catalog_button(def: PartDef, text: String, stock: ShipPart) -> PartButton:
 	b.focus_exited.connect(hide_part_hover.bind(b))
 	b.pressed.connect(func() -> void:
 		Synth.play(&"click")
-		add_part(def, Run.ship.parts.size(), stock))
+		add_part(def, Run.ship.auto_index(def), stock))
 	Kinetic.bind_button(b, 0.7, 1.025)
-	_catalog.add_child(b)
+	row.add_child(b)
+	var lamp := Lamp.new("", Lamp.OFF)
+	lamp.custom_minimum_size = Vector2(64, 24)
+	lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lamp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(lamp)
+	_part_lamps.append([lamp, def, stock])
 	return b
+
+
+func _quality_note_text() -> String:
+	match _quality:
+		ShipPart.Quality.SCRAP: return "Chatarra: 65 % más barata, falla seguido."
+		ShipPart.Quality.USED: return "Usada: 35 % más barata, puede venir gastada."
+		ShipPart.Quality.NEW: return "Nueva: precio completo, casi no falla."
+		ShipPart.Quality.MYSTERY: return "Misteriosa: mitad de precio, calidad oculta hasta inspeccionarla."
+	return ""
+
+
+func _paint_part_lamps() -> void:
+	for entry: Array in _part_lamps:
+		var lamp: Lamp = entry[0]
+		var def: PartDef = entry[1]
+		var stock: ShipPart = entry[2]
+		var v: Dictionary = part_viability(def, stock)
+		var badge := String(v.badge)
+		var state := Lamp.OFF
+		var legend := ""
+		if not bool(v.affordable):
+			legend = "Cara"
+			state = Lamp.WARNING
+		elif badge == "NECESARIA":
+			legend = "Vital"
+			state = Lamp.GO
+		elif int(v.tone) == Lamp.GO:
+			legend = "Útil"
+			state = Lamp.GO
+		elif badge == "NO NECESARIA":
+			legend = "Sobra"
+			state = Lamp.CAUTION
+		elif int(v.tone) == Lamp.CAUTION:
+			legend = "Ojo"
+			state = Lamp.CAUTION
+		elif badge == "YA CUBIERTA":
+			legend = "Ya hay"
+			state = Lamp.OFF
+		lamp.text = legend.to_upper()
+		lamp.state = state
+		lamp.modulate.a = 0.0 if legend == "" else 1.0
 
 
 func _build_center(root: Control) -> void:
@@ -332,19 +398,26 @@ func _build_right(root: Control) -> void:
 	Ui.plate(info, "Ingeniería")
 	_contract_label = Ui.label(info, "", 13, Ui.IVORY)
 	_contract_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_contract_label.custom_minimum_size = Vector2(300, 0)
+	_contract_label.custom_minimum_size = Vector2(284, 0)
 	Ui.legend(info, "Presupuesto libre / total")
 	_budget_label = Ui.label(info, "", Ui.SIZE_HEAD, Ui.IVORY)
 	_budget_label.add_theme_font_override("font", Ui.mono())
+	Ui.legend(info, "Siguiente paso")
+	_next_label = Ui.label(info, "", Ui.SIZE_TEXT, Ui.IVORY)
+	_next_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_next_label.custom_minimum_size = Vector2(284, 0)
+	_req_box = Ui.vbox(info, 1)
 	_dv = Gauge.new("Delta-v", Ui.INFO)
 	info.add_child(_dv)
 	_twr_label = Ui.label(info, "", 14)
 	_stages_label = Ui.label(info, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
-	_req_box = Ui.vbox(info, 1)
 	_risk_label = Ui.label(info, "", 14)
 	var sep := HSeparator.new()
 	info.add_child(sep)
 	_part_box = Ui.vbox(info, 4)
+	_launch_note = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_launch_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_launch_note.custom_minimum_size = Vector2(300, 0)
 	_launch = Ui.primary(Ui.button(col, "Despegar", _on_launch))
 	_launch.custom_minimum_size = Vector2(0, 48)
 	_launch.add_theme_font_size_override("font_size", 22)
@@ -380,6 +453,54 @@ func _premium(value: int) -> int:
 
 func _remaining() -> int:
 	return Profile.budget(Run.contract) - _spent()
+
+
+## Lista de despegue en orden de armado. Fila: label, state (Lamp.*), hint y blocks (impide despegar).
+static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, remaining: int) -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	var has_capsule := ship.has_kind(&"capsule")
+	var has_thrust := ship.thrust() > 0.0
+	var has_fuel := ship.fuel_capacity() > 0.0
+	rows.append({"label": "Cápsula", "state": Lamp.GO if has_capsule else Lamp.WARNING, "hint": "" if has_capsule else "Sin cápsula no hay tripulación ni mando. Agrega la Cápsula Mk1.", "blocks": not has_capsule})
+	rows.append({"label": "Motor", "state": Lamp.GO if has_thrust else Lamp.WARNING, "hint": "" if has_thrust else "Sin motor la nave no se mueve. Agrega un motor de Lo básico.", "blocks": not has_thrust})
+	rows.append({"label": "Combustible", "state": Lamp.GO if has_fuel else Lamp.WARNING, "hint": "" if has_fuel else "Un motor sin tanque no tiene qué quemar. Agrega un tanque.", "blocks": false})
+	var home := Catalog.home()
+	var twr := ship.twr(home.surface_gravity) if home != null else 0.0
+	var lift_state := Lamp.OFF
+	var lift_hint := ""
+	if has_thrust and has_fuel:
+		if twr < 1.0:
+			lift_state = Lamp.WARNING
+			lift_hint = "Los motores no levantan el peso de la nave (empuje entre peso %.2f, hace falta más de 1). Pon un motor más fuerte o quita peso." % twr
+		elif twr < 1.2:
+			lift_state = Lamp.CAUTION
+			lift_hint = "Despega justo (empuje entre peso %.2f). Con más de 1.2 sube con margen." % twr
+		else:
+			lift_state = Lamp.GO
+	rows.append({"label": "Levanta el vuelo", "state": lift_state, "hint": lift_hint, "blocks": false})
+	var destination := "Alcanza el destino" if target == null else "Alcanza %s" % target.display_name
+	var reach_state := Lamp.OFF
+	var reach_hint := ""
+	if has_thrust and has_fuel:
+		var dv := ship.delta_v()
+		var need := contract.dv_estimate
+		if dv < need * 0.85:
+			reach_state = Lamp.WARNING
+			reach_hint = "El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con desacoplador." % [int(dv), int(need)]
+		elif dv < need:
+			reach_state = Lamp.CAUTION
+			reach_hint = "Vas justo de combustible: %d de %d m/s." % [int(dv), int(need)]
+		else:
+			reach_state = Lamp.GO
+	rows.append({"label": destination, "state": reach_state, "hint": reach_hint, "blocks": false})
+	for req: Array in Thermal.requirements(ship, target):
+		var req_label: String = String(req[0])
+		var req_ok: bool = bool(req[1])
+		var req_hint: String = String(req[2])
+		rows.append({"label": req_label, "state": Lamp.GO if req_ok else Lamp.WARNING, "hint": "" if req_ok else req_hint, "blocks": false})
+	var budget_ok := remaining >= 0
+	rows.append({"label": "Presupuesto", "state": Lamp.GO if budget_ok else Lamp.WARNING, "hint": "" if budget_ok else "Te pasaste por %s. Quita piezas o compra calidad Usada o Chatarra." % Ui.money(-remaining), "blocks": not budget_ok})
+	return rows
 
 
 func add_part(def: PartDef, index: int, stock: ShipPart = null, mount: float = 0.5, side: int = 0) -> void:
@@ -488,6 +609,8 @@ func stats_text(def: PartDef) -> String:
 func _refresh() -> void:
 	var ship := Run.ship
 	var target := Run.target()
+	var remaining := _remaining()
+	var rows: Array[Dictionary] = checklist(ship, Run.contract, target, remaining)
 	_view.fit()
 	var hazards: PackedStringArray = PackedStringArray()
 	for h: StringName in target.hazards:
@@ -497,7 +620,6 @@ func _refresh() -> void:
 	_contract_label.text = "%s\nPago %s, adelanto %s\nPeligros: %s" % [
 		Run.contract.title, Ui.money(Run.contract.payout), Ui.money(Run.contract.advance),
 		", ".join(hazards) if not hazards.is_empty() else "ninguno conocido"]
-	var remaining := _remaining()
 	_budget_label.text = "%s / %s" % [Ui.money(remaining), Ui.money(Profile.budget(Run.contract))]
 	_budget_label.add_theme_color_override("font_color", Ui.IVORY if remaining >= 0 else Ui.LAMP_WARNING)
 	var dv := ship.delta_v()
@@ -517,18 +639,59 @@ func _refresh() -> void:
 	_stages_label.text = "\n".join(lines)
 	for child: Node in _req_box.get_children():
 		child.queue_free()
-	Ui.legend(_req_box, "Entorno del destino (%s)" % target.display_name)
-	for req: Array in Thermal.requirements(ship, target):
+	Ui.legend(_req_box, "Lista de despegue")
+	var first_warning := ""
+	var first_caution := ""
+	var blocked_hint := ""
+	var has_warning := false
+	var has_caution := false
+	var has_block := false
+	for row: Dictionary in rows:
+		var state: int = int(row.state)
+		var legend := "OK" if state == Lamp.GO else ("Falta" if state == Lamp.WARNING else ("Justo" if state == Lamp.CAUTION else "Luego"))
 		var req_row := Ui.hbox(_req_box, 6)
-		var lamp := Lamp.new("OK" if req[1] else "Falta", Lamp.GO if req[1] else Lamp.WARNING)
+		var lamp := Lamp.new(legend, state)
 		lamp.custom_minimum_size.x = 64
 		req_row.add_child(lamp)
-		Ui.label(req_row, str(req[0]), Ui.SIZE_LEGEND, Ui.IVORY)
+		var row_label := Ui.label(req_row, String(row.label), Ui.SIZE_LEGEND, Ui.IVORY)
+		row_label.tooltip_text = String(row.hint)
+		row_label.mouse_filter = Control.MOUSE_FILTER_PASS
+		if state == Lamp.WARNING:
+			has_warning = true
+			if first_warning == "":
+				first_warning = String(row.hint)
+		elif state == Lamp.CAUTION:
+			has_caution = true
+			if first_caution == "":
+				first_caution = String(row.hint)
+		if bool(row.blocks):
+			has_block = true
+			if blocked_hint == "":
+				blocked_hint = String(row.hint)
+	if first_warning != "":
+		_next_label.text = first_warning
+		_next_label.add_theme_color_override("font_color", Ui.LAMP_WARNING)
+	elif first_caution != "":
+		_next_label.text = first_caution
+		_next_label.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
+	else:
+		_next_label.text = "La nave cumple la lista. Puedes despegar."
+		_next_label.add_theme_color_override("font_color", Ui.LAMP_GO)
 	var rel := Odds.ship_reliability(ship)
 	_risk_label.text = "Fiabilidad estimada: %d a %d %%" % [int(rel.x * 100.0), int(rel.y * 100.0)]
 	_risk_label.add_theme_color_override("font_color", Odds.risk_color((rel.x + rel.y) * 0.5))
 	_refresh_part()
-	_launch.disabled = not ship.has_kind(&"capsule") or ship.thrust() <= 0.0 or remaining < 0
+	_launch.disabled = has_block
+	if has_block:
+		_launch_note.text = "No puedes despegar todavía. " + blocked_hint
+		_launch_note.add_theme_color_override("font_color", Ui.LAMP_WARNING)
+	elif has_warning or has_caution:
+		_launch_note.text = "Puedes despegar, pero la lista tiene avisos."
+		_launch_note.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
+	else:
+		_launch_note.text = "Lista para despegar."
+		_launch_note.add_theme_color_override("font_color", Ui.LAMP_GO)
+	_paint_part_lamps()
 	if _hover_card != null and _hover_card.visible and is_instance_valid(_hover_owner):
 		if _hover_owner is PartButton:
 			var pb := _hover_owner as PartButton
@@ -552,7 +715,7 @@ func _refresh_part() -> void:
 	Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
 	var stats := Ui.label(_part_box, stats_text(part.def), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	stats.custom_minimum_size = Vector2(300, 0)
+	stats.custom_minimum_size = Vector2(284, 0)
 	var row := Ui.hbox(_part_box, 6)
 	if not part.inspected:
 		var cost := "gratis" if Run.free_inspections > 0 else Ui.money(INSPECT_COST)
