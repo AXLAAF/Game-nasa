@@ -22,6 +22,7 @@ var best_payout: int = 0
 var lessons: Array[String] = []
 var inventory: Array = [] ## diccionarios de ShipPart.to_dict()
 var insurance: int = 0
+var arcade: bool = false ## modo facil arcade: navegacion WASD sin gravedad y aterrizaje directo con motores WASD
 var assist: bool = false ## modo asistido: mas facil, menos pago
 var reduced_motion: bool = false ## sin sacudida, destellos ni lamparas intermitentes
 var crew: int = 1
@@ -109,7 +110,7 @@ func save_profile() -> void:
 		return
 	var data := {
 		"credits": credits, "runs": runs, "wins": wins, "best": best_payout,
-		"lessons": lessons, "inventory": inventory, "insurance": insurance, "assist": assist, "reduced_motion": reduced_motion, "crew": crew,
+		"lessons": lessons, "inventory": inventory, "insurance": insurance, "arcade": arcade, "assist": assist, "reduced_motion": reduced_motion, "crew": crew,
 		"tutorial": tutorial_seen, "contracts": contracts, "training_completed": training_completed,
 	}
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
@@ -136,6 +137,7 @@ func load_profile() -> void:
 		lessons.append(str(id))
 	inventory = data.get("inventory", [])
 	insurance = clampi(int(data.get("insurance", 0)), 0, 2)
+	arcade = bool(data.get("arcade", false))
 	assist = bool(data.get("assist", false))
 	reduced_motion = bool(data.get("reduced_motion", false))
 	crew = clampi(int(data.get("crew", 1)), 1, 2)
@@ -154,6 +156,7 @@ func reset() -> void:
 	lessons.clear()
 	inventory.clear()
 	insurance = 0
+	arcade = false
 	assist = false
 	reduced_motion = false
 	crew = 1
