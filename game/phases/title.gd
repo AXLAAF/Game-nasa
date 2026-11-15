@@ -49,14 +49,34 @@ func _process(_delta: float) -> void:
 
 
 func _new_game() -> void:
-	Modal.confirm("¿Seguro? Se borra el perfil: créditos, lecciones, inventario y contratos.", "Borrar y empezar", _start)
+	var modal := Modal.new("Nueva partida")
+	var warn := Ui.label(modal.col, "Se reiniciará el perfil actual (créditos, lecciones, inventario y contratos). Elige un modo:", Ui.SIZE_TEXT, Ui.IVORY)
+	warn.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	warn.custom_minimum_size = Vector2(460, 0)
+	var arcade_btn := Ui.primary(Ui.button(modal.col, "Modo Fácil Arcade (Recomendado)", func() -> void:
+		modal.close()
+		_start(true)))
+	var arcade_note := Ui.label(modal.col, "Navegación espacial libre con WASD sin gravedad (con inercia) y descenso directo ajustando tu trayectoria con los motores en WASD.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	arcade_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	arcade_note.custom_minimum_size = Vector2(460, 0)
+	Ui.button(modal.col, "Simulación original", func() -> void:
+		modal.close()
+		_start(false))
+	var sim_note := Ui.label(modal.col, "Física orbital original.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	sim_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	sim_note.custom_minimum_size = Vector2(460, 0)
+	modal.add_back("Cancelar")
+	modal.open()
+	arcade_btn.grab_focus()
 
 
-func _start() -> void:
-	var assist := Profile.assist
+func _start(is_arcade: Variant = null) -> void:
+	var arcade_mode := Profile.arcade if is_arcade == null else bool(is_arcade)
+	var assist := Profile.assist if is_arcade == null else false
 	var reduced_motion := Profile.reduced_motion
 	var training_completed := Profile.training_completed
 	Profile.reset()
+	Profile.arcade = arcade_mode
 	Profile.assist = assist
 	Profile.reduced_motion = reduced_motion
 	Profile.training_completed = training_completed

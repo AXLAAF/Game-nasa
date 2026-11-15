@@ -4,6 +4,9 @@ extends Node2D
 ## Aqui viven los puntos de interes, los peligros del espacio y las apuestas en ruta.
 
 const ROT_SPEED := 2.6
+const ARCADE_ACCEL_MULT := 4.5
+const ARCADE_MIN_ACCEL := 50.0
+const ARCADE_MAX_ACCEL := 110.0
 const POI_RADIUS := 40.0
 const BELT := Vector2(3950.0, 4750.0)
 const ELECTRONICS: Array[StringName] = [&"computer", &"sensor", &"antenna", &"battery", &"solar"]
@@ -67,7 +70,7 @@ func _ready() -> void:
 		_belt_rocks.append(Vector3(rng.randf_range(BELT.x, BELT.y), rng.randf() * TAU, rng.randf_range(0.6, 2.2)))
 	flare_timer = Run.rng.randf_range(70.0, 140.0)
 	target = Run.target()
-	nav_assist = Profile.assist
+	nav_assist = Profile.assist and not Profile.arcade
 	_cam = Camera2D.new()
 	add_child(_cam)
 	_cam.make_current()
@@ -83,7 +86,7 @@ func _place_ship() -> void:
 	st = Run.space_state
 	var back: StringName = st.get("return_body", &"")
 	if st.has("pos") and back == &"":
-		heading = (st.vel as Vector2).angle()
+		heading = (st.vel as Vector2).angle() if (st.vel as Vector2).length_squared() > 0.0001 else -PI * 0.5
 		return
 	var t: float = st.get("t", 0.0)
 	var home := Catalog.body(back) if back != &"" else Catalog.home()
@@ -92,13 +95,13 @@ func _place_ship() -> void:
 	var radial := Vector2(cos(a), sin(a))
 	var speed := sqrt(home.mu / r) * float(st.get("return_boost", 1.0))
 	st.pos = Gravity.body_pos(home, t) + radial * r
-	st.vel = Gravity.body_vel(home, t) + Vector2(-radial.y, radial.x) * speed
+	st.vel = Gravity.body_vel(home, t) + (Vector2.ZERO if Profile.arcade else Vector2(-radial.y, radial.x) * speed)
 	st.t = t
 	st.erase("return_body")
 	st.erase("return_boost")
 	if not st.has("dv0"):
 		st.dv0 = maxf(Run.ship.delta_v(), 1.0)
-	heading = Vector2(-radial.y, radial.x).angle()
+	heading = -PI * 0.5 if Profile.arcade else Vector2(-radial.y, radial.x).angle()
 	zoom = 2.0
 	target_zoom = 2.0
 
@@ -156,7 +159,8 @@ func _build_hud() -> void:
 	_repair_button = Ui.compact(Ui.button(buttons, "Reparar (R)", _repair_card))
 	Ui.compact(Ui.button(buttons, "Estado (C)", func() -> void: Ui.toggle_status(self)))
 	_salvage_button = Ui.compact(Ui.button(buttons, "Instalar (I)", _salvage_card))
-	Ui.compact(Ui.button(buttons, "Navegación (N)", _toggle_nav))
+	if not Profile.arcade:
+		Ui.compact(Ui.button(buttons, "Navegación (N)", _toggle_nav))
 	_rescue_button = Ui.compact(Ui.button(buttons, "Pedir rescate", _stranded_card))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
@@ -167,7 +171,7 @@ func _build_hud() -> void:
 	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_prompt.offset_top = -Ui.CONSOLE_H - 70
 	_prompt.offset_bottom = -Ui.CONSOLE_H - 70
-	Ui.keys(root, "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom")
+	Ui.keys(root, "WASD moverse (inercia, sin gravedad)   Mayús sobrecarga   Ctrl fino   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom" if Profile.arcade else "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom")
 
 
 # ---------------------------------------------------------------- input
@@ -184,12 +188,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if Controls.cmd_just(&"cmd_cycle"):
 		_cycle_target()
-	if Controls.cmd_just(&"cmd_hold_pro"):
-		hold = 0 if hold == 1 else 1
-	if Controls.cmd_just(&"cmd_hold_retro"):
-		hold = 0 if hold == -1 else -1
-	if Controls.cmd_just(&"cmd_nav"):
-		_toggle_nav()
+	if not Profile.arcade:
+		if Controls.cmd_just(&"cmd_hold_pro"):
+			hold = 0 if hold == 1 else 1
+		if Controls.cmd_just(&"cmd_hold_retro"):
+			hold = 0 if hold == -1 else -1
+		if Controls.cmd_just(&"cmd_nav"):
+			_toggle_nav()
 	if Controls.cmd_just(&"cmd_repair"):
 		_repair_card()
 	if Controls.cmd_just(&"cmd_status"):
@@ -206,6 +211,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _toggle_nav() -> void:
+	if Profile.arcade:
+		return
 	nav_assist = not nav_assist
 	if nav_assist:
 		hold = 0
@@ -222,8 +229,10 @@ func _set_warp(index: int) -> void:
 
 
 func _warp_cap() -> int:
-	if burning or flare_warn >= 0.0:
+	if flare_warn >= 0.0:
 		return 0
+	if burning:
+		return 1 if Profile.arcade else 0
 	return Run.TIME_SCALES.size() - 1
 
 
@@ -297,6 +306,27 @@ func _poi_name(poi: Dictionary) -> String:
 
 # ---------------------------------------------------------------- simulacion
 
+## Avanza la nave en modo arcade: solo inercia y empuje WASD, sin atraccion gravitatoria.
+static func arcade_space_step(state: Dictionary, dt: float, bodies: Array[BodyDef], thrust_acc: Vector2, max_step: float = Gravity.MAX_STEP) -> StringName:
+	var steps := maxi(1, ceili(dt / max_step))
+	var h := dt / steps
+	var pos: Vector2 = state.pos
+	var vel: Vector2 = state.vel
+	var t: float = state.t
+	var hit := &""
+	for i: int in steps:
+		vel += thrust_acc * h
+		pos += vel * h
+		t += h
+		hit = Gravity.collision(pos, t, bodies)
+		if hit != &"":
+			break
+	state.pos = pos
+	state.vel = vel
+	state.t = t
+	return hit
+
+
 func _process(delta: float) -> void:
 	if _leaving:
 		return
@@ -304,11 +334,13 @@ func _process(delta: float) -> void:
 		_leave(&"debrief", 1.6 if Run.outcome == &"lost" else 0.4)
 		return
 	zoom = lerpf(zoom, target_zoom, minf(delta * 6.0, 1.0))
+	if Profile.arcade and _wasd_dir() != Vector2.ZERO and flare_warn < 0.0:
+		warp_i = mini(warp_i, 1)
 	warp_i = mini(warp_i, _warp_cap())
 	var dt := minf(delta, 0.05) * Run.time_scale(warp_i)
 	_steer(delta)
 	var thrust := _thrust(delta, dt)
-	var hit := Gravity.step(st, dt, bodies, thrust)
+	var hit := arcade_space_step(st, dt, bodies, thrust) if Profile.arcade else Gravity.step(st, dt, bodies, thrust)
 	if hit != &"":
 		_collide(Catalog.body(hit))
 		return
@@ -316,14 +348,17 @@ func _process(delta: float) -> void:
 	_hazards(dt)
 	_check_pois()
 	_check_approach()
-	_pred_timer -= delta
-	if _pred_timer <= 0.0:
-		_pred_timer = 0.15
-		_predict()
+	if Profile.arcade:
+		_pred = {}
+	else:
+		_pred_timer -= delta
+		if _pred_timer <= 0.0:
+			_pred_timer = 0.15
+			_predict()
 	_update_hud()
 	_cam.position = st.pos + ShipInterior.view_shift(zoom)
 	_cam.zoom = Vector2(zoom, zoom)
-	_stars.set_view((st.pos as Vector2) * 0.02)
+	_stars.set_view((st.pos as Vector2) * (0.06 if Profile.arcade else 0.02))
 	_place_planets()
 	queue_redraw()
 
@@ -344,10 +379,21 @@ func _place_planets() -> void:
 			planet.light_from(-pos)
 
 
+func _wasd_dir() -> Vector2:
+	return Vector2(Controls.steer(), -Controls.throttle_axis())
+
+
 func _steer(delta: float) -> void:
+	var mobility := Run.channel(&"mobility")
+	if Profile.arcade:
+		_nav = {}
+		hold = 0
+		var wasd := _wasd_dir()
+		if wasd != Vector2.ZERO:
+			heading = rotate_toward(heading, wasd.angle(), ROT_SPEED * 6.0 * mobility * delta)
+		return
 	_nav = _nav_guidance()
 	var turn := Controls.steer()
-	var mobility := Run.channel(&"mobility")
 	if turn != 0.0:
 		hold = 0
 		heading += turn * ROT_SPEED * mobility * delta
@@ -388,23 +434,33 @@ func _nav_text() -> String:
 
 func _thrust(delta: float, dt: float) -> Vector2:
 	var ship := Run.ship
+	var fine := 0.15 if Controls.cmd_held(&"cmd_fine") else 1.0
+	var wasd := _wasd_dir() if Profile.arcade else Vector2.ZERO
 	var throttle := 0.0
-	var axis := Controls.throttle_axis()
-	if axis > 0.0:
-		throttle = (0.15 if Controls.cmd_held(&"cmd_fine") else 1.0) * axis
+	if Profile.arcade:
+		if wasd != Vector2.ZERO:
+			throttle = fine * minf(wasd.length(), 1.0)
+	else:
+		var axis := Controls.throttle_axis()
+		if axis > 0.0:
+			throttle = fine * axis
 	var over := throttle > 0.0 and Controls.cmd_held(&"cmd_overdrive")
 	if over:
 		overdrive = minf(overdrive + delta * 0.3, 1.0)
 	else:
 		overdrive = maxf(overdrive - delta * 0.15, 0.0)
-	burning = throttle > 0.0 and ship.thrust() > 0.0 and ship.fuel_total() > 0.0
+	while ship.auto_stage():
+		pass
+	burning = throttle > 0.0 and ship.thrust() > 0.0 and ship.stage_fuel(ship.active_stage()) > 0.0
 	Synth.engine_level = throttle * (1.4 if over else 1.0) if burning else 0.0
 	if not burning:
 		return Vector2.ZERO
-	if ship.stage_fuel(ship.active_stage()) <= 0.0:
-		ship.auto_stage()
 	var mult := Run.channel(&"thrust") * (1.5 if over else 1.0)
 	var acc := ship.burn(throttle * mult, dt * RocketMath.BURN_COMPRESS, 1.1 if over else 1.0)
+	if acc <= 0.0:
+		burning = false
+		Synth.engine_level = 0.0
+		return Vector2.ZERO
 	if over:
 		_od_clock += delta
 		Juice.shake(delta * 0.6)
@@ -422,7 +478,11 @@ func _thrust(delta: float, dt: float) -> Vector2:
 						Card.malfunction(engine)
 					else:
 						Events.toast.emit("El motor tose, pero aguanta", Ui.LAMP_CAUTION)
-	return Vector2.from_angle(heading) * acc * RocketMath.BURN_COMPRESS * RocketMath.SPACE_SCALE
+	var push_dir := wasd.normalized() if Profile.arcade else Vector2.from_angle(heading)
+	if Profile.arcade:
+		var arcade_acc := clampf(acc * ARCADE_ACCEL_MULT, ARCADE_MIN_ACCEL * throttle, ARCADE_MAX_ACCEL) * (1.4 if over else 1.0)
+		return push_dir * arcade_acc
+	return push_dir * acc * RocketMath.BURN_COMPRESS * RocketMath.SPACE_SCALE
 
 
 func _collide(body: BodyDef) -> void:
@@ -632,8 +692,11 @@ func _leave(phase: StringName, wait: float) -> void:
 
 
 func _predict() -> void:
-	var frame := Gravity.dominant(st.pos, st.t, bodies)
+	if Profile.arcade:
+		_pred = {}
+		return
 	var map := Run.channel(&"map")
+	var frame := Gravity.dominant(st.pos, st.t, bodies)
 	var local := not frame.is_star
 	var steps := int((300.0 if local else 420.0) * clampf(map, 0.15, 1.0))
 	var dt := 0.12 if local else 1.2
@@ -900,7 +963,7 @@ func _draw_poi(poi: Dictionary, px: float) -> void:
 
 
 func _draw_prediction(px: float) -> void:
-	if not _pred.has("points"):
+	if Profile.arcade or not _pred.has("points"):
 		return
 	var points: PackedVector2Array = _pred.points
 	points = points.duplicate()

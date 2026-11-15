@@ -78,7 +78,16 @@ func _ready() -> void:
 	add_child(_plasma)
 	_build_hud()
 	_hidden_hazard()
-	if body.atmosphere <= 0.0:
+	if Profile.arcade:
+		state = State.FLIGHT
+		x = nearest_pad(0.0) + Run.rng.randf_range(-260.0, 260.0)
+		h = terrain(x) + clampf(top * 0.25, 2800.0, 4500.0)
+		vx = Run.rng.randf_range(-18.0, 18.0)
+		vy = -45.0
+		pitch = 0.0
+		throttle = 0.0
+		_say("Descenso arcade: ajusta tu trayectoria con WASD", Ui.INFO)
+	elif body.atmosphere <= 0.0:
 		gamma = -2.0
 		_commit()
 	else:
@@ -207,7 +216,7 @@ func _unhandled_input(_event: InputEvent) -> void:
 		_eject()
 	if Controls.cmd_just(&"cmd_status"):
 		Ui.toggle_status(self)
-	if Controls.cmd_just(&"cmd_hold_pro") or Controls.cmd_just(&"cmd_hold_retro"):
+	if not Profile.arcade and (Controls.cmd_just(&"cmd_hold_pro") or Controls.cmd_just(&"cmd_hold_retro")):
 		hold_retro = not hold_retro
 	var next := Controls.warp_choice(DESCENT_WARPS.size(), warp_i)
 	if next != warp_i:
@@ -318,13 +327,44 @@ func _corridor() -> Vector2:
 	return corridor
 
 
+## Un paso del descenso arcade: la nave cae con la gravedad local y WASD empuja motores para ajustar trayectoria.
+static func arcade_descent_step(s: Dictionary, ship: ShipModel, body: BodyDef, input_x: float, input_y: float,
+		chute_area: float, wind: float, dt: float, thrust_mult: float = 1.0) -> Dictionary:
+	var air := Vector2(s.vx - wind * clampf(1.0 - s.h / 8000.0, 0.0, 1.0), s.vy)
+	var speed := air.length()
+	s.q = 0.5 * RocketMath.density(body, s.h) * speed * speed
+	var ref_area := ship.area() * (1.3 if ship.has_kind(&"heatshield") else 1.0)
+	var drag: float = s.q * (1.1 * ref_area + chute_area) / maxf(ship.mass() * 1000.0, 1.0)
+	var air_dir := air / speed if speed > 0.5 else Vector2.ZERO
+	var cmd := Vector2(input_x * 0.85, input_y if input_y >= 0.0 else input_y * 0.55)
+	var level := minf(cmd.length(), 1.0)
+	var acc := 0.0
+	var engine_acc := Vector2.ZERO
+	if level > 0.001:
+		while ship.auto_stage():
+			pass
+		acc = ship.burn(level, dt) * thrust_mult
+		engine_acc = cmd.normalized() * acc
+	var push := -air_dir * drag + engine_acc
+	s.g = push.length() / RocketMath.G0
+	s.vx += push.x * dt
+	s.vy += (push.y - body.surface_gravity) * dt
+	s.x += s.vx * dt
+	s.h += s.vy * dt
+	return {"acc": acc, "throttle": level if acc > 0.0 else 0.0}
+
+
 func _fly(delta: float) -> void:
 	var dt := minf(delta, 0.05) * SIM_SPEED * DESCENT_WARPS[warp_i]
 	var ship := Run.ship
 	var mobility := Run.channel(&"mobility")
-	if state == State.ENTRY:
+	var dir_x := Controls.steer()
+	var dir_y := Controls.throttle_axis()
+	if Profile.arcade:
 		lift = 0.0
-		lift = Controls.throttle_axis() * mobility
+		pitch = move_toward(pitch, dir_x * 22.0, 90.0 * mobility * delta)
+	elif state == State.ENTRY:
+		lift = dir_y * mobility
 		throttle = 0.0
 		pitch = rad_to_deg(atan2(-vx, -vy))
 		if Vector2(vx, vy).length() < v_orb * 0.45 or agl() < 7000.0:
@@ -332,31 +372,36 @@ func _fly(delta: float) -> void:
 			_say("Control manual", Ui.INFO)
 	else:
 		lift = 0.0
-		if Controls.throttle_axis() > 0.0:
-			throttle = minf(throttle + delta * 1.2 * Controls.throttle_axis(), 1.0)
-		elif Controls.throttle_axis() < 0.0:
-			throttle = maxf(throttle + delta * 1.2 * Controls.throttle_axis(), 0.0)
+		if dir_y > 0.0:
+			throttle = minf(throttle + delta * 1.2 * dir_y, 1.0)
+		elif dir_y < 0.0:
+			throttle = maxf(throttle + delta * 1.2 * dir_y, 0.0)
 		if Controls.cmd_held(&"cmd_throttle_full"):
 			throttle = 1.0
 		if Controls.cmd_held(&"cmd_throttle_zero"):
 			throttle = 0.0
-		var turn := Controls.steer()
-		if turn != 0.0:
+		if dir_x != 0.0:
 			hold_retro = false
-			pitch = clampf(pitch + turn * 50.0 * mobility * delta, -100.0, 100.0)
+			pitch = clampf(pitch + dir_x * 50.0 * mobility * delta, -100.0, 100.0)
 		elif hold_retro:
 			pitch = move_toward(pitch, clampf(rad_to_deg(atan2(-vx, -vy)), -100.0, 100.0), 60.0 * mobility * delta)
 		if ship.stage_fuel(ship.active_stage()) <= 0.0:
 			ship.auto_stage()
-	if throttle > 0.0 or heat > 0.05:
-		warp_i = mini(warp_i, 1)
 	var chute_area := 0.0
 	if chute > 0:
 		for part: ShipPart in ship.of_kind(&"parachute"):
 			if not part.broken:
 				chute_area += part.def.drag * (0.3 if chute == 1 else 3.0)
 	var s := {"x": x, "h": h, "vx": vx, "vy": vy}
-	var acc := RocketMath.descent_step(s, ship, body, throttle, pitch, lift, chute_area, wind, dt, Run.channel(&"thrust"))
+	var acc := 0.0
+	if Profile.arcade:
+		var res := arcade_descent_step(s, ship, body, dir_x, dir_y, chute_area, wind, dt, Run.channel(&"thrust"))
+		acc = float(res.acc)
+		throttle = float(res.throttle)
+	else:
+		acc = RocketMath.descent_step(s, ship, body, throttle, pitch, lift, chute_area, wind, dt, Run.channel(&"thrust"))
+	if throttle > 0.0 or heat > 0.05:
+		warp_i = mini(warp_i, 1)
 	x = s.x
 	h = s.h
 	vx = s.vx
@@ -379,7 +424,7 @@ func _fly(delta: float) -> void:
 			Synth.play(&"alarm", -6.0)
 			_raise(Run.roll_stress((g_load - g_cap) / g_cap + 0.4))
 	Juice.shake(clampf(q / 30000.0, 0.0, 1.0) * delta * 1.5)
-	if h > top * 1.03 and vy > 0.0:
+	if not Profile.arcade and h > top * 1.03 and vy > 0.0:
 		_skip_out()
 		return
 	if agl() <= 0.0:
@@ -645,6 +690,8 @@ func _update_hud() -> void:
 			lines.append("Viento %+d m/s" % int(wind))
 		if state == State.ENTRY:
 			_prompt.text = "W/S sustentación   P paracaídas (freno bajo 450 m/s, principal bajo 120)   E eyectar   1-4 tiempo"
+		elif Profile.arcade:
+			_prompt.text = "WASD ajustar trayectoria con motores   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
 		else:
 			_prompt.text = "W/S acelerador   A/D inclinar   T retro   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
 	if state == State.LANDED:

@@ -17,6 +17,7 @@ func run(tree_root: Window) -> int:
 	_test_reliability()
 	_test_part_states()
 	_test_assist_and_time()
+	_test_arcade()
 	_test_nav_burn()
 	_test_tutorial()
 	_test_part_viability()
@@ -387,6 +388,8 @@ func _test_assist_and_time() -> void:
 	near(Run.time_scale(5), 50.0, 0.001, "max time")
 	check(Run.time_label(0) == "x0.5" and Run.time_label(3).begins_with("x"), "time labels")
 	var was := bool(profile.assist)
+	var was_arcade := bool(profile.arcade)
+	profile.arcade = false
 	profile.assist = false
 	var def: PartDef = _catalog().part(&"motor_trueno")
 	var part := ShipPart.create(def, ShipPart.Quality.SCRAP, rng)
@@ -398,6 +401,75 @@ func _test_assist_and_time() -> void:
 	check(soft < hard and is_equal_approx(soft, hard * 0.55), "assist cuts fail chance")
 	near(run.assist_payout_mult(), 0.85, 0.001, "assist payout cut")
 	profile.assist = was
+	profile.arcade = was_arcade
+
+
+func _test_arcade() -> void:
+	var profile := root.get_node("Profile")
+	var run := root.get_node("Run")
+	var cat := _catalog()
+	var was_arcade := bool(profile.arcade)
+	var was_assist := bool(profile.assist)
+	profile.assist = false
+	profile.arcade = false
+	var sim_budget := float(profile.budget(null))
+	var sim_rate := float(profile.premium_rate())
+	var sim_payout := float(run.assist_payout_mult())
+	profile.arcade = true
+	near(float(profile.budget(null)), sim_budget, 0.001, "arcade keeps budget identical")
+	near(float(profile.premium_rate()), sim_rate, 0.001, "arcade keeps insurance premium identical")
+	near(float(run.assist_payout_mult()), sim_payout, 0.001, "arcade keeps payout multiplier identical")
+	var bodies: Array[BodyDef] = cat.body_list()
+	var terra: BodyDef = cat.body(&"terra")
+	var SpaceScript := load("res://game/phases/space.gd") as GDScript
+	var p0 := Gravity.body_pos(terra, 0.0) + Vector2(terra.radius * 3.0, 0.0)
+	var v0 := Vector2(12.0, -8.0)
+	var st := {"pos": p0, "vel": v0, "t": 0.0}
+	SpaceScript.arcade_space_step(st, 2.0, bodies, Vector2.ZERO)
+	check((st.vel as Vector2).is_equal_approx(v0), "arcade space preserves exact velocity with zero gravity")
+	check((st.pos as Vector2).is_equal_approx(p0 + v0 * 2.0), "arcade space integrates pure inertia")
+	SpaceScript.arcade_space_step(st, 1.0, bodies, Vector2(5.0, 0.0))
+	check((st.vel as Vector2).is_equal_approx(v0 + Vector2(5.0, 0.0)), "arcade space accelerates along thrust")
+	run.debug_setup()
+	for p: ShipPart in run.ship.active_stage():
+		if p.fuel > 0.0:
+			p.fuel = 0.0
+	var ctrl := root.get_node("Controls")
+	var space: Node2D = SpaceScript.new()
+	root.add_child(space)
+	var v_start: Vector2 = space.st.vel
+	for i: int in 15:
+		ctrl._key_just[KEY_D] = true
+		space._process(1.0 / 60.0)
+	var dv_push := (space.st.vel as Vector2) - v_start
+	check(space.burning and dv_push.x > 10.0, "arcade space pushes laterally with WASD even after dry stage 0")
+	check(space.warp_i == 1, "arcade space keeps 1x time speed while burning instead of 0.5x")
+	check(space._pred.is_empty(), "arcade space draws no ship orbit prediction")
+	ctrl._key_just.clear()
+	var v_coast: Vector2 = space.st.vel
+	for i: int in 15:
+		space._process(1.0 / 60.0)
+	check((space.st.vel as Vector2).is_equal_approx(v_coast), "arcade space holds inertial velocity after releasing WASD")
+	root.remove_child(space)
+	space.free()
+	var DescentScript := load("res://game/phases/descent.gd") as GDScript
+	var ship := _make(["motor_trueno", "tanque_ancho", "capsula", "paracaidas"])
+	var fuel0 := ship.fuel_total()
+	var d_free := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
+	DescentScript.arcade_descent_step(d_free, ship, terra, 0.0, 0.0, 0.0, 0.0, 1.0)
+	check(float(d_free.vy) < -45.0, "arcade descent falls under local gravity without input")
+	near(ship.fuel_total(), fuel0, 0.001, "arcade descent spends no fuel while falling idle")
+	var d_brake := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
+	DescentScript.arcade_descent_step(d_brake, ship, terra, 0.0, 1.0, 0.0, 0.0, 1.0)
+	check(float(d_brake.vy) > float(d_free.vy), "arcade descent W brakes vertical fall with engines")
+	var d_right := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
+	DescentScript.arcade_descent_step(d_right, ship, terra, 1.0, 0.0, 0.0, 0.0, 1.0)
+	check(float(d_right.vx) > 5.0, "arcade descent D steers trajectory right with engines")
+	var d_left := {"x": 0.0, "h": 3500.0, "vx": 0.0, "vy": -45.0}
+	DescentScript.arcade_descent_step(d_left, ship, terra, -1.0, 0.0, 0.0, 0.0, 1.0)
+	check(float(d_left.vx) < -5.0, "arcade descent A steers trajectory left with engines")
+	profile.assist = was_assist
+	profile.arcade = was_arcade
 
 
 func _test_thermal() -> void:

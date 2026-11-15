@@ -18,9 +18,11 @@ func _init() -> void:
 	_slider("Efectos", &"sfx")
 	Ui.legend(col, "Accesibilidad")
 	_switch("Movimiento reducido", &"reduced_motion", "Sin sacudidas, destellos ni lámparas intermitentes.")
+	var arcade := _switch("Modo Fácil Arcade", &"arcade", "Navegación espacial con WASD sin gravedad (con inercia) y aterrizaje directo ajustando trayectoria con motores WASD.")
 	var assist := _switch("Modo asistido", &"assist", "Menos averías, más kits, corredores más anchos y navegación asistida (N). El contrato paga un 15 % menos.")
 	# Con un contrato en curso no se cambia: se podria volar asistido y cobrar el pago completo.
 	if Router.current != &"title" and Router.current != &"hangar":
+		arcade.disabled = true
 		assist.disabled = true
 		var hint := Ui.label(col, "El modo asistido se cambia en el hangar, no con un contrato en curso.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 		hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
