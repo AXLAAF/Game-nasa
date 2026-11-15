@@ -1,0 +1,4689 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Project-Id-Version: Contratista Orbital\n"
+
+#: content/bodies/jupiter.tres:8
+msgid "Júpiter"
+msgstr "Jupiter"
+
+#: content/bodies/jupiter.tres:9
+msgid "Gigante a 5,2 UA [NASA]. No tiene suelo: Galileo se hundió en su atmósfera en 2003 para no contaminar Europa. Los cinturones de radiación queman la electrónica."
+msgstr "Giant at 5.2 AU [NASA]. It has no surface: Galileo sank into its atmosphere in 2003 to avoid contaminating Europa. The radiation belts fry electronics."
+
+#: content/bodies/luna.tres:8
+msgid "Luna"
+msgstr "Moon"
+
+#: content/bodies/luna.tres:9
+msgid "A unos 384 000 km de la Tierra [NASA]. Sin aire: hay que bajar a motor. Ahí siguen las etapas de descenso Apolo y los vehículos lunares."
+msgstr "About 384,000 km from Earth [NASA]. No air: you have to land on engines. The Apollo descent stages and the lunar rovers are still there."
+
+#: content/bodies/marte.tres:8
+msgid "Marte"
+msgstr "Mars"
+
+#: content/bodies/marte.tres:9
+msgid "A 1,52 UA [NASA]. El aire real es muy fino; en el juego alcanza para un paracaídas. El polvo tapa los paneles de las sondas que se quedaron."
+msgstr "At 1.52 AU [NASA]. The real air is very thin; in the game it is enough for a parachute. Dust covers the panels of the probes left behind."
+
+#: content/bodies/mercurio.tres:8
+msgid "Mercurio"
+msgstr "Mercury"
+
+#: content/bodies/mercurio.tres:9
+msgid "El más cercano al Sol: 0,39 UA [NASA]. Sin aire y con el día abrasador. MESSENGER chocó aquí en 2015."
+msgstr "Closest to the Sun: 0.39 AU [NASA]. No air and a scorching day. MESSENGER crashed here in 2015."
+
+#: content/bodies/neptuno.tres:8
+msgid "Neptuno"
+msgstr "Neptune"
+
+#: content/bodies/neptuno.tres:9
+msgid "El más lejano, a 30,1 UA [NASA]. Oscuro, frío y sin superficie firme."
+msgstr "The farthest, at 30.1 AU [NASA]. Dark, cold and with no solid surface."
+
+#: content/bodies/saturno.tres:8
+msgid "Saturno"
+msgstr "Saturn"
+
+#: content/bodies/saturno.tres:9
+msgid "Gigante con anillos, a 9,6 UA [NASA]. Cassini se destruyó en su atmósfera en 2017. El suelo útil está en Titán."
+msgstr "Ringed giant, at 9.6 AU [NASA]. Cassini was destroyed in its atmosphere in 2017. The usable ground is on Titan."
+
+#: content/bodies/sol.tres:8
+msgid "Sol"
+msgstr "Sun"
+
+#: content/bodies/sol.tres:9
+msgid "El Sol. No se aterriza."
+msgstr "The Sun. You do not land here."
+
+#: content/bodies/tierra.tres:8
+msgid "Tierra"
+msgstr "Earth"
+
+#: content/bodies/tierra.tres:9
+msgid "Casa. Órbita a 1 UA [NASA]. El radio y la gravedad del mapa están a escala de juego."
+msgstr "Home. Orbit at 1 AU [NASA]. The radius and gravity on the map are at game scale."
+
+#: content/bodies/titan.tres:8
+msgid "Titán"
+msgstr "Titan"
+
+#: content/bodies/titan.tres:9
+msgid "Luna de Saturno con aire y frío. Huygens, llevado por el Cassini de la NASA, se posó aquí el 14 de enero de 2005."
+msgstr "A moon of Saturn with air and cold. Huygens, carried by NASA's Cassini, landed here on January 14, 2005."
+
+#: content/bodies/urano.tres:8
+msgid "Urano"
+msgstr "Uranus"
+
+#: content/bodies/urano.tres:9
+msgid "Gigante de hielo a 19,2 UA [NASA]. El Sol calienta poco y no hay suelo donde posarse."
+msgstr "Ice giant at 19.2 AU [NASA]. The Sun gives little heat and there is no ground to land on."
+
+#: content/bodies/venus.tres:8
+msgid "Venus"
+msgstr "Venus"
+
+#: content/bodies/venus.tres:9
+msgid "A 0,72 UA [NASA]. El aire real es unas 90 veces más denso que el de la Tierra; aquí está suavizado para que un escudo y un paracaídas puedan bajar."
+msgstr "At 0.72 AU [NASA]. The real air is about 90 times denser than Earth's; here it is softened so a shield and a parachute can get down."
+
+#: content/encounters/asteroide_hielo.tres:8
+msgid "Perforar"
+msgstr "Drill"
+
+#: content/encounters/asteroide_hielo.tres:17
+msgid "Tanques un poco más llenos."
+msgstr "Tanks a little fuller."
+
+#: content/encounters/asteroide_hielo.tres:18
+msgid "El taladro rebotó contra la nave."
+msgstr "The drill bounced off the ship."
+
+#: content/encounters/asteroide_hielo.tres:23
+msgid "Escanear al pasar"
+msgstr "Scan on the way past"
+
+#: content/encounters/asteroide_hielo.tres:35
+msgid "Asteroide de hielo"
+msgstr "Ice asteroid"
+
+#: content/encounters/asteroide_hielo.tres:36
+msgid "Una roca cubierta de hielo sucio. Hielo = combustible, si sabes perforar."
+msgstr "A rock covered in dirty ice. Ice = fuel, if you know how to drill."
+
+#: content/encounters/asteroide_metal.tres:8
+msgid "Minar"
+msgstr "Mine"
+
+#: content/encounters/asteroide_metal.tres:16
+msgid "Bodega llena de metal."
+msgstr "Cargo bay full of metal."
+
+#: content/encounters/asteroide_metal.tres:17
+msgid "Un fragmento golpeó la nave."
+msgstr "A fragment hit the ship."
+
+#: content/encounters/asteroide_metal.tres:22
+msgid "Aterrizaje relámpago"
+msgstr "Lightning landing"
+
+#: content/encounters/asteroide_metal.tres:32
+msgid "Muestras y una caja rara."
+msgstr "Samples and a rare crate."
+
+#: content/encounters/asteroide_metal.tres:33
+msgid "Rebotaste contra la roca."
+msgstr "You bounced off the rock."
+
+#: content/encounters/asteroide_metal.tres:42
+msgid "Asteroide metálico"
+msgstr "Metal asteroid"
+
+#: content/encounters/asteroide_metal.tres:43
+msgid "Hierro y níquel puro. Vale una fortuna... si no te parte el casco."
+msgstr "Pure iron and nickel. Worth a fortune... if it doesn't crack your hull."
+
+#: content/encounters/baliza_dorada.tres:8
+msgid "Todo o nada"
+msgstr "All or nothing"
+
+#: content/encounters/baliza_dorada.tres:17
+msgid "Premio mayor."
+msgstr "Jackpot."
+
+#: content/encounters/baliza_dorada.tres:18
+msgid "La baliza era una mina."
+msgstr "The beacon was a mine."
+
+#: content/encounters/baliza_dorada.tres:22
+msgid "Tomar lo seguro"
+msgstr "Take the safe option"
+
+#: content/encounters/baliza_dorada.tres:30
+msgid "Baliza dorada"
+msgstr "Golden beacon"
+
+#: content/encounters/baliza_dorada.tres:31
+msgid "Una baliza brilla en dorado. Nadie sabe quién la puso. Todo o nada."
+msgstr "A beacon glows gold. Nobody knows who put it there. All or nothing."
+
+#: content/encounters/cache_pirata.tres:8
+msgid "Forzar la esclusa"
+msgstr "Force the airlock"
+
+#: content/encounters/cache_pirata.tres:18
+msgid "Caja fuerte: créditos y un kit."
+msgstr "Safe: credits and a kit."
+
+#: content/encounters/cache_pirata.tres:19
+msgid "Una trampa de gas cortó los circuitos."
+msgstr "A gas trap cut the circuits."
+
+#: content/encounters/cache_pirata.tres:23
+msgid "Remolcar el casco"
+msgstr "Tow the hull"
+
+#: content/encounters/cache_pirata.tres:32
+msgid "Arrancaste un módulo útil."
+msgstr "You tore off a useful module."
+
+#: content/encounters/cache_pirata.tres:33
+msgid "El casco se deshizo al remolcar."
+msgstr "The hull fell apart while towing."
+
+#: content/encounters/cache_pirata.tres:37
+msgid "Dejarlo"
+msgstr "Leave it"
+
+#: content/encounters/cache_pirata.tres:42
+msgid "Caché pirata"
+msgstr "Pirate cache"
+
+#: content/encounters/cache_pirata.tres:43
+msgid "Una nave sin marcas flota a la deriva. Alguien escondió botín aquí."
+msgstr "An unmarked ship drifts here. Someone hid loot aboard."
+
+#: content/encounters/campo_escombros.tres:8
+msgid "Atravesar lento"
+msgstr "Cross slowly"
+
+#: content/encounters/campo_escombros.tres:18
+msgid "Pasaste limpio y recogiste restos."
+msgstr "You passed through clean and picked up scrap."
+
+#: content/encounters/campo_escombros.tres:19
+msgid "Un fragmento te abrió un panel."
+msgstr "A fragment tore open a panel."
+
+#: content/encounters/campo_escombros.tres:23
+msgid "Empujar a toda"
+msgstr "Push through at full thrust"
+
+#: content/encounters/campo_escombros.tres:32
+msgid "Saliste con chatarra valiosa."
+msgstr "You came out with valuable scrap."
+
+#: content/encounters/campo_escombros.tres:33
+msgid "El campo te rajó un tanque."
+msgstr "The field split a tank."
+
+#: content/encounters/campo_escombros.tres:37
+msgid "Rodear"
+msgstr "Go around"
+
+#: content/encounters/campo_escombros.tres:42
+msgid "Campo de escombros"
+msgstr "Debris field"
+
+#: content/encounters/campo_escombros.tres:43
+msgid "Restos de una estación vieja giran a cientos de metros por segundo."
+msgstr "Wreckage of an old station spins at hundreds of meters per second."
+
+#: content/encounters/cola_cometa.tres:8 content/encounters/cometa_cristal.tres:8
+msgid "Recoger hielo"
+msgstr "Collect ice"
+
+#: content/encounters/cola_cometa.tres:18
+msgid "Tanques cargados."
+msgstr "Tanks loaded."
+
+#: content/encounters/cola_cometa.tres:19
+msgid "Granizo contra el casco."
+msgstr "Hail against the hull."
+
+#: content/encounters/cola_cometa.tres:23 content/encounters/cometa_raro.tres:23
+msgid "Fotografiar"
+msgstr "Photograph"
+
+#: content/encounters/cola_cometa.tres:31
+msgid "Cola de cometa"
+msgstr "Comet tail"
+
+#: content/encounters/cola_cometa.tres:32
+msgid "Hielo y polvo brillante. Combustible gratis y peligro gratis."
+msgstr "Ice and glittering dust. Free fuel and free danger."
+
+#: content/encounters/cometa_cristal.tres:18
+msgid "Propelente gratis y muestras."
+msgstr "Free propellant and samples."
+
+#: content/encounters/cometa_cristal.tres:19
+msgid "El frío agarrotó las líneas."
+msgstr "The cold seized up the lines."
+
+#: content/encounters/cometa_cristal.tres:23
+msgid "Vender coordenadas"
+msgstr "Sell coordinates"
+
+#: content/encounters/cometa_cristal.tres:28
+msgid "La agencia pagó por la ruta."
+msgstr "The agency paid for the route."
+
+#: content/encounters/cometa_cristal.tres:32 content/encounters/senal_debil.tres:21
+msgid "Ignorar"
+msgstr "Ignore"
+
+#: content/encounters/cometa_cristal.tres:37
+msgid "Cometa de cristal"
+msgstr "Crystal comet"
+
+#: content/encounters/cometa_cristal.tres:38
+msgid "Un núcleo brillante arrastra una cola de hielo puro."
+msgstr "A bright nucleus trails a tail of pure ice."
+
+#: content/encounters/cometa_raro.tres:8
+msgid "Tomar muestra del núcleo"
+msgstr "Take a sample of the nucleus"
+
+#: content/encounters/cometa_raro.tres:18
+msgid "Ciencia de primera."
+msgstr "First-rate science."
+
+#: content/encounters/cometa_raro.tres:19
+msgid "Un chorro de gas te golpeó."
+msgstr "A jet of gas hit you."
+
+#: content/encounters/cometa_raro.tres:31
+msgid "Núcleo de cometa"
+msgstr "Comet nucleus"
+
+#: content/encounters/cometa_raro.tres:32
+msgid "Puedes ver el núcleo: compuestos orgánicos rarísimos."
+msgstr "You can see the nucleus: extremely rare organic compounds."
+
+#: content/encounters/eco_extrano.tres:8
+msgid "Seguir la señal"
+msgstr "Follow the signal"
+
+#: content/encounters/eco_extrano.tres:17
+msgid "Cajas flotando en la nada."
+msgstr "Crates floating in the void."
+
+#: content/encounters/eco_extrano.tres:18
+msgid "Interferencia que frie circuitos."
+msgstr "Interference that fries circuits."
+
+#: content/encounters/eco_extrano.tres:22
+msgid "Grabar y seguir"
+msgstr "Record and move on"
+
+#: content/encounters/eco_extrano.tres:30
+msgid "Eco extrano"
+msgstr "Strange echo"
+
+#: content/encounters/eco_extrano.tres:31
+msgid "La señal se repite con un patrón que no es natural."
+msgstr "The signal repeats in a pattern that is not natural."
+
+#: content/encounters/enjambre.tres:8
+msgid "Atravesarlo"
+msgstr "Cross it"
+
+#: content/encounters/enjambre.tres:17
+msgid "Saliste del otro lado."
+msgstr "You came out the other side."
+
+#: content/encounters/enjambre.tres:18
+msgid "El casco quedó como colador."
+msgstr "The hull came out like a sieve."
+
+#: content/encounters/enjambre.tres:23
+msgid "Rodearlo"
+msgstr "Go around it"
+
+#: content/encounters/enjambre.tres:27
+msgid "Rodeo seguro."
+msgstr "Safe detour."
+
+#: content/encounters/enjambre.tres:32
+msgid "Enjambre de rocas"
+msgstr "Rock swarm"
+
+#: content/encounters/enjambre.tres:33
+msgid "Un cúmulo de escombros en tu ruta. Dentro hay cristales."
+msgstr "A cluster of debris on your route. There are crystals inside."
+
+#: content/encounters/estacion_fantasma.tres:8
+msgid "Abordar a lo loco"
+msgstr "Board recklessly"
+
+#: content/encounters/estacion_fantasma.tres:19
+msgid "Botín completo."
+msgstr "Full loot."
+
+#: content/encounters/estacion_fantasma.tres:20
+msgid "Algo explotó dentro."
+msgstr "Something exploded inside."
+
+#: content/encounters/estacion_fantasma.tres:24
+msgid "Acoplar con cuidado"
+msgstr "Dock carefully"
+
+#: content/encounters/estacion_fantasma.tres:33
+msgid "Combustible y un kit."
+msgstr "Fuel and a kit."
+
+#: content/encounters/estacion_fantasma.tres:34
+msgid "Mal acople."
+msgstr "Bad docking."
+
+#: content/encounters/estacion_fantasma.tres:44
+msgid "Estación fantasma"
+msgstr "Ghost station"
+
+#: content/encounters/estacion_fantasma.tres:45
+msgid "Una estación apagada gira lentamente. Las luces de emergencia parpadean."
+msgstr "A dark station turns slowly. The emergency lights flicker."
+
+#: content/encounters/faro_antiguo.tres:8
+msgid "Descifrar la señal"
+msgstr "Decode the signal"
+
+#: content/encounters/faro_antiguo.tres:19
+msgid "Mapas olvidados y dos cajas selladas."
+msgstr "Forgotten maps and two sealed crates."
+
+#: content/encounters/faro_antiguo.tres:20
+msgid "El protocolo te dejó ciego un rato."
+msgstr "The protocol left you blind for a while."
+
+#: content/encounters/faro_antiguo.tres:24
+msgid "Retransmitir a la agencia"
+msgstr "Relay to the agency"
+
+#: content/encounters/faro_antiguo.tres:33
+msgid "Pagaron por el enlace."
+msgstr "They paid for the link."
+
+#: content/encounters/faro_antiguo.tres:34
+msgid "Se cortó a mitad."
+msgstr "It cut out halfway."
+
+#: content/encounters/faro_antiguo.tres:38
+msgid "Apagar receptores"
+msgstr "Shut off receivers"
+
+#: content/encounters/faro_antiguo.tres:43
+msgid "Faro antiguo"
+msgstr "Ancient lighthouse"
+
+#: content/encounters/faro_antiguo.tres:44
+msgid "Una baliza late con un código que nadie ha oído en décadas."
+msgstr "A beacon pulses with a code nobody has heard in decades."
+
+#: content/encounters/nave_rival.tres:8
+msgid "Acoplar"
+msgstr "Dock"
+
+#: content/encounters/nave_rival.tres:19
+msgid "Jackpot de chatarra."
+msgstr "Scrap jackpot."
+
+#: content/encounters/nave_rival.tres:20
+msgid "Choque feo."
+msgstr "Ugly crash."
+
+#: content/encounters/nave_rival.tres:25
+msgid "Hackear su computadora"
+msgstr "Hack its computer"
+
+#: content/encounters/nave_rival.tres:34
+msgid "Transferencia completa."
+msgstr "Transfer complete."
+
+#: content/encounters/nave_rival.tres:35
+msgid "Virus en tu sistema."
+msgstr "Virus in your system."
+
+#: content/encounters/nave_rival.tres:44
+msgid "Nave de otra agencia"
+msgstr "Another agency's ship"
+
+#: content/encounters/nave_rival.tres:45
+msgid "Una nave rival a la deriva. Su bodega está llena."
+msgstr "A rival ship adrift. Its cargo bay is full."
+
+#: content/encounters/nube_ionica.tres:8
+msgid "Cargar baterías"
+msgstr "Charge batteries"
+
+#: content/encounters/nube_ionica.tres:18
+msgid "La nube te cargó las celdas."
+msgstr "The cloud charged your cells."
+
+#: content/encounters/nube_ionica.tres:19
+msgid "Una descarga frió la electrónica."
+msgstr "A discharge fried the electronics."
+
+#: content/encounters/nube_ionica.tres:23
+msgid "Tomar lecturas"
+msgstr "Take readings"
+
+#: content/encounters/nube_ionica.tres:32
+msgid "Datos limpios para la agencia."
+msgstr "Clean data for the agency."
+
+#: content/encounters/nube_ionica.tres:33
+msgid "El sensor se saturó."
+msgstr "The sensor saturated."
+
+#: content/encounters/nube_ionica.tres:37
+msgid "Esquivar"
+msgstr "Dodge"
+
+#: content/encounters/nube_ionica.tres:42
+msgid "Nube iónica"
+msgstr "Ion cloud"
+
+#: content/encounters/nube_ionica.tres:43
+msgid "Una mancha brillante de plasma se mueve sola. Carga y quema por igual."
+msgstr "A bright patch of plasma moves on its own. It charges and burns alike."
+
+#: content/encounters/senal_debil.tres:8
+msgid "Investigar"
+msgstr "Investigate"
+
+#: content/encounters/senal_debil.tres:16
+msgid "Un satélite con datos vendibles."
+msgstr "A satellite with sellable data."
+
+#: content/encounters/senal_debil.tres:17
+msgid "Era una trampa de interferencia."
+msgstr "It was an interference trap."
+
+#: content/encounters/senal_debil.tres:26
+msgid "Señal débil"
+msgstr "Weak signal"
+
+#: content/encounters/senal_debil.tres:27
+msgid "Un pitido en frecuencia de emergencia."
+msgstr "A beep on the emergency frequency."
+
+#: content/encounters/sobrevuelo_lunar.tres:8
+msgid "Pasada rasante"
+msgstr "Low pass"
+
+#: content/encounters/sobrevuelo_lunar.tres:18
+msgid "Fotos espectaculares."
+msgstr "Spectacular photos."
+
+#: content/encounters/sobrevuelo_lunar.tres:19
+msgid "Rozaste un pico."
+msgstr "You grazed a peak."
+
+#: content/encounters/sobrevuelo_lunar.tres:23
+msgid "Escanear cráteres"
+msgstr "Scan craters"
+
+#: content/encounters/sobrevuelo_lunar.tres:38
+msgid "Sobrevuelo"
+msgstr "Flyby"
+
+#: content/encounters/sobrevuelo_lunar.tres:39
+msgid "Pasas rozando una luna. Los cráteres guardan secretos."
+msgstr "You skim past a moon. The craters hold secrets."
+
+#: content/encounters/sonda_abandonada.tres:8
+msgid "Acoplar y saquear"
+msgstr "Dock and loot"
+
+#: content/encounters/sonda_abandonada.tres:17
+msgid "Te llevas piezas."
+msgstr "You take parts."
+
+#: content/encounters/sonda_abandonada.tres:18
+msgid "Golpeaste la sonda."
+msgstr "You hit the probe."
+
+#: content/encounters/sonda_abandonada.tres:23
+msgid "Arrancar paneles con el brazo"
+msgstr "Rip off panels with the arm"
+
+#: content/encounters/sonda_abandonada.tres:32
+msgid "Batería y chatarra."
+msgstr "Battery and scrap."
+
+#: content/encounters/sonda_abandonada.tres:33
+msgid "Un panel rayó las cámaras."
+msgstr "A panel scratched the cameras."
+
+#: content/encounters/sonda_abandonada.tres:42
+msgid "Sonda abandonada"
+msgstr "Abandoned probe"
+
+#: content/encounters/sonda_abandonada.tres:43
+msgid "Una sonda vieja de otra misión. Paneles intactos y una caja negra."
+msgstr "An old probe from another mission. Intact panels and a black box."
+
+#: content/malfunctions/apagon_motor.tres:8
+msgid "Reencender ya"
+msgstr "Relight now"
+
+#: content/malfunctions/apagon_motor.tres:13
+msgid "Ruge otra vez."
+msgstr "Roars again."
+
+#: content/malfunctions/apagon_motor.tres:14
+msgid "Encendió a medias."
+msgstr "Half-lit."
+
+#: content/malfunctions/apagon_motor.tres:18
+msgid "Purgar y reencender"
+msgstr "Purge and relight"
+
+#: content/malfunctions/apagon_motor.tres:26
+msgid "Limpio y estable."
+msgstr "Clean and stable."
+
+#: content/malfunctions/apagon_motor.tres:27
+msgid "Murió del todo."
+msgstr "It died completely."
+
+#: content/malfunctions/apagon_motor.tres:31
+msgid "Darlo por perdido"
+msgstr "Write it off"
+
+#: content/malfunctions/apagon_motor.tres:35
+msgid "Un motor menos."
+msgstr "One engine less."
+
+#: content/malfunctions/apagon_motor.tres:40
+msgid "Apagón de motor"
+msgstr "Engine flameout"
+
+#: content/malfunctions/apagon_motor.tres:41
+msgid "%part% se apagó en pleno encendido."
+msgstr "%part% shut down mid-burn."
+
+#: content/malfunctions/cortocircuito.tres:8
+msgid "Reiniciar sistema"
+msgstr "Reboot system"
+
+#: content/malfunctions/cortocircuito.tres:14
+msgid "Frito."
+msgstr "Fried."
+
+#: content/malfunctions/cortocircuito.tres:18
+msgid "Desviar energía"
+msgstr "Reroute power"
+
+#: content/malfunctions/cortocircuito.tres:22
+msgid "Funciona, pero chupa batería."
+msgstr "It works, but drains the battery."
+
+#: content/malfunctions/cortocircuito.tres:26
+msgid "Aislar la pieza"
+msgstr "Isolate the part"
+
+#: content/malfunctions/cortocircuito.tres:30
+msgid "Desconectada para siempre."
+msgstr "Disconnected for good."
+
+#: content/malfunctions/cortocircuito.tres:35
+msgid "Cortocircuito"
+msgstr "Short circuit"
+
+#: content/malfunctions/cortocircuito.tres:36
+msgid "Chispas en %part%. Huele a quemado."
+msgstr "Sparks in %part%. Smells like burning."
+
+#: content/malfunctions/desacople_trabado.tres:8
+msgid "Pernos de respaldo"
+msgstr "Backup bolts"
+
+#: content/malfunctions/desacople_trabado.tres:13
+msgid "La etapa se solto."
+msgstr "The stage came loose."
+
+#: content/malfunctions/desacople_trabado.tres:14
+msgid "Siguen trabados."
+msgstr "Still stuck."
+
+#: content/malfunctions/desacople_trabado.tres:18
+msgid "Sacudir con los motores"
+msgstr "Shake it loose with the engines"
+
+#: content/malfunctions/desacople_trabado.tres:23
+msgid "Se solto de un tiron."
+msgstr "It came loose with one jerk."
+
+#: content/malfunctions/desacople_trabado.tres:24
+msgid "Algo más se rompió."
+msgstr "Something else broke."
+
+#: content/malfunctions/desacople_trabado.tres:29
+msgid "Desacoplador trabado"
+msgstr "Stuck decoupler"
+
+#: content/malfunctions/desacople_trabado.tres:30
+msgid "%part% no suelta la etapa. Peso muerto colgando."
+msgstr "%part% will not release the stage. Dead weight hanging on."
+
+#: content/malfunctions/error_navegacion.tres:8
+msgid "Recalibrar"
+msgstr "Recalibrate"
+
+#: content/malfunctions/error_navegacion.tres:13
+msgid "Cálculos limpios."
+msgstr "Clean calculations."
+
+#: content/malfunctions/error_navegacion.tres:14
+msgid "La predicción quedó corta."
+msgstr "The prediction fell short."
+
+#: content/malfunctions/error_navegacion.tres:18
+msgid "Navegar a ojo"
+msgstr "Navigate by eye"
+
+#: content/malfunctions/error_navegacion.tres:26
+msgid "Error de navegación"
+msgstr "Navigation error"
+
+#: content/malfunctions/error_navegacion.tres:27
+msgid "%part% calcula trayectorias imposibles."
+msgstr "%part% is calculating impossible trajectories."
+
+#: content/malfunctions/falla_misteriosa.tres:8
+msgid "Ignorarlo"
+msgstr "Ignore it"
+
+#: content/malfunctions/falla_misteriosa.tres:13
+msgid "Era nada."
+msgstr "It was nothing."
+
+#: content/malfunctions/falla_misteriosa.tres:14
+msgid "Era algo."
+msgstr "It was something."
+
+#: content/malfunctions/falla_misteriosa.tres:18
+msgid "Revisar a fondo"
+msgstr "Inspect thoroughly"
+
+#: content/malfunctions/falla_misteriosa.tres:25
+msgid "Ajustado."
+msgstr "Adjusted."
+
+#: content/malfunctions/falla_misteriosa.tres:30
+msgid "Falla misteriosa"
+msgstr "Mysterious fault"
+
+#: content/malfunctions/falla_misteriosa.tres:31
+msgid "Algo en %part% hace un ruido que no debería."
+msgstr "Something in %part% is making a noise it shouldn't."
+
+#: content/malfunctions/fuga_cabina.tres:8
+msgid "Parchar con kit"
+msgstr "Patch with a kit"
+
+#: content/malfunctions/fuga_cabina.tres:12
+msgid "Hermetica otra vez."
+msgstr "Airtight again."
+
+#: content/malfunctions/fuga_cabina.tres:16
+msgid "Cinta adhesiva"
+msgstr "Duct tape"
+
+#: content/malfunctions/fuga_cabina.tres:22
+msgid "La cinta aguanta."
+msgstr "The tape holds."
+
+#: content/malfunctions/fuga_cabina.tres:23
+msgid "Visores empanados y radio muda."
+msgstr "Fogged visors and a silent radio."
+
+#: content/malfunctions/fuga_cabina.tres:28
+msgid "Fuga de aire en cabina"
+msgstr "Cabin air leak"
+
+#: content/malfunctions/fuga_cabina.tres:29
+msgid "Silbido en %part%. La tripulación se pone el casco."
+msgstr "Hissing in %part%. The crew puts on their helmets."
+
+#: content/malfunctions/fuga_combustible.tres:8
+msgid "Sellar con kit"
+msgstr "Seal with a kit"
+
+#: content/malfunctions/fuga_combustible.tres:15
+msgid "Sellado."
+msgstr "Sealed."
+
+#: content/malfunctions/fuga_combustible.tres:19
+msgid "Soldadura improvisada"
+msgstr "Improvised weld"
+
+#: content/malfunctions/fuga_combustible.tres:27
+msgid "Aguanta la soldadura."
+msgstr "The weld holds."
+
+#: content/malfunctions/fuga_combustible.tres:28
+msgid "La grieta se abrió más."
+msgstr "The crack opened wider."
+
+#: content/malfunctions/fuga_combustible.tres:32
+msgid "Dejar que se vacíe"
+msgstr "Let it drain"
+
+#: content/malfunctions/fuga_combustible.tres:40
+msgid "Fuga de combustible"
+msgstr "Fuel leak"
+
+#: content/malfunctions/fuga_combustible.tres:41
+msgid "%part% pierde propelente. Cada segundo cuenta."
+msgstr "%part% is losing propellant. Every second counts."
+
+#: content/malfunctions/grieta_escudo.tres:8
+msgid "Girar para repartir el calor"
+msgstr "Rotate to spread the heat"
+
+#: content/malfunctions/grieta_escudo.tres:16
+msgid "El calor se reparte."
+msgstr "The heat spreads out."
+
+#: content/malfunctions/grieta_escudo.tres:17
+msgid "La grieta se abrió."
+msgstr "The crack opened."
+
+#: content/malfunctions/grieta_escudo.tres:21
+msgid "Rezar"
+msgstr "Pray"
+
+#: content/malfunctions/grieta_escudo.tres:26
+msgid "Increíble, aguantó."
+msgstr "Incredible, it held."
+
+#: content/malfunctions/grieta_escudo.tres:27
+msgid "El escudo se desprende."
+msgstr "The shield tears away."
+
+#: content/malfunctions/grieta_escudo.tres:32
+msgid "Grieta en el escudo"
+msgstr "Shield crack"
+
+#: content/malfunctions/grieta_escudo.tres:33
+msgid "%part% se agrieta en el peor momento."
+msgstr "%part% cracks at the worst moment."
+
+#: content/malfunctions/motor_desbalanceado.tres:8
+msgid "Cortar potencia"
+msgstr "Cut power"
+
+#: content/malfunctions/motor_desbalanceado.tres:12
+msgid "Vibra menos, empuja menos."
+msgstr "Vibrates less, pushes less."
+
+#: content/malfunctions/motor_desbalanceado.tres:16
+msgid "Forzarlo a tope"
+msgstr "Push it to the limit"
+
+#: content/malfunctions/motor_desbalanceado.tres:24
+msgid "Aguantó. De milagro."
+msgstr "It held. By a miracle."
+
+#: content/malfunctions/motor_desbalanceado.tres:25
+msgid "El motor se desintegró."
+msgstr "The engine disintegrated."
+
+#: content/malfunctions/motor_desbalanceado.tres:29
+msgid "Reiniciar ignición"
+msgstr "Restart ignition"
+
+#: content/malfunctions/motor_desbalanceado.tres:34
+msgid "Volvió a la normalidad."
+msgstr "Back to normal."
+
+#: content/malfunctions/motor_desbalanceado.tres:35
+msgid "No volvió a encender."
+msgstr "It did not relight."
+
+#: content/malfunctions/motor_desbalanceado.tres:40
+msgid "Motor desbalanceado"
+msgstr "Unbalanced engine"
+
+#: content/malfunctions/motor_desbalanceado.tres:41
+msgid "%part% vibra fuera de rango. Las alarmas no se callan."
+msgstr "%part% vibrates out of range. The alarms will not stop."
+
+#: content/malfunctions/panel_danado.tres:8
+msgid "Recalibrar el mecanismo"
+msgstr "Recalibrate the mechanism"
+
+#: content/malfunctions/panel_danado.tres:13
+msgid "Vuelve a su sitio."
+msgstr "It snaps back into place."
+
+#: content/malfunctions/panel_danado.tres:14
+msgid "Se partió."
+msgstr "It snapped."
+
+#: content/malfunctions/panel_danado.tres:18
+msgid "Replegarlo"
+msgstr "Fold it back"
+
+#: content/malfunctions/panel_danado.tres:26
+msgid "Panel dañado"
+msgstr "Damaged panel"
+
+#: content/malfunctions/panel_danado.tres:27
+msgid "%part% se dobla y pierde rendimiento."
+msgstr "%part% bends and loses performance."
+
+#: content/malfunctions/paracaidas_enredado.tres:8
+msgid "Cortar y desplegar reserva"
+msgstr "Cut away and deploy the reserve"
+
+#: content/malfunctions/paracaidas_enredado.tres:13
+msgid "La reserva se abrió."
+msgstr "The reserve opened."
+
+#: content/malfunctions/paracaidas_enredado.tres:14
+msgid "No hay reserva que valga."
+msgstr "No reserve can save this."
+
+#: content/malfunctions/paracaidas_enredado.tres:18
+msgid "Sacudir las cuerdas"
+msgstr "Shake the lines"
+
+#: content/malfunctions/paracaidas_enredado.tres:23
+msgid "Se desenredó."
+msgstr "It untangled."
+
+#: content/malfunctions/paracaidas_enredado.tres:24
+msgid "Se hizo jirones."
+msgstr "It shredded."
+
+#: content/malfunctions/paracaidas_enredado.tres:29
+msgid "Paracaídas enredado"
+msgstr "Tangled parachute"
+
+#: content/malfunctions/paracaidas_enredado.tres:30
+msgid "Las cuerdas de %part% se enredaron."
+msgstr "The lines of %part% tangled."
+
+#: content/malfunctions/pata_atascada.tres:8
+msgid "Forzar el pistón"
+msgstr "Force the piston"
+
+#: content/malfunctions/pata_atascada.tres:13
+msgid "Clack. Desplegada."
+msgstr "Clack. Deployed."
+
+#: content/malfunctions/pata_atascada.tres:14
+msgid "Se dobló."
+msgstr "It bent."
+
+#: content/malfunctions/pata_atascada.tres:18
+msgid "Dejarla así"
+msgstr "Leave it as is"
+
+#: content/malfunctions/pata_atascada.tres:26
+msgid "Pata atascada"
+msgstr "Stuck leg"
+
+#: content/malfunctions/pata_atascada.tres:27
+msgid "%part% no termina de desplegarse."
+msgstr "%part% will not fully deploy."
+
+#: content/malfunctions/sobrepresion.tres:8
+msgid "Ventilar"
+msgstr "Vent"
+
+#: content/malfunctions/sobrepresion.tres:12
+msgid "Presión normal, menos combustible."
+msgstr "Normal pressure, less fuel."
+
+#: content/malfunctions/sobrepresion.tres:21
+msgid "Se estabilizó solo."
+msgstr "It stabilized on its own."
+
+#: content/malfunctions/sobrepresion.tres:22
+msgid "El tanque reventó."
+msgstr "The tank burst."
+
+#: content/malfunctions/sobrepresion.tres:27
+msgid "Sobrepresión en tanque"
+msgstr "Tank overpressure"
+
+#: content/malfunctions/sobrepresion.tres:28
+msgid "La presión de %part% sube sin control."
+msgstr "The pressure in %part% is rising out of control."
+
+#: content/parts/aislante.tres:8
+msgid "Manta MLI"
+msgstr "MLI blanket"
+
+#: content/parts/aislante.tres:9
+msgid "Aislante de Kapton, la manta dorada. Guarda el calor de la nave lejos del Sol."
+msgstr "Kapton insulation, the golden blanket. It keeps the ship's heat in far from the Sun."
+
+#: content/parts/antena.tres:8
+msgid "Antena HGA"
+msgstr "HGA antenna"
+
+#: content/parts/antena.tres:9
+msgid "Antena de alta ganancia. Habla con la Red del Espacio Profundo."
+msgstr "High-gain antenna. It talks to the Deep Space Network."
+
+#: content/parts/bateria.tres:8
+msgid "Batería Li-Ion"
+msgstr "Li-Ion battery"
+
+#: content/parts/bateria.tres:9
+msgid "Batería de litio-ion. Guarda energía para la sombra y los picos."
+msgstr "Lithium-ion battery. Stores energy for the shadow and for peaks."
+
+#: content/parts/blindaje.tres:9
+msgid "Como la bóveda de Juno. Protege la electrónica de llamaradas y cinturones."
+msgstr "Like Juno's vault. Protects the electronics from flares and belts."
+
+#: content/parts/capsula.tres:8
+msgid "Cápsula Apolo"
+msgstr "Apollo capsule"
+
+#: content/parts/capsula.tres:9
+msgid "Cápsula de morro romo. La tripulación va aquí. Sin ella no hay misión."
+msgstr "Blunt-nosed capsule. The crew rides here. Without it there is no mission."
+
+#: content/parts/computadora.tres:8
+msgid "Computadora RAD750"
+msgstr "RAD750 computer"
+
+#: content/parts/computadora.tres:9
+msgid "Computadora de vuelo endurecida, como la de Curiosity. Predice la trayectoria completa."
+msgstr "Radiation-hardened flight computer, like Curiosity's. It predicts the full trajectory."
+
+#: content/parts/desacoplador.tres:8
+msgid "Pernos de etapa"
+msgstr "Stage bolts"
+
+#: content/parts/desacoplador.tres:9
+msgid "Pernos frangibles: separan la etapa de abajo y se van con ella."
+msgstr "Frangible bolts: they separate the stage below and go with it."
+
+#: content/parts/escudo_ligero.tres:8
+msgid "Escudo SLA-561"
+msgstr "SLA-561 shield"
+
+#: content/parts/escudo_ligero.tres:9
+msgid "Ablativo ligero de las Viking. Sirve para una entrada suave, como la de Marte."
+msgstr "Light ablative from the Vikings. Good for a gentle entry, like Mars."
+
+#: content/parts/escudo_termico.tres:8
+msgid "Escudo PICA"
+msgstr "PICA shield"
+
+#: content/parts/escudo_termico.tres:9
+msgid "Ablativo de carbono, como el de Curiosity. Se consume en la entrada."
+msgstr "Carbon ablative, like Curiosity's. It burns away on entry."
+
+#: content/parts/giroscopio.tres:8
+msgid "Rueda de reacción"
+msgstr "Reaction wheel"
+
+#: content/parts/giroscopio.tres:9
+msgid "Gira la nave sin gastar propelente, como las ruedas del Hubble."
+msgstr "Turns the ship without spending propellant, like Hubble's wheels."
+
+#: content/parts/motor_chispa.tres:8
+msgid "Motor AJ10"
+msgstr "AJ10 engine"
+
+#: content/parts/motor_chispa.tres:9
+msgid "Propelentes almacenables, como el SPS del Apolo. No levanta una nave pesada desde el suelo."
+msgstr "Storable propellants, like the Apollo SPS. It cannot lift a heavy ship off the ground."
+
+#: content/parts/motor_susurro.tres:8
+msgid "Motor RL10"
+msgstr "RL10 engine"
+
+#: content/parts/motor_susurro.tres:9
+msgid "Motor de vacío, como el RL10 del Centauro. Casi no empuja, pero estira cada gota."
+msgstr "Vacuum engine, like the Centaur's RL10. It barely pushes, but stretches every drop."
+
+#: content/parts/motor_trueno.tres:8
+msgid "Motor H-1"
+msgstr "H-1 engine"
+
+#: content/parts/motor_trueno.tres:9
+msgid "Primera etapa, como el H-1 del Saturno I. Mucho empuje y mucho consumo."
+msgstr "First stage, like the Saturn I's H-1. Lots of thrust and lots of consumption."
+
+#: content/parts/panel_solar.tres:8
+msgid "Panel triple unión"
+msgstr "Triple-junction panel"
+
+#: content/parts/panel_solar.tres:9
+msgid "Celdas GaInP/GaAs/Ge. Rinden cerca del Sol, casi nada lejos, y se queman muy cerca."
+msgstr "GaInP/GaAs/Ge cells. They perform near the Sun, almost nothing far away, and burn out very close."
+
+#: content/parts/paracaidas.tres:8
+msgid "Paracaídas DGB"
+msgstr "DGB parachute"
+
+#: content/parts/paracaidas.tres:9
+msgid "Disco y banda, como el de Perseverance. Freno (P) y principal (P otra vez)."
+msgstr "Disk-gap-band, like Perseverance's. Drogue (P) and main (P again)."
+
+#: content/parts/patas.tres:8
+msgid "Patas de panal"
+msgstr "Honeycomb legs"
+
+#: content/parts/patas.tres:9
+msgid "Panal de aluminio que se aplasta, como en el módulo lunar. Aguanta un golpe más duro."
+msgstr "Crushable aluminum honeycomb, like on the lunar module. Takes a harder hit."
+
+#: content/parts/radiador.tres:8
+msgid "Radiador de amoníaco"
+msgstr "Ammonia radiator"
+
+#: content/parts/radiador.tres:9
+msgid "Como los paneles de la estación. Tira el calor cerca del Sol."
+msgstr "Like the station's panels. Dumps heat near the Sun."
+
+#: content/parts/rcs.tres:8
+msgid "Propulsores RCS"
+msgstr "RCS thrusters"
+
+#: content/parts/rcs.tres:9
+msgid "Motores pequeños de actitud, como los del Apolo. Giran la nave gastando propelente."
+msgstr "Small attitude engines, like the Apollo's. They turn the ship while spending propellant."
+
+#: content/parts/rtg.tres:9
+msgid "Generador de plutonio-238, como el de Curiosity. Da energía en cualquier sitio y también calienta."
+msgstr "Plutonium-238 generator, like Curiosity's. It gives power anywhere and also heats."
+
+#: content/parts/sensores.tres:8
+msgid "Seguidor estelar"
+msgstr "Star tracker"
+
+#: content/parts/sensores.tres:9
+msgid "Orientación por estrellas. Avisa de llamaradas y marca lo que hay alrededor."
+msgstr "Star-based orientation. It warns of flares and marks what is around you."
+
+#: content/parts/tanque_ancho.tres:8
+msgid "Núcleo ancho"
+msgstr "Wide core"
+
+#: content/parts/tanque_ancho.tres:9
+msgid "Tanque ancho de aluminio-litio. 16 t de propelente. Pesa, pero rinde."
+msgstr "Wide aluminum-lithium tank. 16 t of propellant. Heavy, but worth it."
+
+#: content/parts/tanque_corto.tres:8
+msgid "Tanque Al-Li corto"
+msgstr "Short Al-Li tank"
+
+#: content/parts/tanque_corto.tres:9
+msgid "Tanque de aluminio-litio. 4 t de propelente."
+msgstr "Aluminum-lithium tank. 4 t of propellant."
+
+#: content/parts/tanque_gota.tres:8
+msgid "Tanque Atlas"
+msgstr "Atlas tank"
+
+#: content/parts/tanque_gota.tres:9
+msgid "Tanque globo, como el del Atlas: barato y frágil. 6 t si no se raja."
+msgstr "Balloon tank, like the Atlas's: cheap and fragile. 6 t if it does not crack."
+
+#: content/parts/tanque_largo.tres:8
+msgid "Tanque Al-Li largo"
+msgstr "Long Al-Li tank"
+
+#: content/parts/tanque_largo.tres:9
+msgid "Tanque de aluminio-litio. 9 t de propelente."
+msgstr "Aluminum-lithium tank. 9 t of propellant."
+
+#: content/parts/torre_escape.tres:8
+msgid "Torre LES"
+msgstr "LES tower"
+
+#: content/parts/torre_escape.tres:9
+msgid "Torre de escape de tracción, como la del Apolo. Aborta el despegue y salva la cápsula (Retroceso)."
+msgstr "Pulling escape tower, like the Apollo's. It aborts the launch and saves the capsule (Backspace)."
+
+#: data/design/training.json:1
+msgid "Abre el freno del paracaídas"
+msgstr "Open the parachute drogue"
+
+#: data/design/training.json:1
+msgid "Abre el paracaídas principal"
+msgstr "Open the main parachute"
+
+#: data/design/training.json:1
+msgid "Activa Ignición cuando el reloj marque cero. La práctica espera en T-0: una pulsación temprana explica el error sin consumir combustible."
+msgstr "Activate Ignition when the clock reaches zero. The practice waits at T-0: an early press explains the mistake without using fuel."
+
+#: data/design/training.json:1
+msgid "Ahora sí: separa la primera etapa"
+msgstr "Now it's time: separate the first stage"
+
+#: data/design/training.json:1
+msgid "Ajusta el ángulo dentro de la franja verde y activa Entrar. Muy plano puede hacerte salir de la atmósfera; demasiado empinado concentra calor y carga. El tramo de costa se resume [DIS]."
+msgstr "Adjust the angle inside the green band and activate Enter. Too flat can send you back out of the atmosphere; too steep concentrates heat and load. The coasting stretch is summarized [DIS]."
+
+#: data/design/training.json:1
+msgid "Ajusta potencia y orientación. La asistencia sigue el corredor cuando sueltas el giro. Vigila presión y combustible de la etapa activa."
+msgstr "Adjust power and orientation. The assist follows the corridor when you release the turn. Watch pressure and the active stage's fuel."
+
+#: data/design/training.json:1
+msgid "Aprende a orientar"
+msgstr "Learn to steer"
+
+#: data/design/training.json:1
+msgid "Apunta contra el movimiento"
+msgstr "Aim against the motion"
+
+#: data/design/training.json:1
+msgid "Avería programada de práctica. El cierre no se liberó. Usa Reparar; después vuelve a activar Separar. El vuelo permanece congelado."
+msgstr "Scripted practice malfunction. The latch did not release. Use Repair; then activate Separate again. The flight stays frozen."
+
+#: data/design/training.json:1
+msgid "Cabina de mando"
+msgstr "Command cabin"
+
+#: data/design/training.json:1
+msgid "Colócalo sobre el H-1. Cada motor consume solo los tanques de su etapa."
+msgstr "Place it on top of the H-1. Each engine only burns the tanks of its own stage."
+
+#: data/design/training.json:1
+msgid "Comprueba la nueva etapa"
+msgstr "Check the new stage"
+
+#: data/design/training.json:1
+msgid "Construiste dos etapas, redujiste la carga del aire, reparaste el cierre, separaste sin desperdiciar combustible y regresaste con escudo y paracaídas. Puedes volver al hangar o repetir."
+msgstr "You built two stages, reduced the air load, repaired the latch, separated without wasting fuel and returned with a shield and a parachute. You can go back to the hangar or repeat."
+
+#: data/design/training.json:1
+msgid "Construye de abajo hacia arriba"
+msgstr "Build from the bottom up"
+
+#: data/design/training.json:1
+msgid "Deja trabajar al escudo"
+msgstr "Let the shield work"
+
+#: data/design/training.json:1
+msgid "Desacoplador atascado"
+msgstr "Stuck decoupler"
+
+#: data/design/training.json:1
+msgid "El RL10 va encima de los pernos de etapa. Es eficiente en el vacío; solo no levanta esta nave desde el suelo."
+msgstr "The RL10 goes above the stage bolts. It is efficient in vacuum; on its own it cannot lift this ship off the ground."
+
+#: data/design/training.json:1
+msgid "El aire frena la nave y calienta el escudo. Observa su reserva. Espera la ventana segura antes de desplegar el freno del paracaídas."
+msgstr "The air slows the ship and heats the shield. Watch its reserve. Wait for the safe window before deploying the parachute drogue."
+
+#: data/design/training.json:1
+msgid "El cierre está reparado. Activa Separar una sola vez para descartar el motor y tanque vacíos de abajo."
+msgstr "The latch is repaired. Activate Separate once to discard the empty engine and tank below."
+
+#: data/design/training.json:1
+msgid "El escudo protege la cabina durante la entrada. Añade masa, pero su material absorbe calor al consumirse."
+msgstr "The shield protects the cabin during entry. It adds mass, but its material absorbs heat as it burns away."
+
+#: data/design/training.json:1
+msgid "El motor va abajo. El H-1 levanta el peso del cohete, pero consume más combustible."
+msgstr "The engine goes at the bottom. The H-1 lifts the rocket's weight, but burns more fuel."
+
+#: data/design/training.json:1
+msgid "Elige el corredor de entrada"
+msgstr "Choose the entry corridor"
+
+#: data/design/training.json:1
+msgid "Este tanque alimenta el RL10. El combustible de abajo no sirve después de separar."
+msgstr "This tank feeds the RL10. The fuel below is useless after separation."
+
+#: data/design/training.json:1
+msgid "Frena para regresar"
+msgstr "Brake to return"
+
+#: data/design/training.json:1
+msgid "Freno para aterrizar"
+msgstr "Brake for landing"
+
+#: data/design/training.json:1
+msgid "Generación eléctrica"
+msgstr "Power generation"
+
+#: data/design/training.json:1
+msgid "Gira hasta el objetivo retrógrado de -90 grados [DIS]. Apuntar a favor del movimiento aceleraría la nave."
+msgstr "Turn to the retrograde target of -90 degrees [DIS]. Aiming with the motion would speed the ship up."
+
+#: data/design/training.json:1
+msgid "Ignición en T-0"
+msgstr "Ignition at T-0"
+
+#: data/design/training.json:1
+msgid "La batería guarda energía. No la genera: necesita el panel para recargarse."
+msgstr "The battery stores energy. It does not generate it: it needs the panel to recharge."
+
+#: data/design/training.json:1
+msgid "La cabina debe quedar en la etapa que conservas. No la pongas debajo de los pernos de etapa."
+msgstr "The cabin must stay in the stage you keep. Do not put it below the stage bolts."
+
+#: data/design/training.json:1
+msgid "La masa descartada ya no pesa. Sube la potencia hasta 100 % [DIS] para comprobar que el RL10 produce empuje con su propio tanque."
+msgstr "The discarded mass no longer weighs you down. Raise the power to 100 % [DIS] to check that the RL10 produces thrust from its own tank."
+
+#: data/design/training.json:1
+msgid "La presión actual está por debajo del límite de carga. Vuelve a subir la potencia al 100 % [DIS] para sostener el ascenso. Reducirla durante demasiado tiempo desperdicia combustible luchando contra la gravedad."
+msgstr "The current pressure is below the load limit. Raise the power back to 100 % [DIS] to sustain the climb. Keeping it reduced for too long wastes fuel fighting gravity."
+
+#: data/design/training.json:1
+msgid "Llegaste a órbita. La velocidad horizontal sostiene el vuelo. Inicia Regreso para aprender a frenar en sentido contrario al movimiento."
+msgstr "You reached orbit. Horizontal speed sustains the flight. Start Return to learn to brake against the direction of motion."
+
+#: data/design/training.json:1
+msgid "Los paneles mantienen la electrónica encendida con luz solar. Añaden masa y no generan en la sombra."
+msgstr "The panels keep the electronics running on sunlight. They add mass and generate nothing in shadow."
+
+#: data/design/training.json:1
+msgid "Límite entre etapas"
+msgstr "Stage boundary"
+
+#: data/design/training.json:1
+msgid "Motor de primera etapa"
+msgstr "First-stage engine"
+
+#: data/design/training.json:1
+msgid "Motor de segunda etapa"
+msgstr "Second-stage engine"
+
+#: data/design/training.json:1
+msgid "Protección para regresar"
+msgstr "Protection for the return"
+
+#: data/design/training.json:1
+msgid "Práctica completada"
+msgstr "Practice completed"
+
+#: data/design/training.json:1
+msgid "Recupera potencia para subir"
+msgstr "Restore power to climb"
+
+#: data/design/training.json:1
+msgid "Reduce la carga del aire"
+msgstr "Reduce the air load"
+
+#: data/design/training.json:1
+msgid "Reintenta la separación"
+msgstr "Retry the separation"
+
+#: data/design/training.json:1
+msgid "Reserva eléctrica"
+msgstr "Power reserve"
+
+#: data/design/training.json:1
+msgid "Revisa y reintenta"
+msgstr "Review and retry"
+
+#: data/design/training.json:1
+msgid "Selecciona la pieza resaltada. La posición se numera desde la base. Puedes retirar o mover piezas; la guía vuelve al primer requisito pendiente."
+msgstr "Select the highlighted part. Positions are numbered from the base. You can remove or move parts; the guide goes back to the first pending requirement."
+
+#: data/design/training.json:1
+msgid "Sigue el corredor"
+msgstr "Follow the corridor"
+
+#: data/design/training.json:1
+msgid "Sube la potencia. El encendido retrógrado reduce la velocidad orbital y consume la reserva de la etapa superior."
+msgstr "Raise the power. The retrograde burn reduces orbital speed and uses the upper stage's reserve."
+
+#: data/design/training.json:1
+msgid "Tanque de primera etapa"
+msgstr "First-stage tank"
+
+#: data/design/training.json:1
+msgid "Tanque de segunda etapa"
+msgstr "Second-stage tank"
+
+#: data/design/training.json:1
+msgid "Usa Reintentar para recuperar el último punto de control. La práctica no cambia créditos, contratos ni inventario."
+msgstr "Use Retry to restore the last checkpoint. The practice does not change credits, contracts or inventory."
+
+#: data/design/training.json:1
+msgid "Va sobre el primer tanque. Al activarlo se descarta todo lo que queda debajo, incluidos los pernos de etapa."
+msgstr "It goes on top of the first tank. When activated, everything below is discarded, including the stage bolts."
+
+#: data/design/training.json:1
+msgid "Va sobre la cabina. Se abre en dos pasos y solo cuando la velocidad permite hacerlo."
+msgstr "It goes on top of the cabin. It opens in two steps and only when the speed allows it."
+
+#: data/design/training.json:1
+msgid "Vuelo congelado en una ventana segura. Activa Paracaídas para desplegar el freno pequeño. El principal todavía requiere menos velocidad y altura."
+msgstr "Frozen flight in a safe window. Activate Parachute to deploy the small drogue. The main still needs lower speed and altitude."
+
+#: data/design/training.json:1
+msgid "Vuelo congelado. Activa Paracaídas otra vez: el principal aumenta el área y reduce la velocidad de caída."
+msgstr "Frozen flight. Activate Parachute again: the main increases the area and reduces the fall speed."
+
+#: data/design/training.json:1
+msgid "Vuelo congelado. Baja la potencia hasta 60 % [DIS]. A mucha velocidad en aire denso aumenta la presión sobre la nave. Bajar potencia reduce esa carga."
+msgstr "Frozen flight. Lower the power to 60 % [DIS]. At high speed in dense air the pressure on the ship increases. Lowering power reduces that load."
+
+#: data/design/training.json:1
+msgid "Vuelo congelado. Gira hasta alinear el indicador con el objetivo. Después la asistencia mantendrá el corredor cuando sueltes el control."
+msgstr "Frozen flight. Turn until the indicator lines up with the target. Afterwards the assist will hold the corridor when you release the control."
+
+#: data/design/training.json:1
+msgid "Vuelo congelado. La etapa activa está vacía; la superior conserva motor y combustible. Activa Separar. Soltar antes habría desperdiciado combustible útil."
+msgstr "Frozen flight. The active stage is empty; the upper one keeps its engine and fuel. Activate Separate. Dropping it earlier would have wasted useful fuel."
+
+#: data/design/training.json:1
+msgid "Órbita y regreso"
+msgstr "Orbit and return"
+
+#: game/autoload/pause.gd:16 game/autoload/pause.gd:45 game/phases/title.gd:36
+msgid "Ajustes"
+msgstr "Settings"
+
+#: game/autoload/pause.gd:43
+msgid "Pausa"
+msgstr "Pause"
+
+#: game/autoload/pause.gd:44 game/ui/card.gd:321 game/ui/card.gd:499
+msgid "Continuar"
+msgstr "Resume"
+
+#: game/autoload/pause.gd:46
+msgid "Volver al menú principal"
+msgstr "Back to main menu"
+
+#: game/autoload/pause.gd:47
+msgid "Volver al menú"
+msgstr "Back to menu"
+
+#: game/autoload/pause.gd:47
+msgid "¿Volver al menú principal? Se pierde el contrato en curso."
+msgstr "Back to the main menu? The current contract will be lost."
+
+#: game/autoload/pause.gd:49 game/autoload/pause.gd:50 game/phases/title.gd:42
+msgid "Salir"
+msgstr "Quit"
+
+#: game/autoload/pause.gd:50
+msgid "¿Salir del juego?"
+msgstr "Quit the game?"
+
+#: game/autoload/profile.gd:6
+msgid "Básico"
+msgstr "Basic"
+
+#: game/autoload/profile.gd:6
+msgid "Premium"
+msgstr "Premium"
+
+#: game/autoload/profile.gd:6
+msgid "Sin seguro"
+msgstr "No insurance"
+
+#: game/autoload/profile.gd:10
+msgid "Una inspección gratis por partida."
+msgstr "One free inspection per run."
+
+#: game/autoload/profile.gd:11
+msgid "Las averías muestran probabilidades exactas."
+msgstr "Malfunctions show exact odds."
+
+#: game/autoload/profile.gd:12
+msgid "El seguro cuesta la mitad."
+msgstr "Insurance costs half."
+
+#: game/autoload/profile.gd:13
+msgid "Empiezas con un kit de reparación extra."
+msgstr "You start with an extra repair kit."
+
+#: game/autoload/profile.gd:14
+msgid "La agencia suma 250 al presupuesto."
+msgstr "The agency adds 250 to your budget."
+
+#: game/autoload/profile.gd:15
+msgid "Ves la rareza de las señales desde lejos."
+msgstr "You see the rarity of signals from afar."
+
+#: game/autoload/run.gd:133
+msgid "Racha perdida (x%.2f)"
+msgstr "Streak lost (x%.2f)"
+
+#: game/autoload/run.gd:150
+msgid "%s era %s"
+msgstr "%s was %s"
+
+#: game/autoload/run.gd:169
+msgid "Suerte, aguantaron: %s."
+msgstr "Lucky, they held: %s."
+
+#: game/autoload/run.gd:171
+msgid "Se gastaron: %s."
+msgstr "Worn out: %s."
+
+#: game/autoload/run.gd:216
+msgid "%s explotó."
+msgstr "%s exploded."
+
+#: game/autoload/run.gd:216
+msgid "La nave"
+msgstr "The ship"
+
+#: game/autoload/run.gd:260
+msgid "%s se rompió"
+msgstr "%s broke"
+
+#: game/autoload/run.gd:262
+msgid "La suerte salvó %s"
+msgstr "Luck saved %s"
+
+#: game/autoload/run.gd:276
+msgid "Rescate pagado por la agencia. La carga se perdió."
+msgstr "Rescue paid for by the agency. The cargo was lost."
+
+#: game/autoload/run.gd:292
+msgid "explota"
+msgstr "explodes"
+
+#: game/autoload/run.gd:293
+msgid "se rompe"
+msgstr "breaks"
+
+#: game/autoload/run.gd:294
+msgid "reparada"
+msgstr "repaired"
+
+#: game/autoload/run.gd:295
+msgid "desgaste %+d %%"
+msgstr "wear %+d %%"
+
+#: game/autoload/run.gd:296
+msgid "empuje %+d %%"
+msgstr "thrust %+d %%"
+
+#: game/autoload/run.gd:297
+msgid "pierdes %d %% combustible"
+msgstr "you lose %d %% fuel"
+
+#: game/autoload/run.gd:298
+msgid "+%d %% combustible"
+msgstr "+%d %% fuel"
+
+#: game/autoload/run.gd:300
+msgid "+%d ciencia"
+msgstr "+%d science"
+
+#: game/autoload/run.gd:301
+msgid "%+d kit"
+msgstr "%+d kit"
+
+#: game/autoload/run.gd:302
+msgid "batería %+d %%"
+msgstr "battery %+d %%"
+
+#: game/autoload/run.gd:303
+msgid "calor %+d"
+msgstr "heat %+d"
+
+#: game/autoload/run.gd:304
+msgid "+%d pieza misteriosa"
+msgstr "+%d mystery part"
+
+#: game/autoload/run.gd:305
+msgid "+%d caja"
+msgstr "+%d crate"
+
+#: game/autoload/run.gd:306
+msgid "rompe una pieza al azar"
+msgstr "breaks a random part"
+
+#: game/autoload/run.gd:307
+msgid "sistemas restaurados"
+msgstr "systems restored"
+
+#: game/autoload/run.gd:308
+msgid "pieza instalada"
+msgstr "part installed"
+
+#: game/autoload/run.gd:309
+msgid "pieza perdida"
+msgstr "part lost"
+
+#: game/autoload/run.gd:310
+msgid "fin de la misión"
+msgstr "end of mission"
+
+#: game/autoload/run.gd:311
+msgid "apuestas %d $"
+msgstr "bets %d $"
+
+#: game/autoload/run.gd:312
+msgid "apuesta registrada"
+msgstr "bet registered"
+
+#: game/crew/ship_interior.gd:274 game/crew/ship_interior.gd:278
+msgid "Saliste al casco"
+msgstr "You went out onto the hull"
+
+#: game/crew/ship_interior.gd:297
+msgid "Volviste a la cabina"
+msgstr "You went back into the cabin"
+
+#: game/crew/ship_interior.gd:300
+msgid "%s en orden"
+msgstr "%s in order"
+
+#: game/crew/ship_interior.gd:329
+msgid "La reparación falló"
+msgstr "The repair failed"
+
+#: game/crew/ship_interior.gd:335 game/phases/descent.gd:612
+msgid "%s reparada"
+msgstr "%s repaired"
+
+#: game/crew/ship_interior.gd:338
+msgid "Improvisada, sin kits"
+msgstr "Improvised, no kits"
+
+#: game/crew/ship_interior.gd:340
+msgid "%s revisada"
+msgstr "%s checked"
+
+#: game/crew/ship_interior.gd:408
+msgid "Aquí"
+msgstr "Here"
+
+#: game/crew/ship_interior.gd:408
+msgid "Falla"
+msgstr "Fault"
+
+#: game/crew/ship_interior.gd:408 game/sim/ship_part.gd:7
+msgid "Roto"
+msgstr "Broken"
+
+#: game/crew/ship_interior.gd:434
+msgid "Casco"
+msgstr "Hull"
+
+#: game/crew/ship_interior.gd:437
+msgid "Cabina"
+msgstr "Cabin"
+
+#: game/crew/ship_interior.gd:460
+msgid "Falla en cabina. Enter en el anillo cian para entrar."
+msgstr "Fault in the cabin. Press Enter on the cyan ring to go in."
+
+#: game/crew/ship_interior.gd:462
+msgid "Rodea el casco hasta el aro y pulsa Enter."
+msgstr "Walk around the hull to the ring and press Enter."
+
+#: game/crew/ship_interior.gd:464
+msgid "Enter en el anillo cian para volver a la cabina."
+msgstr "Press Enter on the cyan ring to go back to the cabin."
+
+#: game/crew/ship_interior.gd:466
+msgid "Enter sobre el aro naranja. Si no llegas, sal por el marco cian."
+msgstr "Press Enter on the orange ring. If you cannot reach it, leave through the cyan frame."
+
+#: game/crew/ship_interior.gd:470
+msgid "Cápsula rota: Enter sobre ella repara. El marco cian es la salida."
+msgstr "Broken capsule: Enter on it repairs it. The cyan frame is the exit."
+
+#: game/crew/ship_interior.gd:472
+msgid "Falla naranja: Enter sobre el aro para repararla."
+msgstr "Orange fault: press Enter on the ring to repair it."
+
+#: game/crew/ship_interior.gd:474
+msgid "Enter en la cápsula (marco cian) para salir al casco."
+msgstr "Press Enter on the capsule (cyan frame) to go out onto the hull."
+
+#: game/phases/assembly.gd:8
+msgid "calor"
+msgstr "heat"
+
+#: game/phases/assembly.gd:8
+msgid "frío"
+msgstr "cold"
+
+#: game/phases/assembly.gd:8
+msgid "polvo"
+msgstr "dust"
+
+#: game/phases/assembly.gd:8
+msgid "radiación"
+msgstr "radiation"
+
+#: game/phases/assembly.gd:8
+msgid "tormentas"
+msgstr "storms"
+
+#: game/phases/assembly.gd:10
+msgid "Lo básico"
+msgstr "The basics"
+
+#: game/phases/assembly.gd:11
+msgid "Segunda etapa"
+msgstr "Second stage"
+
+#: game/phases/assembly.gd:12
+msgid "Aterrizaje"
+msgstr "Landing"
+
+#: game/phases/assembly.gd:13
+msgid "Energía"
+msgstr "Power"
+
+#: game/phases/assembly.gd:14
+msgid "Calor, frío y radiación"
+msgstr "Heat, cold and radiation"
+
+#: game/phases/assembly.gd:15
+msgid "Navegación y control"
+msgstr "Navigation and control"
+
+#: game/phases/assembly.gd:16
+msgid "Seguridad"
+msgstr "Safety"
+
+#: game/phases/assembly.gd:197
+msgid "etapa %d"
+msgstr "stage %d"
+
+#: game/phases/assembly.gd:208
+msgid "ambos lados"
+msgstr "both sides"
+
+#: game/phases/assembly.gd:208 game/phases/descent.gd:688 game/phases/minigame.gd:880
+msgid "derecha"
+msgstr "right"
+
+#: game/phases/assembly.gd:208 game/phases/descent.gd:688 game/phases/minigame.gd:884
+msgid "izquierda"
+msgstr "left"
+
+#: game/phases/assembly.gd:214
+msgid "Empieza por la cápsula, un motor y un tanque."
+msgstr "Start with the capsule, an engine and a tank."
+
+#: game/phases/assembly.gd:215
+msgid "Haz clic en el catálogo y se colocan solas. Arrastra para moverlas."
+msgstr "Click in the catalog and they place themselves. Drag to move them."
+
+#: game/phases/assembly.gd:216
+msgid "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar"
+msgstr "Stack: center | Mount: left/right of the block | Right click/Del: remove"
+
+#: game/phases/assembly.gd:248
+msgid "Catálogo"
+msgstr "Catalog"
+
+#: game/phases/assembly.gd:249
+msgid "Calidad de compra"
+msgstr "Purchase quality"
+
+#: game/phases/assembly.gd:258
+msgid "%s: precio x%.2f, estado %d-%d %%"
+msgstr "%s: price x%.2f, condition %d-%d %%"
+
+#: game/phases/assembly.gd:283
+msgid "Inventario (gratis)"
+msgstr "Inventory (free)"
+
+#: game/phases/assembly.gd:294 game/ui/card.gd:295
+msgid "Apuesta"
+msgstr "Gamble"
+
+#: game/phases/assembly.gd:295
+msgid "Caja misteriosa  %s"
+msgstr "Mystery crate  %s"
+
+#: game/phases/assembly.gd:338
+msgid "Chatarra: 65 % más barata, falla seguido."
+msgstr "Scrap: 65 % cheaper, fails often."
+
+#: game/phases/assembly.gd:339
+msgid "Usada: 35 % más barata, puede venir gastada."
+msgstr "Used: 35 % cheaper, may come worn."
+
+#: game/phases/assembly.gd:340
+msgid "Nueva: precio completo, casi no falla."
+msgstr "New: full price, rarely fails."
+
+#: game/phases/assembly.gd:341
+msgid "Misteriosa: mitad de precio, calidad oculta hasta inspeccionarla."
+msgstr "Mystery: half price, quality hidden until inspected."
+
+#: game/phases/assembly.gd:355
+msgid "Cara"
+msgstr "Pricey"
+
+#: game/phases/assembly.gd:357 game/phases/assembly.gd:903 game/phases/assembly.gd:918
+msgid "NECESARIA"
+msgstr "NEEDED"
+
+#: game/phases/assembly.gd:358
+msgid "Vital"
+msgstr "Vital"
+
+#: game/phases/assembly.gd:361
+msgid "Útil"
+msgstr "Useful"
+
+#: game/phases/assembly.gd:363 game/phases/assembly.gd:958 game/phases/assembly.gd:971
+msgid "NO NECESARIA"
+msgstr "UNNEEDED"
+
+#: game/phases/assembly.gd:364
+msgid "Sobra"
+msgstr "Spare"
+
+#: game/phases/assembly.gd:367
+msgid "Ojo"
+msgstr "Watch"
+
+#: game/phases/assembly.gd:369 game/phases/assembly.gd:907 game/phases/assembly.gd:955
+msgid "YA CUBIERTA"
+msgstr "COVERED"
+
+#: game/phases/assembly.gd:370
+msgid "Ya hay"
+msgstr "Have"
+
+#: game/phases/assembly.gd:406
+msgid "Ingeniería"
+msgstr "Engineering"
+
+#: game/phases/assembly.gd:409
+msgid "Presupuesto libre / total"
+msgstr "Free budget / total"
+
+#: game/phases/assembly.gd:412
+msgid "Siguiente paso"
+msgstr "Next step"
+
+#: game/phases/assembly.gd:416 game/phases/launch.gd:80 game/phases/space.gd:185
+msgid "Delta-v"
+msgstr "Delta-v"
+
+#: game/phases/assembly.gd:427
+msgid "Despegar"
+msgstr "Launch"
+
+#: game/phases/assembly.gd:430 game/phases/debrief.gd:158
+msgid "Volver al hangar"
+msgstr "Back to hangar"
+
+#: game/phases/assembly.gd:470
+msgid "Cápsula"
+msgstr "Capsule"
+
+#: game/phases/assembly.gd:470
+msgid "Sin cápsula no hay tripulación ni mando. Agrega la cápsula Apolo."
+msgstr "Without a capsule there is no crew or command. Add the Apollo capsule."
+
+#: game/phases/assembly.gd:471
+msgid "Motor"
+msgstr "Engine"
+
+#: game/phases/assembly.gd:471
+msgid "Sin motor la nave no se mueve. Agrega un motor de Lo básico."
+msgstr "Without an engine the ship does not move. Add an engine from The basics."
+
+#: game/phases/assembly.gd:472 game/phases/descent.gd:141 game/phases/launch.gd:86
+msgid "Combustible"
+msgstr "Fuel"
+
+#: game/phases/assembly.gd:472
+msgid "Un motor sin tanque no tiene qué quemar. Agrega un tanque."
+msgstr "An engine without a tank has nothing to burn. Add a tank."
+
+#: game/phases/assembly.gd:480
+msgid "Los motores no levantan el peso de la nave (empuje entre peso %.2f, hace falta más de 1). Pon un motor más fuerte o quita peso."
+msgstr "The engines cannot lift the ship's weight (thrust-to-weight %.2f, it needs more than 1). Fit a stronger engine or remove weight."
+
+#: game/phases/assembly.gd:483
+msgid "Despega justo (empuje entre peso %.2f). Con más de 1.2 sube con margen."
+msgstr "It barely lifts off (thrust-to-weight %.2f). Above 1.2 it climbs with margin."
+
+#: game/phases/assembly.gd:486
+msgid "Levanta el vuelo"
+msgstr "Lift off"
+
+#: game/phases/assembly.gd:487
+msgid "Alcanza %s"
+msgstr "Reach %s"
+
+#: game/phases/assembly.gd:487
+msgid "Alcanza el destino"
+msgstr "Reach the destination"
+
+#: game/phases/assembly.gd:495
+msgid "El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con pernos de etapa."
+msgstr "The fuel covers %d of %d m/s. Add a tank or a second stage with stage bolts."
+
+#: game/phases/assembly.gd:498
+msgid "Vas justo de combustible: %d de %d m/s."
+msgstr "Fuel is tight: %d of %d m/s."
+
+#: game/phases/assembly.gd:508
+msgid "Presupuesto"
+msgstr "Budget"
+
+#: game/phases/assembly.gd:508
+msgid "Te pasaste por %s. Quita piezas o compra calidad Usada o Chatarra."
+msgstr "You are over by %s. Remove parts or buy Used or Scrap quality."
+
+#: game/phases/assembly.gd:518
+msgid "Sin presupuesto para %s"
+msgstr "No budget for %s"
+
+#: game/phases/assembly.gd:542
+msgid "La caja contenia: %s"
+msgstr "The crate contained: %s"
+
+#: game/phases/assembly.gd:600
+msgid "Masa %.1f t"
+msgstr "Mass %.1f t"
+
+#: game/phases/assembly.gd:601
+msgid "Empuje %d kN  Isp %d s"
+msgstr "Thrust %d kN  Isp %d s"
+
+#: game/phases/assembly.gd:602
+msgid "Propelente %.0f t"
+msgstr "Propellant %.0f t"
+
+#: game/phases/assembly.gd:603
+msgid "Solar %.1f"
+msgstr "Solar %.1f"
+
+#: game/phases/assembly.gd:604
+msgid "Energía %.1f"
+msgstr "Power %.1f"
+
+#: game/phases/assembly.gd:605
+msgid "Batería %.1f"
+msgstr "Battery %.1f"
+
+#: game/phases/assembly.gd:606
+msgid "Enfriamiento %.1f"
+msgstr "Cooling %.1f"
+
+#: game/phases/assembly.gd:607
+msgid "Aislamiento %d %%"
+msgstr "Insulation %d %%"
+
+#: game/phases/assembly.gd:608
+msgid "Resist. calor %d %%"
+msgstr "Heat resist. %d %%"
+
+#: game/phases/assembly.gd:609
+msgid "Blindaje %d %%"
+msgstr "Shielding %d %%"
+
+#: game/phases/assembly.gd:610
+msgid "Ablativo %.0f"
+msgstr "Ablative %.0f"
+
+#: game/phases/assembly.gd:611
+msgid "Fragilidad x%.1f"
+msgstr "Fragility x%.1f"
+
+#: game/phases/assembly.gd:625
+msgid "rumores sin confirmar"
+msgstr "unconfirmed rumors"
+
+#: game/phases/assembly.gd:626
+msgid "%s\nPago %s, adelanto %s\nPeligros: %s"
+msgstr "%s\nPayout %s, advance %s\nHazards: %s"
+
+#: game/phases/assembly.gd:628
+msgid "ninguno conocido"
+msgstr "none known"
+
+#: game/phases/assembly.gd:634
+msgid "%d de %d m/s"
+msgstr "%d of %d m/s"
+
+#: game/phases/assembly.gd:638
+msgid " (no despega)"
+msgstr " (will not lift off)"
+
+#: game/phases/assembly.gd:638
+msgid "TWR al despegar %.2f%s"
+msgstr "TWR at liftoff %.2f%s"
+
+#: game/phases/assembly.gd:643
+msgid "Etapa %d   %5d m/s   TWR %.2f"
+msgstr "Stage %d   %5d m/s   TWR %.2f"
+
+#: game/phases/assembly.gd:644
+msgid "Masa %.1f t   Valor %s   Prima seguro %s"
+msgstr "Mass %.1f t   Value %s   Insurance premium %s"
+
+#: game/phases/assembly.gd:648
+msgid "Lista de despegue"
+msgstr "Launch checklist"
+
+#: game/phases/assembly.gd:657
+msgid "Falta"
+msgstr "Short"
+
+#: game/phases/assembly.gd:657
+msgid "Justo"
+msgstr "Tight"
+
+#: game/phases/assembly.gd:657
+msgid "Luego"
+msgstr "Later"
+
+#: game/phases/assembly.gd:685
+msgid "La nave cumple la lista. Puedes despegar."
+msgstr "The ship meets the checklist. You can launch."
+
+#: game/phases/assembly.gd:688
+msgid "Fiabilidad estimada: %d a %d %%"
+msgstr "Estimated reliability: %d to %d %%"
+
+#: game/phases/assembly.gd:693
+msgid "No puedes despegar todavía. "
+msgstr "You cannot launch yet. "
+
+#: game/phases/assembly.gd:696
+msgid "Puedes despegar, pero la lista tiene avisos."
+msgstr "You can launch, but the checklist has warnings."
+
+#: game/phases/assembly.gd:699
+msgid "Lista para despegar."
+msgstr "Ready to launch."
+
+#: game/phases/assembly.gd:714
+msgid "Selecciona una pieza para ver su estado."
+msgstr "Select a part to see its condition."
+
+#: game/phases/assembly.gd:718
+msgid "pila / %s"
+msgstr "stack / %s"
+
+#: game/phases/assembly.gd:720
+msgid "ambos"
+msgstr "both"
+
+#: game/phases/assembly.gd:720
+msgid "der"
+msgstr "right"
+
+#: game/phases/assembly.gd:720
+msgid "izq"
+msgstr "left"
+
+#: game/phases/assembly.gd:721
+msgid "montaje %s  altura %d %%"
+msgstr "mount %s  height %d %%"
+
+#: game/phases/assembly.gd:722
+msgid "Calidad %s   %s   Estado %s   %s"
+msgstr "Quality %s   %s   Condition %s   %s"
+
+#: game/phases/assembly.gd:728 game/phases/assembly.gd:794
+msgid "gratis"
+msgstr "free"
+
+#: game/phases/assembly.gd:729
+msgid "Inspeccionar (%s)"
+msgstr "Inspect (%s)"
+
+#: game/phases/assembly.gd:730
+msgid "Quitar"
+msgstr "Remove"
+
+#: game/phases/assembly.gd:812
+msgid "Caja misteriosa (%s)"
+msgstr "Mystery crate (%s)"
+
+#: game/phases/assembly.gd:813
+msgid "APUESTA"
+msgstr "GAMBLE"
+
+#: game/phases/assembly.gd:813
+msgid "SIN SALDO"
+msgstr "NO FUNDS"
+
+#: game/phases/assembly.gd:817
+msgid "Entrega una pieza aleatoria de calidad oculta."
+msgstr "Gives a random part of hidden quality."
+
+#: game/phases/assembly.gd:818
+msgid "No viable: supera el presupuesto libre (%s)."
+msgstr "Not viable: exceeds the free budget (%s)."
+
+#: game/phases/assembly.gd:818
+msgid "Viable si quieres arriesgar para ahorrar o sacar piezas raras."
+msgstr "Worth it if you want to risk it to save money or pull rare parts."
+
+#: game/phases/assembly.gd:820
+msgid "Costo %s (+ prima %s)"
+msgstr "Cost %s (+ premium %s)"
+
+#: game/phases/assembly.gd:885 game/phases/assembly.gd:938 game/phases/assembly.gd:1012
+msgid "OPCIONAL"
+msgstr "OPTIONAL"
+
+#: game/phases/assembly.gd:887
+msgid "Suma capacidad adicional a la nave."
+msgstr "Adds extra capacity to the ship."
+
+#: game/phases/assembly.gd:905
+msgid "Obligatoria: centro de mando sin el cual no puedes despegar."
+msgstr "Mandatory: the command center without which you cannot launch."
+
+#: game/phases/assembly.gd:908
+msgid "Ya llevas cápsula; otra añade masa extra y consumo eléctrico."
+msgstr "You already have a capsule; another adds extra mass and electrical draw."
+
+#: game/phases/assembly.gd:914 game/phases/assembly.gd:988
+msgid "POCO VIABLE"
+msgstr "UNLIKELY"
+
+#: game/phases/assembly.gd:916
+msgid "Empuje muy bajo para despegar desde la Tierra; úsalo arriba tras un motor grande."
+msgstr "Thrust too low to lift off from Earth; use it up high after a big engine."
+
+#: game/phases/assembly.gd:920
+msgid "Indispensable para tener empuje en el despegue."
+msgstr "Essential for having thrust at liftoff."
+
+#: game/phases/assembly.gd:922 game/phases/assembly.gd:942 game/phases/assembly.gd:976
+msgid "RECOMENDADA"
+msgstr "RECOMMENDED"
+
+#: game/phases/assembly.gd:924
+msgid "Tu empuje inicial aún es justo (TWR %.2f); este motor ayuda a despegar."
+msgstr "Your initial thrust is still tight (TWR %.2f); this engine helps you lift off."
+
+#: game/phases/assembly.gd:926
+msgid "VIABLE ARRIBA"
+msgstr "VIABLE UP HIGH"
+
+#: game/phases/assembly.gd:928
+msgid "Muy eficiente en el vacío para segunda etapa y ahorro de combustible."
+msgstr "Very efficient in vacuum for a second stage and saving fuel."
+
+#: game/phases/assembly.gd:930 game/phases/assembly.gd:946 game/phases/assembly.gd:1004
+msgid "VIABLE"
+msgstr "VIABLE"
+
+#: game/phases/assembly.gd:931
+msgid "Añade empuje para etapa superior o aterrizaje en cuerpos sin aire."
+msgstr "Adds thrust for an upper stage or landing on airless bodies."
+
+#: game/phases/assembly.gd:936
+msgid "Te falta Delta-v (%d / %d m/s); agrega propelente."
+msgstr "You lack Delta-v (%d / %d m/s); add propellant."
+
+#: game/phases/assembly.gd:939
+msgid "Ya cubres el Delta-v del contrato; más masa baja el TWR al despegar."
+msgstr "You already cover the contract's Delta-v; more mass lowers TWR at liftoff."
+
+#: game/phases/assembly.gd:944
+msgid "Separa los tanques vacíos del despegue para ganar mucho Delta-v."
+msgstr "Drop the empty tanks after liftoff to gain a lot of Delta-v."
+
+#: game/phases/assembly.gd:947
+msgid "Útil si quieres dividir la nave en dos etapas independientes."
+msgstr "Useful if you want to split the ship into two independent stages."
+
+#: game/phases/assembly.gd:953
+msgid "%s tiene atmósfera: sin escudo te quemas al reentrar."
+msgstr "%s has an atmosphere: without a shield you burn up on reentry."
+
+#: game/phases/assembly.gd:956
+msgid "Ya tienes protección térmica de entrada."
+msgstr "You already have entry heat protection."
+
+#: game/phases/assembly.gd:960
+msgid "Este destino no tiene atmósfera; el escudo solo suma peso muerto."
+msgstr "This destination has no atmosphere; the shield only adds dead weight."
+
+#: game/phases/assembly.gd:966
+msgid "%s tiene aire: frena la caída gratis sin gastar combustible."
+msgstr "%s has air: it slows the fall for free without spending fuel."
+
+#: game/phases/assembly.gd:969
+msgid "Ya llevas paracaídas para el descenso."
+msgstr "You already carry a parachute for the descent."
+
+#: game/phases/assembly.gd:973
+msgid "Sin atmósfera no abre el paracaídas; necesitarás motor en la última etapa."
+msgstr "Without an atmosphere the parachute does not open; you will need an engine in the last stage."
+
+#: game/phases/assembly.gd:978
+msgid "Suaviza el golpe al tocar suelo y evita que se dañe el motor al aterrizar."
+msgstr "Softens the impact on touchdown and keeps the engine from being damaged when landing."
+
+#: game/phases/assembly.gd:981
+msgid "Ya llevas tren de aterrizaje instalado."
+msgstr "You already have landing gear installed."
+
+#: game/phases/assembly.gd:984
+msgid "RIESGOSA"
+msgstr "RISKY"
+
+#: game/phases/assembly.gd:986
+msgid "Cerca del Sol (%s) puede sobrecalentarse; considera un MMRTG o un radiador de amoníaco."
+msgstr "Close to the Sun (%s) it may overheat; consider an MMRTG or an ammonia radiator."
+
+#: game/phases/assembly.gd:990
+msgid "Tan lejos del Sol rinde menos del 20 %; conviene usar un MMRTG."
+msgstr "So far from the Sun it yields under 20 %; an MMRTG is a better choice."
+
+#: game/phases/assembly.gd:994
+msgid "Genera energía barata para cubrir la electrónica en ruta."
+msgstr "Generates cheap power to cover the electronics en route."
+
+#: game/phases/assembly.gd:997
+msgid "Tu generación eléctrica actual ya alcanza en ruta."
+msgstr "Your current power generation already covers the trip."
+
+#: game/phases/assembly.gd:1000
+msgid "MUY VIABLE"
+msgstr "VERY VIABLE"
+
+#: game/phases/assembly.gd:1002
+msgid "Energía continua sin depender del Sol; ideal para viajes lejanos o sombra."
+msgstr "Continuous power without relying on the Sun; ideal for long trips or shadow."
+
+#: game/phases/assembly.gd:1005
+msgid "Cara en presupuesto, pero nunca falla por falta de luz solar."
+msgstr "Expensive for the budget, but never fails for lack of sunlight."
+
+#: game/phases/assembly.gd:1010
+msgid "Da reserva eléctrica para usar el escáner y cruzar zonas de sombra."
+msgstr "Gives an electrical reserve to run the scanner and cross shadow zones."
+
+#: game/phases/assembly.gd:1013
+msgid "Ya llevas buena reserva de batería."
+msgstr "You already carry a good battery reserve."
+
+#: game/phases/assembly.gd:1018
+msgid "La ruta sobrecalienta la nave (%d %%): sin radiador fallarán piezas."
+msgstr "The route overheats the ship (%d %%): without a radiator parts will fail."
+
+#: game/phases/assembly.gd:1021
+msgid "No pasas el límite térmico en esta ruta, salvo que te acerques al Sol."
+msgstr "You do not exceed the thermal limit on this route, unless you get close to the Sun."
+
+#: game/phases/assembly.gd:1026
+msgid "Ruta muy fría (%d %%): evita que la nave se congele."
+msgstr "Very cold route (%d %%): keeps the ship from freezing."
+
+#: game/phases/assembly.gd:1029
+msgid "La temperatura mínima en esta ruta sigue dentro de rango."
+msgstr "The minimum temperature on this route stays within range."
+
+#: game/phases/assembly.gd:1034
+msgid "%s tiene radiación alta; sin blindaje se fríe la electrónica."
+msgstr "%s has high radiation; without shielding the electronics fry."
+
+#: game/phases/assembly.gd:1037
+msgid "Protege frente a llamaradas solares, aunque añade bastante masa."
+msgstr "Protects against solar flares, though it adds a lot of mass."
+
+#: game/phases/assembly.gd:1042
+msgid "Avisa antes de llamaradas solares y muestra probabilidades de eventos."
+msgstr "Warns before solar flares and shows event odds."
+
+#: game/phases/assembly.gd:1045
+msgid "Ya llevas sensores activos."
+msgstr "You already have active sensors."
+
+#: game/phases/assembly.gd:1050
+msgid "Evita que los mensajes y alertas de vuelo lleguen cortados."
+msgstr "Keeps flight messages and alerts from arriving cut off."
+
+#: game/phases/assembly.gd:1053
+msgid "Ya tienes enlace de comunicaciones."
+msgstr "You already have a communications link."
+
+#: game/phases/assembly.gd:1058
+msgid "Mantiene precisa la línea de trayectoria en el mapa espacial."
+msgstr "Keeps the trajectory line accurate on the space map."
+
+#: game/phases/assembly.gd:1061
+msgid "Ya llevas computadora de navegación."
+msgstr "You already carry a navigation computer."
+
+#: game/phases/assembly.gd:1063
+msgid "ÚTIL"
+msgstr "USEFUL"
+
+#: game/phases/assembly.gd:1064
+msgid "Mejora el giro y la estabilidad cuando la nave es larga o pesada."
+msgstr "Improves turning and stability when the ship is long or heavy."
+
+#: game/phases/assembly.gd:1066
+msgid "SEGURIDAD"
+msgstr "SAFETY"
+
+#: game/phases/assembly.gd:1067
+msgid "Permite abortar el despegue salvando la cápsula si algo sale mal."
+msgstr "Lets you abort the launch and save the capsule if something goes wrong."
+
+#: game/phases/assembly.gd:1070
+msgid "NO VIABLE"
+msgstr "NOT VIABLE"
+
+#: game/phases/assembly.gd:1072
+msgid "Supera tu presupuesto libre (%s). Prueba calidad Chatarra o quita piezas."
+msgstr "Exceeds your free budget (%s). Try Scrap quality or remove parts."
+
+#: game/phases/debrief.gd:31
+msgid "Entrega"
+msgstr "Delivery"
+
+#: game/phases/debrief.gd:31
+msgid "Pérdida"
+msgstr "Loss"
+
+#: game/phases/debrief.gd:40
+msgid "Total"
+msgstr "Total"
+
+#: game/phases/debrief.gd:50
+msgid "Entrega completa"
+msgstr "Delivery complete"
+
+#: game/phases/debrief.gd:51
+msgid "Entrega parcial"
+msgstr "Partial delivery"
+
+#: game/phases/debrief.gd:52
+msgid "Misión abortada"
+msgstr "Mission aborted"
+
+#: game/phases/debrief.gd:53 game/phases/space.gd:860
+msgid "A la deriva"
+msgstr "Adrift"
+
+#: game/phases/debrief.gd:54
+msgid "Nave perdida"
+msgstr "Ship lost"
+
+#: game/phases/debrief.gd:65
+msgid "Pago del contrato"
+msgstr "Contract payout"
+
+#: game/phases/debrief.gd:68
+msgid "Modo asistido, -15 %"
+msgstr "Assist mode, -15 %"
+
+#: game/phases/debrief.gd:72
+msgid "Aterrizaje %s  x%.2f"
+msgstr "Landing %s  x%.2f"
+
+#: game/phases/debrief.gd:75
+msgid "A tiempo, +15 %"
+msgstr "On time, +15 %"
+
+#: game/phases/debrief.gd:77
+msgid "Fuera de plazo  -30%"
+msgstr "Past deadline  -30%"
+
+#: game/phases/debrief.gd:79 game/ui/card.gd:311 game/ui/card.gd:498
+msgid "Racha x%.2f"
+msgstr "Streak x%.2f"
+
+#: game/phases/debrief.gd:81
+msgid "Adelanto ya cobrado"
+msgstr "Advance already collected"
+
+#: game/phases/debrief.gd:83
+msgid "Botín en ruta"
+msgstr "Loot en route"
+
+#: game/phases/debrief.gd:85
+msgid "Ciencia  %d x %d"
+msgstr "Science  %d x %d"
+
+#: game/phases/debrief.gd:89
+msgid "Apuesta %s  (%d)"
+msgstr "Gamble %s  (%d)"
+
+#: game/phases/debrief.gd:92
+msgid "Seguro %s"
+msgstr "Insurance %s"
+
+#: game/phases/debrief.gd:97
+msgid "Chatarra al inventario  (%d)"
+msgstr "Scrap to inventory  (%d)"
+
+#: game/phases/debrief.gd:107
+msgid "Lección: "
+msgstr "Lesson: "
+
+#: game/phases/debrief.gd:128
+msgid "combustible"
+msgstr "fuel"
+
+#: game/phases/debrief.gd:129
+msgid "plazo"
+msgstr "deadline"
+
+#: game/phases/debrief.gd:130
+msgid "aterrizaje perfecto"
+msgstr "perfect landing"
+
+#: game/phases/debrief.gd:157
+msgid "Créditos: %s"
+msgstr "Credits: %s"
+
+#: game/phases/debrief.gd:164
+msgid "Cajas misteriosas x%d"
+msgstr "Mystery crates x%d"
+
+#: game/phases/descent.gd:89
+msgid "Descenso arcade: ajusta tu trayectoria con WASD"
+msgstr "Arcade descent: adjust your trajectory with WASD"
+
+#: game/phases/descent.gd:100 game/ui/tutorial.gd:28
+msgid "Corredor de entrada"
+msgstr "Entry corridor"
+
+#: game/phases/descent.gd:113
+msgid "tormenta en la zona de aterrizaje"
+msgstr "storm over the landing zone"
+
+#: game/phases/descent.gd:116
+msgid "polvo, visibilidad reducida"
+msgstr "dust, reduced visibility"
+
+#: game/phases/descent.gd:118
+msgid "Radiación en superficie"
+msgstr "Surface radiation"
+
+#: game/phases/descent.gd:122
+msgid "Frío extremo: el combustible se espesa"
+msgstr "Extreme cold: fuel thickens"
+
+#: game/phases/descent.gd:126
+msgid "calor extremo, el casco ya viene caliente"
+msgstr "extreme heat, the hull is already hot"
+
+#: game/phases/descent.gd:127 game/phases/descent.gd:128
+msgid "Peligro oculto: "
+msgstr "Hidden hazard: "
+
+#: game/phases/descent.gd:135 game/phases/launch.gd:80
+msgid "Altitud"
+msgstr "Altitude"
+
+#: game/phases/descent.gd:135
+msgid "Vel. horizontal"
+msgstr "Horizontal speed"
+
+#: game/phases/descent.gd:135
+msgid "Vel. vertical"
+msgstr "Vertical speed"
+
+#: game/phases/descent.gd:141
+msgid "Calor del casco"
+msgstr "Hull heat"
+
+#: game/phases/descent.gd:141
+msgid "Carga G"
+msgstr "G-load"
+
+#: game/phases/descent.gd:141
+msgid "Escudo ablativo"
+msgstr "Ablative shield"
+
+#: game/phases/descent.gd:141
+msgid "Frenado"
+msgstr "Braking"
+
+#: game/phases/descent.gd:144 game/phases/launch.gd:89 game/phases/space.gd:189
+msgid "Estado (C)"
+msgstr "Status (C)"
+
+#: game/phases/descent.gd:145
+msgid "Paracaídas (P)"
+msgstr "Parachute (P)"
+
+#: game/phases/descent.gd:146
+msgid "Eyectar (E)"
+msgstr "Eject (E)"
+
+#: game/phases/descent.gd:224
+msgid "Demasiado bajo o caliente para acelerar"
+msgstr "Too low or too hot to accelerate"
+
+#: game/phases/descent.gd:228 game/phases/launch.gd:150
+msgid "Tiempo %s"
+msgstr "Time %s"
+
+#: game/phases/descent.gd:239
+msgid "Interfaz de entrada: %.1f grados"
+msgstr "Entry interface: %.1f degrees"
+
+#: game/phases/descent.gd:241
+msgid "Sin atmósfera: frena con el motor (T retro)"
+msgstr "No atmosphere: brake with the engine (T retro)"
+
+#: game/phases/descent.gd:251
+msgid "Etapa separada"
+msgstr "Stage separated"
+
+#: game/phases/descent.gd:267
+msgid "Demasiado alto para el principal"
+msgstr "Too high for the main"
+
+#: game/phases/descent.gd:272
+msgid "Paracaídas desgarrado"
+msgstr "Parachute torn"
+
+#: game/phases/descent.gd:282
+msgid "Freno desplegado"
+msgstr "Drogue deployed"
+
+#: game/phases/descent.gd:282
+msgid "Principal desplegado"
+msgstr "Main deployed"
+
+#: game/phases/descent.gd:287
+msgid "Paracaídas perdido"
+msgstr "Parachute lost"
+
+#: game/phases/descent.gd:299
+msgid "Cápsula eyectada"
+msgstr "Capsule ejected"
+
+#: game/phases/descent.gd:300
+msgid "Cápsula eyectada en %s"
+msgstr "Capsule ejected at %s"
+
+#: game/phases/descent.gd:372
+msgid "Control manual"
+msgstr "Manual control"
+
+#: game/phases/descent.gd:423
+msgid "Sobrecarga: %.1f G"
+msgstr "Overload: %.1f G"
+
+#: game/phases/descent.gd:446
+msgid "Escudo ablativo agotado"
+msgstr "Ablative shield depleted"
+
+#: game/phases/descent.gd:457
+msgid "La nave se desintegro en la reentrada de %s."
+msgstr "The ship disintegrated on reentry at %s."
+
+#: game/phases/descent.gd:462
+msgid "%s se fundio"
+msgstr "%s melted"
+
+#: game/phases/descent.gd:468
+msgid "Rebote en la atmósfera"
+msgstr "Bounce off the atmosphere"
+
+#: game/phases/descent.gd:491
+msgid "Impacto a %d m/s contra %s."
+msgstr "Impact at %d m/s against %s."
+
+#: game/phases/descent.gd:511
+msgid "%s cedio en el impacto"
+msgstr "%s gave way on impact"
+
+#: game/phases/descent.gd:517
+msgid "Aterrizaje en plataforma: +$200"
+msgstr "Pad landing: +$200"
+
+#: game/phases/descent.gd:520
+msgid "Aterrizaje %s"
+msgstr "Landing %s"
+
+#: game/phases/descent.gd:547
+msgid "Superficie de %s"
+msgstr "Surface of %s"
+
+#: game/phases/descent.gd:550
+msgid "Entregar %s"
+msgstr "Deliver %s"
+
+#: game/phases/descent.gd:552
+msgid "  (cápsula sola: entrega parcial)"
+msgstr "  (capsule only: partial delivery)"
+
+#: game/phases/descent.gd:555
+msgid "Explorar la zona"
+msgstr "Explore the area"
+
+#: game/phases/descent.gd:557
+msgid "Reparar con kit (%d)"
+msgstr "Repair with kit (%d)"
+
+#: game/phases/descent.gd:562
+msgid "Despegar a órbita (%d / %d m/s)"
+msgstr "Launch to orbit (%d / %d m/s)"
+
+#: game/phases/descent.gd:565
+msgid "Terminar la misión en casa"
+msgstr "End the mission at home"
+
+#: game/phases/descent.gd:567
+msgid "Abandonar y pedir rescate"
+msgstr "Abandon and call for rescue"
+
+#: game/phases/descent.gd:574
+msgid "Entrega %s en %s. Aterrizaje %s."
+msgstr "Delivery: %s, at %s. Landing %s."
+
+#: game/phases/descent.gd:574
+msgid "completa"
+msgstr "complete"
+
+#: game/phases/descent.gd:574
+msgid "parcial"
+msgstr "partial"
+
+#: game/phases/descent.gd:583
+msgid "Expedicion profunda"
+msgstr "Deep expedition"
+
+#: game/phases/descent.gd:587
+msgid "Cuevas llenas de minerales."
+msgstr "Caves full of minerals."
+
+#: game/phases/descent.gd:588
+msgid "El rover volvio a rastras."
+msgstr "The rover limped back."
+
+#: game/phases/descent.gd:590
+msgid "Paseo corto"
+msgstr "Short trip"
+
+#: game/phases/descent.gd:595
+msgid "Quedarse en la nave"
+msgstr "Stay on the ship"
+
+#: game/phases/descent.gd:597
+msgid "Exploracion de %s"
+msgstr "Exploration of %s"
+
+#: game/phases/descent.gd:637
+msgid "Volviste a %s sin entregar la carga."
+msgstr "You returned to %s without delivering the cargo."
+
+#: game/phases/descent.gd:675
+msgid "Ángulo %.1f"
+msgstr "Angle %.1f"
+
+#: game/phases/descent.gd:676
+msgid "Corredor de %.1f a %.1f"
+msgstr "Corridor from %.1f to %.1f"
+
+#: game/phases/descent.gd:677
+msgid "Velocidad de entrada %d m/s"
+msgstr "Entry speed %d m/s"
+
+#: game/phases/descent.gd:678
+msgid "W/S ajustar ángulo   Espacio confirmar   Muy plano rebotas; muy empinado, calor y G"
+msgstr "W/S adjust angle   Space confirm   Too flat you bounce; too steep, heat and G"
+
+#: game/phases/descent.gd:680
+msgid "Apagón de plasma"
+msgstr "Plasma blackout"
+
+#: game/phases/descent.gd:681
+msgid "Sin telemetría"
+msgstr "No telemetry"
+
+#: game/phases/descent.gd:682
+msgid "W/S sustentación arriba o abajo   P paracaídas   E eyectar"
+msgstr "W/S lift up or down   P parachute   E eject"
+
+#: game/phases/descent.gd:684
+msgid "Sobre el suelo %d m"
+msgstr "Above ground %d m"
+
+#: game/phases/descent.gd:685
+msgid "Velocidad %d m/s"
+msgstr "Speed %d m/s"
+
+#: game/phases/descent.gd:686
+msgid "Delta-v %d m/s, TWR %.2f"
+msgstr "Delta-v %d m/s, TWR %.2f"
+
+#: game/phases/descent.gd:688
+msgid "Plataforma a %d m a la %s"
+msgstr "Pad %d m to the %s"
+
+#: game/phases/descent.gd:690
+msgid "Viento %+d m/s"
+msgstr "Wind %+d m/s"
+
+#: game/phases/descent.gd:692
+msgid "W/S sustentación   P paracaídas (freno bajo 450 m/s, principal bajo 120)   E eyectar   1-4 tiempo"
+msgstr "W/S lift   P parachute (drogue below 450 m/s, main below 120)   E eject   1-4 time"
+
+#: game/phases/descent.gd:694
+msgid "WASD ajustar trayectoria con motores   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
+msgstr "WASD adjust trajectory with engines   P parachute   Space stage   E eject   1-4 time"
+
+#: game/phases/descent.gd:696
+msgid "W/S acelerador   A/D inclinar   T retro   P paracaídas   Espacio etapa   E eyectar   1-4 tiempo"
+msgstr "W/S throttle   A/D tilt   T retro   P parachute   Space stage   E eject   1-4 time"
+
+#: game/phases/descent.gd:709
+msgid "Sin escudo"
+msgstr "No shield"
+
+#: game/phases/descent.gd:710
+msgid "%.1f G"
+msgstr "%.1f G"
+
+#: game/phases/descent.gd:714
+msgid "Quemar ya"
+msgstr "Burn now"
+
+#: game/phases/descent.gd:719 game/phases/launch.gd:558
+msgid "%.1f t"
+msgstr "%.1f t"
+
+#: game/phases/descent.gd:804
+msgid "Dentro del corredor"
+msgstr "Inside the corridor"
+
+#: game/phases/descent.gd:804
+msgid "Empinado: calor"
+msgstr "Steep: heat"
+
+#: game/phases/descent.gd:804
+msgid "Plano: rebotas"
+msgstr "Flat: you bounce"
+
+#: game/phases/hangar.gd:43
+msgid "Contratista Orbital"
+msgstr "Orbital Contractor"
+
+#: game/phases/hangar.gd:45
+msgid "Arma barato. Vuela lejos. Apuesta todo."
+msgstr "Build cheap. Fly far. Bet it all."
+
+#: game/phases/hangar.gd:49 game/phases/title.gd:37 game/phases/title.gd:94
+msgid "Créditos"
+msgstr "Credits"
+
+#: game/phases/hangar.gd:50
+msgid "Partidas"
+msgstr "Runs"
+
+#: game/phases/hangar.gd:51
+msgid "Entregas"
+msgstr "Deliveries"
+
+#: game/phases/hangar.gd:52
+msgid "Mejor pago"
+msgstr "Best payout"
+
+#: game/phases/hangar.gd:53 game/phases/hangar.gd:61
+msgid "Jugadores"
+msgstr "Players"
+
+#: game/phases/hangar.gd:63
+msgid "Seguro de la nave"
+msgstr "Ship insurance"
+
+#: game/phases/hangar.gd:65
+msgid "Manual de vuelo"
+msgstr "Flight manual"
+
+#: game/phases/hangar.gd:66
+msgid "Práctica: armar la nave"
+msgstr "Practice: build the ship"
+
+#: game/phases/hangar.gd:73
+msgid "Lecciones"
+msgstr "Lessons"
+
+#: game/phases/hangar.gd:75
+msgid "Ninguna todavía. Se aprenden perdiendo naves."
+msgstr "None yet. You learn by losing ships."
+
+#: game/phases/hangar.gd:82
+msgid "Inventario: %d piezas guardadas"
+msgstr "Inventory: %d parts stored"
+
+#: game/phases/hangar.gd:83
+msgid "Reiniciar perfil"
+msgstr "Reset profile"
+
+#: game/phases/hangar.gd:90
+msgid "¿Seguro? Pulsa otra vez para borrar todo"
+msgstr "Sure? Press again to erase everything"
+
+#: game/phases/hangar.gd:101 game/ui/tutorial.gd:10
+msgid "Contratos"
+msgstr "Contracts"
+
+#: game/phases/hangar.gd:105
+msgid "Pedir contratos nuevos (%s)"
+msgstr "Request new contracts (%s)"
+
+#: game/phases/hangar.gd:125
+msgid "P1 Comandante"
+msgstr "P1 Commander"
+
+#: game/phases/hangar.gd:126 game/phases/hangar.gd:168 game/phases/hangar.gd:171
+msgid "Conectado"
+msgstr "Connected"
+
+#: game/phases/hangar.gd:131
+msgid "P2 Tripulante"
+msgstr "P2 Crew member"
+
+#: game/phases/hangar.gd:132
+msgid "Ausente"
+msgstr "Absent"
+
+#: game/phases/hangar.gd:139 game/phases/hangar.gd:181
+msgid "Unirse (jugador 2)"
+msgstr "Join (player 2)"
+
+#: game/phases/hangar.gd:140
+msgid "El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado."
+msgstr "The second player presses A on the controller or J on the keyboard. P1 pilots with the keyboard."
+
+#: game/phases/hangar.gd:152
+msgid "Prima %d %% del valor de la nave, cubre %d %% si la pierdes."
+msgstr "Premium %d %% of the ship's value, covers %d %% if you lose it."
+
+#: game/phases/hangar.gd:173
+msgid "Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir."
+msgstr "Crew member ready. In flight use the arrow keys or the controller. P1 pilots with the keyboard. Press B / K to leave."
+
+#: game/phases/hangar.gd:175
+msgid "Desconectar jugador 2"
+msgstr "Disconnect player 2"
+
+#: game/phases/hangar.gd:177
+msgid "Esperando"
+msgstr "Waiting"
+
+#: game/phases/hangar.gd:179
+msgid "Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador."
+msgstr "Press A on the controller or J to join. P1 pilots with the keyboard, as in single player."
+
+#: game/phases/hangar.gd:208
+msgid "Delta-v estimado %d m/s, plazo %d días"
+msgstr "Estimated Delta-v %d m/s, deadline %d days"
+
+#: game/phases/hangar.gd:212
+msgid "Rumores de peligro"
+msgstr "Hazard rumors"
+
+#: game/phases/hangar.gd:219
+msgid "Adelanto %s"
+msgstr "Advance %s"
+
+#: game/phases/hangar.gd:220
+msgid "Presupuesto %s"
+msgstr "Budget %s"
+
+#: game/phases/hangar.gd:221
+msgid "Aceptar contrato"
+msgstr "Accept contract"
+
+#: game/phases/hangar.gd:267
+msgid "1 jugador conectado"
+msgstr "1 player connected"
+
+#: game/phases/hangar.gd:267
+msgid "2 jugadores conectados"
+msgstr "2 players connected"
+
+#: game/phases/launch.gd:80
+msgid "Velocidad"
+msgstr "Speed"
+
+#: game/phases/launch.gd:86
+msgid "Acelerador (W/S)"
+msgstr "Throttle (W/S)"
+
+#: game/phases/launch.gd:86
+msgid "Estrés"
+msgstr "Stress"
+
+#: game/phases/launch.gd:86
+msgid "Presión (Q)"
+msgstr "Pressure (Q)"
+
+#: game/phases/launch.gd:86
+msgid "Vel. orbital"
+msgstr "Orbital speed"
+
+#: game/phases/launch.gd:90
+msgid "Ignición o etapa (espacio)"
+msgstr "Ignition or stage (space)"
+
+#: game/phases/launch.gd:93
+msgid "Abortar (retroceso)"
+msgstr "Abort (backspace)"
+
+#: game/phases/launch.gd:103
+msgid "W/S acelerador   A/D cabeceo   1-4 tiempo   Espacio ignición o etapa   C estado   Retroceso abortar"
+msgstr "W/S throttle   A/D pitch   1-4 time   Space ignition or stage   C status   Backspace abort"
+
+#: game/phases/launch.gd:159
+msgid "Ignición perfecta"
+msgstr "Perfect ignition"
+
+#: game/phases/launch.gd:164
+msgid "Arranque duro"
+msgstr "Hard start"
+
+#: game/phases/launch.gd:164
+msgid "Ignición tardía"
+msgstr "Late ignition"
+
+#: game/phases/launch.gd:195
+msgid "Desacoplador trabado: pulsa Espacio para reintentar"
+msgstr "Stuck decoupler: press Space to retry"
+
+#: game/phases/launch.gd:208
+msgid "Separación de etapa"
+msgstr "Stage separation"
+
+#: game/phases/launch.gd:214
+msgid "Autodestrucción tras quedarse sin combustible."
+msgstr "Self-destruct after running out of fuel."
+
+#: game/phases/launch.gd:217
+msgid "Sin torre de escape funcional"
+msgstr "No working escape tower"
+
+#: game/phases/launch.gd:220
+msgid "Abortaste el despegue. La torre salvó la cápsula."
+msgstr "You aborted the launch. The tower saved the capsule."
+
+#: game/phases/launch.gd:304
+msgid "TWR INSUFICIENTE - R para volver al ensamblaje"
+msgstr "INSUFFICIENT TWR - R to return to assembly"
+
+#: game/phases/launch.gd:322
+msgid "MAX-Q  baja el acelerador"
+msgstr "MAX-Q  ease off the throttle"
+
+#: game/phases/launch.gd:329
+msgid "Sobrecarga estructural"
+msgstr "Structural overload"
+
+#: game/phases/launch.gd:340
+msgid "La nave se estrelló contra el suelo."
+msgstr "The ship crashed into the ground."
+
+#: game/phases/launch.gd:376
+msgid "En órbita, ascenso %s"
+msgstr "In orbit, ascent %s"
+
+#: game/phases/launch.gd:386
+msgid "Mesa de apuestas"
+msgstr "Betting table"
+
+#: game/phases/launch.gd:387
+msgid "La agencia acepta apuestas laterales sobre tu propia misión. Se cobran en la liquidación. Tienes %s."
+msgstr "The agency takes side bets on your own mission. They pay out at settlement. You have %s."
+
+#: game/phases/launch.gd:390
+msgid "Sin apuesta"
+msgstr "No bet"
+
+#: game/phases/launch.gd:391
+msgid "Llegar con 25%% de combustible  (100, paga x3)"
+msgstr "Arrive with 25%% fuel  (100, pays x3)"
+
+#: game/phases/launch.gd:392
+msgid "Entregar antes del plazo  (150, paga x2.5)"
+msgstr "Deliver before the deadline  (150, pays x2.5)"
+
+#: game/phases/launch.gd:393
+msgid "Aterrizaje perfecto S  (200, paga x4)"
+msgstr "Perfect S landing  (200, pays x4)"
+
+#: game/phases/launch.gd:404
+msgid "Apuesta registrada."
+msgstr "Bet registered."
+
+#: game/phases/launch.gd:406
+msgid "Sin riesgo extra."
+msgstr "No extra risk."
+
+#: game/phases/launch.gd:548
+msgid "Apoapsis %.1f km\nTWR %.2f\nCabeceo %d, objetivo %d\nTiempo %s"
+msgstr "Apoapsis %.1f km\nTWR %.2f\nPitch %d, target %d\nTime %s"
+
+#: game/phases/launch.gd:550
+msgid "%.0f kPa"
+msgstr "%.0f kPa"
+
+#: game/phases/launch.gd:560
+msgid "Ahora"
+msgstr "Now"
+
+#: game/phases/launch.gd:560
+msgid "T-%d. Pulsa Espacio en T-0"
+msgstr "T-%d. Press Space at T-0"
+
+#: game/phases/launch.gd:580 game/phases/training.gd:307
+msgid "Corredor"
+msgstr "Corridor"
+
+#: game/phases/minigame.gd:171
+msgid "%d de 3 perforaciones limpias"
+msgstr "%d of 3 clean drillings"
+
+#: game/phases/minigame.gd:212
+msgid "El casco no aguantó más golpes"
+msgstr "The hull could not take any more hits"
+
+#: game/phases/minigame.gd:215
+msgid "Cruzaste el campo. Cristales: %d (+%s)"
+msgstr "You crossed the field. Crystals: %d (+%s)"
+
+#: game/phases/minigame.gd:230
+msgid "Acople perfecto a %d m/s"
+msgstr "Perfect docking at %d m/s"
+
+#: game/phases/minigame.gd:233
+msgid "Choque contra el puerto"
+msgstr "Crashed into the port"
+
+#: game/phases/minigame.gd:233
+msgid "Desalineado: rebotaste"
+msgstr "Misaligned: you bounced"
+
+#: game/phases/minigame.gd:235
+msgid "Se acabó el tiempo de acople"
+msgstr "Docking time ran out"
+
+#: game/phases/minigame.gd:260
+msgid "Palanca, cruceta o flechas. A."
+msgstr "Stick, D-pad or arrow keys. A."
+
+#: game/phases/minigame.gd:268
+msgid "Acople, W/S alinear, D avanzar, A frenar"
+msgstr "Docking, W/S align, D advance, A brake"
+
+#: game/phases/minigame.gd:268
+msgid "Campo de asteroides, W/A/S/D"
+msgstr "Asteroid field, W/A/S/D"
+
+#: game/phases/minigame.gd:268
+msgid "Perforación, espacio en la zona verde"
+msgstr "Drilling, press space in the green zone"
+
+#: game/phases/minigame.gd:297
+msgid "Casco %s   Tiempo %d"
+msgstr "Hull %s   Time %d"
+
+#: game/phases/minigame.gd:306
+msgid "Ronda %d/3   Limpias %d"
+msgstr "Round %d/3   Clean %d"
+
+#: game/phases/minigame.gd:318
+msgid "Velocidad %d (máx. 70)   Desvío %d"
+msgstr "Speed %d (max. 70)   Drift %d"
+
+#: game/phases/minigame.gd:331
+msgid "Motor: llama en la banda"
+msgstr "Engine: flame in the band"
+
+#: game/phases/minigame.gd:332
+msgid "Tanque: cierra la fuga"
+msgstr "Tank: close the leak"
+
+#: game/phases/minigame.gd:333
+msgid "Cápsula: sella la escotilla"
+msgstr "Capsule: seal the hatch"
+
+#: game/phases/minigame.gd:334
+msgid "Casco: asienta la loseta"
+msgstr "Hull: seat the tile"
+
+#: game/phases/minigame.gd:335
+msgid "Panel: apunta al sol"
+msgstr "Panel: aim at the sun"
+
+#: game/phases/minigame.gd:336
+msgid "Radiador: purga en verde"
+msgstr "Radiator: purge in the green"
+
+#: game/phases/minigame.gd:337
+msgid "Antena: sostén el enlace"
+msgstr "Antenna: hold the link"
+
+#: game/phases/minigame.gd:338
+msgid "Paracaídas: pliega en la marca"
+msgstr "Parachute: fold at the mark"
+
+#: game/phases/minigame.gd:339
+msgid "Patas: extiende y confirma"
+msgstr "Legs: extend and confirm"
+
+#: game/phases/minigame.gd:340
+msgid "RCS: anula el giro"
+msgstr "RCS: cancel the spin"
+
+#: game/phases/minigame.gd:341
+msgid "Batería: conecta la celda"
+msgstr "Battery: connect the cell"
+
+#: game/phases/minigame.gd:342
+msgid "MMRTG: abrazadera en el zócalo"
+msgstr "MMRTG: clamp into the socket"
+
+#: game/phases/minigame.gd:343
+msgid "Computadora: repite"
+msgstr "Computer: repeat"
+
+#: game/phases/minigame.gd:344
+msgid "Sensores: centra y fija"
+msgstr "Sensors: center and lock"
+
+#: game/phases/minigame.gd:345
+msgid "Desacoplador: corta el perno"
+msgstr "Decoupler: cut the bolt"
+
+#: game/phases/minigame.gd:346
+msgid "Aislante: esquinas en orden"
+msgstr "Insulation: corners in order"
+
+#: game/phases/minigame.gd:347
+msgid "Escape: carga y dispara"
+msgstr "Escape: charge and fire"
+
+#: game/phases/minigame.gd:429
+msgid "No hay procedimiento para esta pieza"
+msgstr "There is no procedure for this part"
+
+#: game/phases/minigame.gd:460
+msgid "La cámara aguanta el régimen"
+msgstr "The chamber holds its regime"
+
+#: game/phases/minigame.gd:462
+msgid "El motor no entró en régimen"
+msgstr "The engine did not reach its regime"
+
+#: game/phases/minigame.gd:473
+msgid "El tanque deja de perder propelente"
+msgstr "The tank stops losing propellant"
+
+#: game/phases/minigame.gd:475
+msgid "El propelente sigue escapando"
+msgstr "The propellant keeps escaping"
+
+#: game/phases/minigame.gd:487
+msgid "La cabina recupera presión"
+msgstr "The cabin regains pressure"
+
+#: game/phases/minigame.gd:491
+msgid "La cabina se quedó sin aire"
+msgstr "The cabin ran out of air"
+
+#: game/phases/minigame.gd:513
+msgid "El escudo vuelve a ser continuo"
+msgstr "The shield is continuous again"
+
+#: game/phases/minigame.gd:515
+msgid "Las losetas se perdieron"
+msgstr "The tiles were lost"
+
+#: game/phases/minigame.gd:530
+msgid "El panel ve el sol de frente"
+msgstr "The panel faces the sun head-on"
+
+#: game/phases/minigame.gd:532
+msgid "El panel sigue de canto"
+msgstr "The panel is still edge-on"
+
+#: game/phases/minigame.gd:545
+msgid "El radiador suelta el calor"
+msgstr "The radiator sheds the heat"
+
+#: game/phases/minigame.gd:547
+msgid "El lazo térmico se pasó"
+msgstr "The thermal loop overshot"
+
+#: game/phases/minigame.gd:561
+msgid "La antena recupera el enlace"
+msgstr "The antenna regains the link"
+
+#: game/phases/minigame.gd:563
+msgid "Se perdió el enlace"
+msgstr "The link was lost"
+
+#: game/phases/minigame.gd:575
+msgid "El paracaídas queda plegado"
+msgstr "The parachute is folded"
+
+#: game/phases/minigame.gd:579
+msgid "La tela quedó mal plegada"
+msgstr "The fabric was folded badly"
+
+#: game/phases/minigame.gd:591
+msgid "Las patas quedan trabadas"
+msgstr "The legs are locked"
+
+#: game/phases/minigame.gd:595
+msgid "La pata no entró en el tope"
+msgstr "The leg did not reach its stop"
+
+#: game/phases/minigame.gd:606
+msgid "El giro está anulado"
+msgstr "The spin is cancelled"
+
+#: game/phases/minigame.gd:610
+msgid "El pulso de RCS quedó a medias"
+msgstr "The RCS pulse came out half-done"
+
+#: game/phases/minigame.gd:612
+msgid "La nave sigue girando"
+msgstr "The ship is still spinning"
+
+#: game/phases/minigame.gd:623
+msgid "El banco vuelve a dar tensión"
+msgstr "The bank is live again"
+
+#: game/phases/minigame.gd:625
+msgid "La celda se descargó"
+msgstr "The cell discharged"
+
+#: game/phases/minigame.gd:638
+msgid "El MMRTG queda sujeto"
+msgstr "The MMRTG is secured"
+
+#: game/phases/minigame.gd:642
+msgid "La abrazadera mordió fuera"
+msgstr "The clamp bit outside"
+
+#: game/phases/minigame.gd:655
+msgid "La computadora arranca"
+msgstr "The computer boots"
+
+#: game/phases/minigame.gd:657
+msgid "La secuencia no coincide"
+msgstr "The sequence does not match"
+
+#: game/phases/minigame.gd:672
+msgid "El sensor vuelve a cero"
+msgstr "The sensor returns to zero"
+
+#: game/phases/minigame.gd:674
+msgid "El sensor sigue desviado"
+msgstr "The sensor is still off"
+
+#: game/phases/minigame.gd:685
+msgid "Los pernos quedan cortados"
+msgstr "The bolts are cut"
+
+#: game/phases/minigame.gd:689
+msgid "Cortaste el perno equivocado"
+msgstr "You cut the wrong bolt"
+
+#: game/phases/minigame.gd:698
+msgid "El aislante cubre el tanque"
+msgstr "The insulation covers the tank"
+
+#: game/phases/minigame.gd:700
+msgid "El aislante quedó suelto"
+msgstr "The insulation was left loose"
+
+#: game/phases/minigame.gd:711
+msgid "La carga se pasó de la ventana"
+msgstr "The charge went past the window"
+
+#: game/phases/minigame.gd:714
+msgid "La torre queda armada"
+msgstr "The tower is armed"
+
+#: game/phases/minigame.gd:716
+msgid "Disparo fuera de la ventana"
+msgstr "Fired outside the window"
+
+#: game/phases/minigame.gd:718
+msgid "La torre no llegó a armarse"
+msgstr "The tower never got armed"
+
+#: game/phases/minigame.gd:762
+msgid "En banda %.1f s"
+msgstr "In band %.1f s"
+
+#: game/phases/minigame.gd:765
+msgid "Cierres %d/3"
+msgstr "Seals %d/3"
+
+#: game/phases/minigame.gd:769
+msgid "Presión %d %%"
+msgstr "Pressure %d %%"
+
+#: game/phases/minigame.gd:774
+msgid "Losetas %d/4"
+msgstr "Tiles %d/4"
+
+#: game/phases/minigame.gd:777
+msgid "Fijos %d/2"
+msgstr "Locked %d/2"
+
+#: game/phases/minigame.gd:780
+msgid "Purgas %d/3"
+msgstr "Purges %d/3"
+
+#: game/phases/minigame.gd:785
+msgid "Enlace %.1f s"
+msgstr "Link %.1f s"
+
+#: game/phases/minigame.gd:788
+msgid "Pliegues %d/4"
+msgstr "Folds %d/4"
+
+#: game/phases/minigame.gd:791
+msgid "Patas %d/2"
+msgstr "Legs %d/2"
+
+#: game/phases/minigame.gd:793
+msgid "Giro %d"
+msgstr "Spin %d"
+
+#: game/phases/minigame.gd:801
+msgid "Tiempo %.1f"
+msgstr "Time %.1f"
+
+#: game/phases/minigame.gd:804
+msgid "Abrazaderas %d/3"
+msgstr "Clamps %d/3"
+
+#: game/phases/minigame.gd:812
+msgid "Ahora, paso %d"
+msgstr "Now, step %d"
+
+#: game/phases/minigame.gd:820
+msgid "Fijos %d/3"
+msgstr "Locked %d/3"
+
+#: game/phases/minigame.gd:826
+msgid "Perno %d/3"
+msgstr "Bolt %d/3"
+
+#: game/phases/minigame.gd:831
+msgid "Esquina %d/4"
+msgstr "Corner %d/4"
+
+#: game/phases/minigame.gd:834
+msgid "Mantén arriba y dispara"
+msgstr "Hold up and fire"
+
+#: game/phases/minigame.gd:878
+msgid "arriba"
+msgstr "up"
+
+#: game/phases/minigame.gd:882
+msgid "abajo"
+msgstr "down"
+
+#: game/phases/space.gd:15
+msgid "Eagle, Apolo 11"
+msgstr "Eagle, Apollo 11"
+
+#: game/phases/space.gd:15
+msgid "La etapa de descenso del Eagle sigue en la Base de la Tranquilidad. La NASA la dejó el 20 de julio de 1969."
+msgstr "The Eagle's descent stage is still at Tranquility Base. NASA left it there on July 20, 1969."
+
+#: game/phases/space.gd:16
+msgid "El vehículo lunar del Apolo 15 sigue en el valle de Hadley. La NASA lo apagó al marcharse, en 1971."
+msgstr "The Apollo 15 lunar vehicle is still in Hadley valley. NASA switched it off when leaving, in 1971."
+
+#: game/phases/space.gd:16
+msgid "Rover del Apolo 15"
+msgstr "Apollo 15 rover"
+
+#: game/phases/space.gd:17
+msgid "Opportunity"
+msgstr "Opportunity"
+
+#: game/phases/space.gd:17
+msgid "Opportunity dejó de llamar el 10 de junio de 2018, cubierto por una tormenta de polvo en Meridiani. La NASA no volvió a oírlo."
+msgstr "Opportunity stopped calling on June 10, 2018, buried by a dust storm at Meridiani. NASA never heard from it again."
+
+#: game/phases/space.gd:18
+msgid "InSight"
+msgstr "InSight"
+
+#: game/phases/space.gd:18
+msgid "InSight se apagó el 15 de diciembre de 2022: el polvo tapó sus paneles en Elysium. Sigue en el suelo."
+msgstr "InSight shut down on December 15, 2022: dust covered its panels at Elysium. It is still on the ground."
+
+#: game/phases/space.gd:19
+msgid "Viking 1"
+msgstr "Viking 1"
+
+#: game/phases/space.gd:19
+msgid "Viking 1 calló el 11 de noviembre de 1982 en Chryse Planitia. El aterrizador de la NASA sigue ahí."
+msgstr "Viking 1 went silent on November 11, 1982 at Chryse Planitia. NASA's lander is still there."
+
+#: game/phases/space.gd:20
+msgid "Impacto de MESSENGER"
+msgstr "MESSENGER impact"
+
+#: game/phases/space.gd:20
+msgid "MESSENGER chocó contra Mercurio el 30 de abril de 2015, cerca del cráter Shakespeare. No quedó posado: son restos del impacto."
+msgstr "MESSENGER hit Mercury on April 30, 2015, near Shakespeare crater. It did not land: these are impact remains."
+
+#: game/phases/space.gd:21
+msgid "En diciembre de 1978 las sondas Pioneer Venus de la NASA llegaron al suelo y callaron en menos de una hora. El calor y la presión las apagaron."
+msgstr "In December 1978 NASA's Pioneer Venus probes reached the ground and went silent in less than an hour. Heat and pressure shut them down."
+
+#: game/phases/space.gd:21
+msgid "Pioneer Venus"
+msgstr "Pioneer Venus"
+
+#: game/phases/space.gd:22
+msgid "Huygens"
+msgstr "Huygens"
+
+#: game/phases/space.gd:22
+msgid "Huygens, de la ESA, viajó en el Cassini de la NASA y se posó en Titán el 14 de enero de 2005. Sigue en ese suelo frío."
+msgstr "Huygens, from ESA, rode on NASA's Cassini and landed on Titan on January 14, 2005. It is still on that cold ground."
+
+#: game/phases/space.gd:23
+msgid "NEAR Shoemaker"
+msgstr "NEAR Shoemaker"
+
+#: game/phases/space.gd:23
+msgid "NEAR Shoemaker se posó en el asteroide Eros el 12 de febrero de 2001. La NASA lo dejó ahí al acabar la misión. Eros orbita a unas 1,46 UA."
+msgstr "NEAR Shoemaker landed on asteroid Eros on February 12, 2001. NASA left it there when the mission ended. Eros orbits at about 1.46 AU."
+
+#: game/phases/space.gd:176
+msgid "Distancia"
+msgstr "Distance"
+
+#: game/phases/space.gd:176
+msgid "Plazo"
+msgstr "Deadline"
+
+#: game/phases/space.gd:176
+msgid "Vel. relativa"
+msgstr "Relative speed"
+
+#: game/phases/space.gd:176
+msgid "días"
+msgstr "days"
+
+#: game/phases/space.gd:185
+msgid "Batería"
+msgstr "Battery"
+
+#: game/phases/space.gd:185
+msgid "Sobrecarga"
+msgstr "Overload"
+
+#: game/phases/space.gd:185
+msgid "Temperatura"
+msgstr "Temperature"
+
+#: game/phases/space.gd:188
+msgid "Reparar (R)"
+msgstr "Repair (R)"
+
+#: game/phases/space.gd:190
+msgid "Instalar (I)"
+msgstr "Install (I)"
+
+#: game/phases/space.gd:192
+msgid "Navegación (N)"
+msgstr "Navigation (N)"
+
+#: game/phases/space.gd:193 game/phases/space.gd:864
+msgid "Pedir rescate"
+msgstr "Call for rescue"
+
+#: game/phases/space.gd:203
+msgid "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom"
+msgstr "A/D turn   W thrust   Shift overload   Ctrl fine   T/G pro/retro   1-6 time   Tab target   F scan   L enter   wheel zoom"
+
+#: game/phases/space.gd:203
+msgid "WASD moverse (inercia, sin gravedad)   Mayús sobrecarga   Ctrl fino   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom"
+msgstr "WASD move (inertia, zero gravity)   Shift overload   Ctrl fine   1-6 time   Tab target   F scan   L enter   wheel zoom"
+
+#: game/phases/space.gd:249
+msgid "Navegación asistida %s"
+msgstr "Assisted navigation %s"
+
+#: game/phases/space.gd:256
+msgid "Suelta el motor para acelerar el tiempo"
+msgstr "Release the engine to speed up time"
+
+#: game/phases/space.gd:314
+msgid "Fuera de alcance del escaner (1500)"
+msgstr "Out of scanner range (1500)"
+
+#: game/phases/space.gd:322
+msgid "Escaneo: %s %s"
+msgstr "Scan: %s %s"
+
+#: game/phases/space.gd:329
+msgid "asteroide"
+msgstr "asteroid"
+
+#: game/phases/space.gd:330
+msgid "nave abandonada"
+msgstr "abandoned ship"
+
+#: game/phases/space.gd:331
+msgid "señal"
+msgstr "signal"
+
+#: game/phases/space.gd:332
+msgid "cometa"
+msgstr "comet"
+
+#: game/phases/space.gd:333
+msgid "luna"
+msgstr "moon"
+
+#: game/phases/space.gd:460
+msgid ", hasta %d"
+msgstr ", up to %d"
+
+#: game/phases/space.gd:460
+msgid "Empuja con W: acelera hacia el objetivo"
+msgstr "Thrust with W: accelerate toward the target"
+
+#: game/phases/space.gd:460
+msgid "Gira hacia el marcador turquesa y luego W"
+msgstr "Turn toward the teal marker, then W"
+
+#: game/phases/space.gd:462
+msgid ", cierre %d"
+msgstr ", closing %d"
+
+#: game/phases/space.gd:462
+msgid "Empuja con W: frena el cierre"
+msgstr "Thrust with W: slow the closing speed"
+
+#: game/phases/space.gd:462
+msgid "Gira hacia el marcador ámbar para frenar"
+msgstr "Turn toward the amber marker to brake"
+
+#: game/phases/space.gd:464
+msgid "Cerca: baja la velocidad relativa y pulsa L si es un planeta"
+msgstr "Close: lower the relative speed and press L if it is a planet"
+
+#: game/phases/space.gd:466
+msgid "Inercia: espera (cierre %d, falta %d)"
+msgstr "Coasting: wait (closing %d, %d to go)"
+
+#: game/phases/space.gd:515
+msgid "El motor tose, pero aguanta"
+msgstr "The engine coughs, but holds"
+
+#: game/phases/space.gd:531
+msgid "La nave se fundio al caer en %s."
+msgstr "The ship melted falling into %s."
+
+#: game/phases/space.gd:533
+msgid "La presión de %s aplastó la nave."
+msgstr "The pressure of %s crushed the ship."
+
+#: game/phases/space.gd:562
+msgid "Sobrecalentamiento: la electrónica sufre"
+msgstr "Overheating: the electronics suffer"
+
+#: game/phases/space.gd:565
+msgid "Congelación: líneas de combustible rígidas"
+msgstr "Freezing: fuel lines stiff"
+
+#: game/phases/space.gd:584
+msgid "Llamarada solar en %d s, escóndete tras un planeta"
+msgstr "Solar flare in %d s, hide behind a planet"
+
+#: game/phases/space.gd:607
+msgid "Radiación de %s"
+msgstr "Radiation from %s"
+
+#: game/phases/space.gd:615
+msgid "La llamarada pasó. A salvo en la sombra."
+msgstr "The flare passed. Safe in the shadow."
+
+#: game/phases/space.gd:624
+msgid "Algo no volvió a encender."
+msgstr "Something did not power back on."
+
+#: game/phases/space.gd:624
+msgid "Apagar sistemas"
+msgstr "Shut down systems"
+
+#: game/phases/space.gd:624
+msgid "Todo volvió a encender."
+msgstr "Everything powered back on."
+
+#: game/phases/space.gd:625 content/malfunctions/sobrepresion.tres:16
+msgid "Aguantar"
+msgstr "Hold on"
+
+#: game/phases/space.gd:625
+msgid "Circuitos fritos."
+msgstr "Fried circuits."
+
+#: game/phases/space.gd:625
+msgid "El blindaje aguanto."
+msgstr "The shielding held."
+
+#: game/phases/space.gd:628
+msgid "Absorber con los paneles"
+msgstr "Absorb with the panels"
+
+#: game/phases/space.gd:628
+msgid "Batería a tope."
+msgstr "Battery full."
+
+#: game/phases/space.gd:628
+msgid "Los paneles se quemaron."
+msgstr "The panels burned out."
+
+#: game/phases/space.gd:631
+msgid "Llamarada solar"
+msgstr "Solar flare"
+
+#: game/phases/space.gd:632
+msgid "Una tormenta de protones barre la nave. Flujo solar x%.1f."
+msgstr "A proton storm sweeps the ship. Solar flux x%.1f."
+
+#: game/phases/space.gd:655
+msgid "Impacto en %s. Aguanto."
+msgstr "Impact on %s. It held."
+
+#: game/phases/space.gd:657
+msgid "Micrometeoroide rebota en %s"
+msgstr "Micrometeoroid bounces off %s"
+
+#: game/phases/space.gd:700
+msgid "Fotografiar y registrar"
+msgstr "Photograph and log"
+
+#: game/phases/space.gd:700
+msgid "Queda en el informe de la misión."
+msgstr "It goes in the mission report."
+
+#: game/phases/space.gd:701 content/encounters/asteroide_hielo.tres:30 content/encounters/asteroide_metal.tres:37
+msgid "Seguir de largo"
+msgstr "Keep going"
+
+#: game/phases/space.gd:802
+msgid "El tripulante repara en la nave. Tirada penalizada: V / Y"
+msgstr "The crew member repairs aboard the ship. Penalized roll: V / Y"
+
+#: game/phases/space.gd:817
+msgid "Nada que reparar"
+msgstr "Nothing to repair"
+
+#: game/phases/space.gd:821
+msgid "Como nueva."
+msgstr "Good as new."
+
+#: game/phases/space.gd:821
+msgid "Kit: reparar %s"
+msgstr "Kit: repair %s"
+
+#: game/phases/space.gd:822
+msgid "Aguanta. De milagro."
+msgstr "It holds. By a miracle."
+
+#: game/phases/space.gd:822
+msgid "Improvisar con cinta"
+msgstr "Improvise with tape"
+
+#: game/phases/space.gd:822
+msgid "Lo empeoraste."
+msgstr "You made it worse."
+
+#: game/phases/space.gd:824
+msgid "Kit: recalibrar sensores"
+msgstr "Kit: recalibrate sensors"
+
+#: game/phases/space.gd:824
+msgid "Sistemas limpios."
+msgstr "Systems clean."
+
+#: game/phases/space.gd:825
+msgid "Algo salto en chispas."
+msgstr "Something went up in sparks."
+
+#: game/phases/space.gd:825
+msgid "Reiniciar a lo bruto"
+msgstr "Hard reboot"
+
+#: game/phases/space.gd:825 content/malfunctions/cortocircuito.tres:13
+msgid "Reinicio limpio."
+msgstr "Clean reboot."
+
+#: game/phases/space.gd:826
+msgid "Dejarlo así"
+msgstr "Leave it"
+
+#: game/phases/space.gd:828
+msgid "Taller de a bordo"
+msgstr "Onboard workshop"
+
+#: game/phases/space.gd:829
+msgid "%s. Estado: %s."
+msgstr "%s. Condition: %s."
+
+#: game/phases/space.gd:829
+msgid "Los sensores están degradados."
+msgstr "The sensors are degraded."
+
+#: game/phases/space.gd:841
+msgid "No tienes chatarra para instalar"
+msgstr "You have no scrap to install"
+
+#: game/phases/space.gd:845
+msgid "Instalar chatarra"
+msgstr "Install scrap"
+
+#: game/phases/space.gd:846
+msgid "Una pieza misteriosa: %s. Montarla en pleno vuelo es una apuesta; si sale mal, se pierde y golpea la nave."
+msgstr "A mystery part: %s. Mounting it in flight is a gamble; if it goes wrong, it is lost and hits the ship."
+
+#: game/phases/space.gd:850
+msgid "Encaja."
+msgstr "It fits."
+
+#: game/phases/space.gd:850
+msgid "Instalar ahora"
+msgstr "Install now"
+
+#: game/phases/space.gd:850
+msgid "Se solto y reboto contra el casco."
+msgstr "It came loose and bounced off the hull."
+
+#: game/phases/space.gd:851
+msgid "Guardarla para vender"
+msgstr "Keep it to sell"
+
+#: game/phases/space.gd:861
+msgid "Tanques secos. La agencia puede enviar un remolque, pero la misión se da por perdida."
+msgstr "Tanks dry. The agency can send a tow, but the mission is written off."
+
+#: game/phases/space.gd:865
+msgid "Esperar un carguero de paso"
+msgstr "Wait for a passing freighter"
+
+#: game/phases/space.gd:865
+msgid "Nadie vino."
+msgstr "Nobody came."
+
+#: game/phases/space.gd:865
+msgid "Te pasaron combustible."
+msgstr "They passed you fuel."
+
+#: game/phases/space.gd:866
+msgid "Seguir intentando"
+msgstr "Keep trying"
+
+#: game/phases/space.gd:877
+msgid "Día %d, tiempo %s, racha x%.2f"
+msgstr "Day %d, time %s, streak x%.2f"
+
+#: game/phases/space.gd:882
+msgid " (guiado)"
+msgstr " (guided)"
+
+#: game/phases/space.gd:882
+msgid "Objetivo: %s%s"
+msgstr "Target: %s%s"
+
+#: game/phases/space.gd:886
+msgid "inercia"
+msgstr "coasting"
+
+#: game/phases/space.gd:888
+msgid "acelerar"
+msgstr "boosting"
+
+#: game/phases/space.gd:889
+msgid "frenar"
+msgstr "braking"
+
+#: game/phases/space.gd:890
+msgid "capturar"
+msgstr "capturing"
+
+#: game/phases/space.gd:891
+msgid "Guiado: %s a %d, falta %d, cierre %d"
+msgstr "Guided: %s at %d, %d to go, closing %d"
+
+#: game/phases/space.gd:893
+msgid "Paso más cercano: %d en %d s"
+msgstr "Closest pass: %d in %d s"
+
+#: game/phases/space.gd:897
+msgid "Plazo vencido: el pago baja"
+msgstr "Deadline passed: the payout drops"
+
+#: game/phases/space.gd:900
+msgid "Plazo vencido: el pago bajará"
+msgstr "Deadline passed: the payout will drop"
+
+#: game/phases/space.gd:904
+msgid "comunicaciones"
+msgstr "comms"
+
+#: game/phases/space.gd:904
+msgid "mapa"
+msgstr "map"
+
+#: game/phases/space.gd:904
+msgid "visión"
+msgstr "vision"
+
+#: game/phases/space.gd:906
+msgid "Degradado: "
+msgstr "Degraded: "
+
+#: game/phases/space.gd:912
+msgid "%d m/s"
+msgstr "%d m/s"
+
+#: game/phases/space.gd:915
+msgid "Caliente"
+msgstr "Hot"
+
+#: game/phases/space.gd:915
+msgid "Helado"
+msgstr "Frozen"
+
+#: game/phases/space.gd:919
+msgid "Reparar (R): %d kits"
+msgstr "Repair (R): %d kits"
+
+#: game/phases/space.gd:920
+msgid "Instalar (I): %d"
+msgstr "Install (I): %d"
+
+#: game/phases/space.gd:930
+msgid "Entrar a %s (L), %d m/s relativa"
+msgstr "Enter %s (L), %d m/s relative"
+
+#: game/phases/space.gd:933
+msgid "Llamarada en %d s"
+msgstr "Flare in %d s"
+
+#: game/phases/space.gd:939
+msgid "Manteniendo %s"
+msgstr "Holding %s"
+
+#: game/phases/space.gd:939
+msgid "progrado"
+msgstr "prograde"
+
+#: game/phases/space.gd:939
+msgid "retrógrado"
+msgstr "retrograde"
+
+#: game/phases/title.gd:28
+msgid "Deuda orbital"
+msgstr "Orbital debt"
+
+#: game/phases/title.gd:32
+msgid "Primera misión: armar la nave"
+msgstr "First mission: build the ship"
+
+#: game/phases/title.gd:32
+msgid "Repetir práctica de montaje"
+msgstr "Repeat assembly practice"
+
+#: game/phases/title.gd:35 game/phases/title.gd:58
+msgid "Nueva partida"
+msgstr "New game"
+
+#: game/phases/title.gd:59
+msgid "Se reiniciará el perfil actual (créditos, lecciones, inventario y contratos). Elige un modo:"
+msgstr "The current profile will be reset (credits, lessons, inventory and contracts). Choose a mode:"
+
+#: game/phases/title.gd:62
+msgid "Modo Fácil Arcade (Recomendado)"
+msgstr "Easy Arcade Mode (Recommended)"
+
+#: game/phases/title.gd:65
+msgid "Navegación espacial libre con WASD sin gravedad (con inercia) y descenso directo ajustando tu trayectoria con los motores en WASD."
+msgstr "Free space navigation with WASD in zero gravity (with inertia) and direct descent by adjusting your trajectory with the WASD engines."
+
+#: game/phases/title.gd:68
+msgid "Simulación original"
+msgstr "Original simulation"
+
+#: game/phases/title.gd:71
+msgid "Física orbital original."
+msgstr "Original orbital physics."
+
+#: game/phases/title.gd:74 game/ui/modal.gd:110
+msgid "Cancelar"
+msgstr "Cancel"
+
+#: game/phases/title.gd:97
+msgid "Hecho para NASA Space Apps Challenge, reto Space Mission Design Game."
+msgstr "Made for the NASA Space Apps Challenge, Space Mission Design Game challenge."
+
+#: game/phases/title.gd:98
+msgid "Datos abiertos: NASA Planetary Fact Sheet (NSSDCA), JPL Small-Body Database, NASA DONKI y NASA Deep Space Network."
+msgstr "Open data: NASA Planetary Fact Sheet (NSSDCA), JPL Small-Body Database, NASA DONKI and NASA Deep Space Network."
+
+#: game/phases/title.gd:99
+msgid "Tipografía B612, B612 Mono (SIL Open Font License) y Pixelta."
+msgstr "Typefaces B612, B612 Mono (SIL Open Font License) and Pixelta."
+
+#: game/phases/title.gd:100
+msgid "Hecho con Godot Engine, licencia MIT."
+msgstr "Made with Godot Engine, MIT license."
+
+#: game/phases/training.gd:4
+msgid "Ignición: pulsa Espacio cuando la aguja entre en el verde del reloj. Antes de tiempo no enciende.\n\nInclina la nave hacia el arco verde. Ese giro da velocidad de lado; sin ella sube y vuelve a caer.\n\nSepara con Espacio cuando se acabe el combustible de la etapa activa. Hacerlo antes tira combustible que aún servía. La etapa de arriba usa su propio motor y su propio tanque.\n\nEn el espacio, modo realista: la nave no se frena sola. Cae siempre; si vas bastante de lado, el planeta se curva y no lo tocas. Eso es una órbita. Empujar a favor del movimiento sube el lado opuesto. Empujar en contra lo baja y puedes volver a caer."
+msgstr "Ignition: press Space when the needle enters the green of the dial. It will not ignite early.\n\nTilt the ship toward the green arc. That turn gives sideways speed; without it you climb and fall back down.\n\nSeparate with Space when the active stage runs out of fuel. Doing it earlier throws away fuel that was still useful. The upper stage uses its own engine and its own tank.\n\nIn space, realistic mode: the ship does not slow down on its own. It is always falling; if you are going sideways fast enough, the planet curves away and you never touch it. That is an orbit. Pushing with your motion raises the opposite side. Pushing against it lowers it and you can fall back down."
+
+#: game/phases/training.gd:55
+msgid "BALLAST-1: Primera misión"
+msgstr "BALLAST-1: First mission"
+
+#: game/phases/training.gd:57
+msgid "Reiniciar montaje"
+msgstr "Reset assembly"
+
+#: game/phases/training.gd:58
+msgid "Salir de práctica"
+msgstr "Leave practice"
+
+#: game/phases/training.gd:80
+msgid "%s\nMasa %.1f t; coste %d cr [DIS]."
+msgstr "%s\nMass %.1f t; cost %d cr [DIS]."
+
+#: game/phases/training.gd:95
+msgid "Hacia la base"
+msgstr "Toward the base"
+
+#: game/phases/training.gd:96
+msgid "Hacia la cima"
+msgstr "Toward the top"
+
+#: game/phases/training.gd:97
+msgid "Retirar"
+msgstr "Remove"
+
+#: game/phases/training.gd:103
+msgid "Telemetría de práctica [DIS]"
+msgstr "Practice telemetry [DIS]"
+
+#: game/phases/training.gd:115 game/phases/training.gd:213
+msgid "Menos potencia"
+msgstr "Less power"
+
+#: game/phases/training.gd:116 game/phases/training.gd:214
+msgid "Más potencia"
+msgstr "More power"
+
+#: game/phases/training.gd:117
+msgid "Girar izquierda (%s)"
+msgstr "Turn left (%s)"
+
+#: game/phases/training.gd:118
+msgid "Girar derecha (%s)"
+msgstr "Turn right (%s)"
+
+#: game/phases/training.gd:122
+msgid "Reparar"
+msgstr "Repair"
+
+#: game/phases/training.gd:123 game/sim/thermal.gd:61
+msgid "Paracaídas"
+msgstr "Parachute"
+
+#: game/phases/training.gd:124
+msgid "Solo se arma la nave. No gasta créditos ni piezas del perfil."
+msgstr "Only the ship is built. It spends no credits or profile parts."
+
+#: game/phases/training.gd:194
+msgid "Nave lista"
+msgstr "Ship ready"
+
+#: game/phases/training.gd:195
+msgid "El montaje cumple. A la derecha está, en corto, la ignición, el arco verde, la separación y la órbita del modo realista."
+msgstr "The assembly passes. On the right, in short, are the ignition, the green arc, the separation and the realistic-mode orbit."
+
+#: game/phases/training.gd:199
+msgid "%s\n\nPosiciones desde la base hacia la cima."
+msgstr "%s\n\nPositions from the base toward the top."
+
+#: game/phases/training.gd:208
+msgid "Queda poco combustible ACTIVO. Prepara la separación; espera a que se agote."
+msgstr "Little ACTIVE fuel is left. Prepare the separation; wait for it to run out."
+
+#: game/phases/training.gd:213
+msgid "Entrada más inclinada"
+msgstr "Steeper entry"
+
+#: game/phases/training.gd:214
+msgid "Entrada más plana"
+msgstr "Flatter entry"
+
+#: game/phases/training.gd:215
+msgid "Arma la nave sin arriesgar la campaña"
+msgstr "Build the ship without risking the campaign"
+
+#: game/phases/training.gd:215
+msgid "Completada"
+msgstr "Completed"
+
+#: game/phases/training.gd:215
+msgid "Práctica de montaje | %s"
+msgstr "Assembly practice | %s"
+
+#: game/phases/training.gd:219
+msgid "Siguiente: "
+msgstr "Next: "
+
+#: game/phases/training.gd:233
+msgid "Entrar en atmósfera"
+msgstr "Enter atmosphere"
+
+#: game/phases/training.gd:233 game/ui/tutorial.gd:19
+msgid "Ignición"
+msgstr "Ignition"
+
+#: game/phases/training.gd:233
+msgid "Iniciar regreso"
+msgstr "Start return"
+
+#: game/phases/training.gd:233
+msgid "Reintentar separación"
+msgstr "Retry separation"
+
+#: game/phases/training.gd:233 game/phases/training.gd:233
+msgid "Separar etapa"
+msgstr "Separate stage"
+
+#: game/phases/training.gd:234
+msgid "Completa el montaje"
+msgstr "Complete the assembly"
+
+#: game/phases/training.gd:234
+msgid "Terminar práctica"
+msgstr "Finish practice"
+
+#: game/phases/training.gd:236
+msgid "Completa la acción indicada"
+msgstr "Complete the indicated action"
+
+#: game/phases/training.gd:240
+msgid "Reparar (%s)"
+msgstr "Repair (%s)"
+
+#: game/phases/training.gd:243
+msgid "Paracaídas (%s)"
+msgstr "Parachute (%s)"
+
+#: game/phases/training.gd:253
+msgid "Etapas: %d\nMasa: %.1f t\nTWR: %.2f\nDelta-v: %d m/s\nCoste de diseño: %d cr\n\nCombustible ACTIVO: %.2f t\nCombustible TOTAL: %.2f t\n\nAltitud: %.1f km\nVelocidad: %.0f m/s\nPresión: %.1f kPa\nPotencia: %d %%\nCabeceo: %.0f°\nObjetivo: %.0f°\nBatería: %.1f\nEscudo: %.1f\nT-%.1f"
+msgstr "Stages: %d\nMass: %.1f t\nTWR: %.2f\nDelta-v: %d m/s\nDesign cost: %d cr\n\nACTIVE fuel: %.2f t\nTOTAL fuel: %.2f t\n\nAltitude: %.1f km\nSpeed: %.0f m/s\nPressure: %.1f kPa\nPower: %d %%\nPitch: %.0f°\nTarget: %.0f°\nBattery: %.1f\nShield: %.1f\nT-%.1f"
+
+#: game/phases/training.gd:255
+msgid "\nEntrada: %.1f°\nCorredor: %.0f° a %.0f°"
+msgstr "\nEntry: %.1f°\nCorridor: %.0f° to %.0f°"
+
+#: game/phases/training.gd:268
+msgid "Coloca el motor en la base"
+msgstr "Place the engine at the base"
+
+#: game/phases/training.gd:285
+msgid "Base abajo, cabina arriba"
+msgstr "Base at the bottom, cabin on top"
+
+#: game/phases/training.gd:285
+msgid "MZ-1 BALLAST: práctica"
+msgstr "MZ-1 BALLAST: practice"
+
+#: game/phases/training.gd:288
+msgid "Montaje listo"
+msgstr "Assembly ready"
+
+#: game/phases/training.gd:288
+msgid "Siguiente posición: %d desde la base"
+msgstr "Next position: %d from the base"
+
+#: game/phases/training.gd:298
+msgid "Inclinado                     Plano"
+msgstr "Steep                         Flat"
+
+#: game/sim/contract.gd:4
+msgid "Fauna exótica"
+msgstr "Exotic fauna"
+
+#: game/sim/contract.gd:4
+msgid "Muestras de ciencia"
+msgstr "Science samples"
+
+#: game/sim/contract.gd:4
+msgid "Paquetes urgentes"
+msgstr "Urgent packages"
+
+#: game/sim/contract.gd:4
+msgid "Satélite averiado"
+msgstr "Broken satellite"
+
+#: game/sim/contract.gd:4
+msgid "Sonda geológica"
+msgstr "Geological probe"
+
+#: game/sim/contract.gd:53
+msgid "%s a %s"
+msgstr "%s to %s"
+
+#: game/sim/odds.gd:20
+msgid "Seguro"
+msgstr "Insurance"
+
+#: game/sim/ship_part.gd:6
+msgid "Chatarra"
+msgstr "Scrap"
+
+#: game/sim/ship_part.gd:6 game/ui/ui.gd:24
+msgid "Legendaria"
+msgstr "Legendary"
+
+#: game/sim/ship_part.gd:6
+msgid "Misteriosa"
+msgstr "Mystery"
+
+#: game/sim/ship_part.gd:6
+msgid "Nueva"
+msgstr "New"
+
+#: game/sim/ship_part.gd:6
+msgid "Usada"
+msgstr "Used"
+
+#: game/sim/ship_part.gd:7
+msgid "Defectuoso"
+msgstr "Faulty"
+
+#: game/sim/ship_part.gd:7
+msgid "Gastado"
+msgstr "Worn"
+
+#: game/sim/ship_part.gd:7
+msgid "Sano"
+msgstr "Sound"
+
+#: game/sim/ship_part.gd:8
+msgid "a medias, falla fácil"
+msgstr "half output, fails easily"
+
+#: game/sim/ship_part.gd:8
+msgid "fuera de servicio"
+msgstr "out of service"
+
+#: game/sim/ship_part.gd:8
+msgid "pleno rendimiento"
+msgstr "full performance"
+
+#: game/sim/ship_part.gd:8
+msgid "rinde menos"
+msgstr "reduced output"
+
+#: game/sim/thermal.gd:55
+msgid "Calor en ruta (%d %%)"
+msgstr "Heat en route (%d %%)"
+
+#: game/sim/thermal.gd:55
+msgid "La nave se calienta demasiado en esta ruta. Agrega un radiador."
+msgstr "The ship gets too hot on this route. Add a radiator."
+
+#: game/sim/thermal.gd:56
+msgid "Frío en ruta (%d %%)"
+msgstr "Cold en route (%d %%)"
+
+#: game/sim/thermal.gd:56
+msgid "La nave se enfría demasiado lejos del Sol. Agrega una manta MLI o un MMRTG."
+msgstr "The ship gets too cold far from the Sun. Add an MLI blanket or an MMRTG."
+
+#: game/sim/thermal.gd:58
+msgid "Energía %.1f / %.1f"
+msgstr "Power %.1f / %.1f"
+
+#: game/sim/thermal.gd:58
+msgid "La electrónica gasta más de lo que generas. Agrega un panel de triple unión o un MMRTG."
+msgstr "The electronics draw more than you generate. Add a triple-junction panel or an MMRTG."
+
+#: game/sim/thermal.gd:60
+msgid "%s tiene atmósfera: sin escudo la nave se quema al entrar."
+msgstr "%s has an atmosphere: without a shield the ship burns up on entry."
+
+#: game/sim/thermal.gd:60
+msgid "Escudo térmico"
+msgstr "Heat shield"
+
+#: game/sim/thermal.gd:61
+msgid "%s tiene aire: el paracaídas frena la caída sin gastar combustible."
+msgstr "%s has air: the parachute slows the fall without spending fuel."
+
+#: game/sim/thermal.gd:63
+msgid "Motor en la última etapa"
+msgstr "Engine in the last stage"
+
+#: game/sim/thermal.gd:63
+msgid "Sin aire no hay paracaídas: la última etapa necesita motor y combustible para frenar."
+msgstr "With no air there is no parachute: the last stage needs an engine and fuel to brake."
+
+#: game/sim/thermal.gd:65
+msgid "%s tiene radiación alta: sin la bóveda se daña la electrónica."
+msgstr "%s has high radiation: without the vault the electronics get damaged."
+
+#: game/sim/thermal.gd:65 content/parts/blindaje.tres:8
+msgid "Bóveda de titanio"
+msgstr "Titanium vault"
+
+#: game/sim/training_assembly.gd:11
+msgid "La posición %d necesita %s. Mueve o retira la pieza que ocupa ese lugar."
+msgstr "Position %d needs %s. Move or remove the part occupying that spot."
+
+#: game/sim/training_assembly.gd:14
+msgid "Esta práctica necesita exactamente dos etapas; retira los pernos de etapa extra."
+msgstr "This practice needs exactly two stages; remove the extra stage bolts."
+
+#: game/sim/training_assembly.gd:17
+msgid "Cada etapa necesita un motor operativo y combustible en su propio tanque."
+msgstr "Each stage needs a working engine and fuel in its own tank."
+
+#: game/sim/training_assembly.gd:19
+msgid "Falta empuje para esta masa. Retira extras para recuperar margen de despegue."
+msgstr "Not enough thrust for this mass. Remove extras to regain liftoff margin."
+
+#: game/sim/training_assembly.gd:21
+msgid "Falta reserva de delta-v para regresar. Retira masa adicional."
+msgstr "Not enough delta-v reserve to return. Remove extra mass."
+
+#: game/sim/training_assembly.gd:23
+msgid "La electrónica necesita generación y una batería operativa."
+msgstr "The electronics need power generation and a working battery."
+
+#: game/sim/training_assembly.gd:25
+msgid "Revisa cabina, escudo y paracaídas antes de regresar."
+msgstr "Check the cabin, shield and parachute before returning."
+
+#: game/sim/training_assembly.gd:26
+msgid "Revisión de lanzamiento"
+msgstr "Launch review"
+
+#: game/sim/training_assembly.gd:27
+msgid "Dos etapas completas. Los extras añaden capacidad, masa y coste. Comprueba empuje, reserva de combustible y energía."
+msgstr "Two complete stages. Extras add capacity, mass and cost. Check thrust, fuel reserve and power."
+
+#: game/sim/training_session.gd:76
+msgid "Orientaste el motor dentro del corredor de ascenso."
+msgstr "You aimed the engine inside the ascent corridor."
+
+#: game/sim/training_session.gd:81
+msgid "Redujiste potencia para limitar la carga aerodinámica."
+msgstr "You cut power to limit aerodynamic load."
+
+#: game/sim/training_session.gd:85
+msgid "Recuperaste potencia para sostener el ascenso tras el aviso preventivo."
+msgstr "You restored power to sustain the climb after the warning."
+
+#: game/sim/training_session.gd:90
+msgid "Confirmaste motor y combustible de la segunda etapa."
+msgstr "You confirmed the second stage's engine and fuel."
+
+#: game/sim/training_session.gd:103
+msgid "Gastaste la reserva antes de terminar el frenado retrógrado."
+msgstr "You used up the reserve before finishing the retrograde braking."
+
+#: game/sim/training_session.gd:106
+msgid "Frenaste contra el movimiento para iniciar el regreso."
+msgstr "You braked against the motion to start the return."
+
+#: game/sim/training_session.gd:134
+msgid "Montaste dos etapas con tanques independientes y protección de regreso."
+msgstr "You built two stages with independent tanks and return protection."
+
+#: game/sim/training_session.gd:137
+msgid "Completa el montaje y la revisión antes de despegar."
+msgstr "Complete the assembly and the review before launching."
+
+#: game/sim/training_session.gd:141
+msgid "Reparaste el cierre atascado antes de reintentar la separación."
+msgstr "You repaired the stuck latch before retrying the separation."
+
+#: game/sim/training_session.gd:149
+msgid "Espera a T-0. Encender antes aumenta el esfuerzo del arranque."
+msgstr "Wait for T-0. Igniting early increases start-up strain."
+
+#: game/sim/training_session.gd:159
+msgid "Ángulo fuera del corredor: ajusta antes de entrar."
+msgstr "Angle outside the corridor: adjust before entering."
+
+#: game/sim/training_session.gd:166
+msgid "Elegiste un corredor de entrada dentro del margen de práctica."
+msgstr "You chose an entry corridor within the practice margin."
+
+#: game/sim/training_session.gd:171
+msgid "Espera: la etapa activa conserva combustible o la siguiente no tiene motor y tanque operativos. Mira combustible ACTIVO, no total."
+msgstr "Wait: the active stage still has fuel or the next one has no working engine and tank. Look at ACTIVE fuel, not total."
+
+#: game/sim/training_session.gd:181
+msgid "Descartaste la etapa vacía sin perder el combustible superior."
+msgstr "You discarded the empty stage without losing the upper fuel."
+
+#: game/sim/training_session.gd:196
+msgid "Sin combustible en la etapa activa antes de alcanzar órbita."
+msgstr "Out of fuel in the active stage before reaching orbit."
+
+#: game/sim/training_session.gd:207
+msgid "La nave perdió altura. Mantén suficiente potencia y sigue el corredor."
+msgstr "The ship lost altitude. Keep enough power and follow the corridor."
+
+#: game/sim/training_session.gd:211
+msgid "Alcanzaste órbita con reserva para el regreso."
+msgstr "You reached orbit with reserve for the return."
+
+#: game/sim/training_session.gd:217
+msgid "El paracaídas se usa durante el descenso, dentro de su ventana segura."
+msgstr "The parachute is used during the descent, within its safe window."
+
+#: game/sim/training_session.gd:221
+msgid "Abriste el freno dentro de su límite de velocidad."
+msgstr "You opened the drogue within its speed limit."
+
+#: game/sim/training_session.gd:225
+msgid "Desplegaste el principal con velocidad y altura seguras."
+msgstr "You deployed the main at a safe speed and altitude."
+
+#: game/sim/training_session.gd:228
+msgid "Todavía no: abrir fuera de la ventana segura puede romper el paracaídas."
+msgstr "Not yet: opening outside the safe window can break the parachute."
+
+#: game/sim/training_session.gd:247
+msgid "Se agotó el escudo térmico durante la entrada. Repite desde el corredor."
+msgstr "The heat shield ran out during entry. Retry from the corridor."
+
+#: game/sim/training_session.gd:255
+msgid "Aterrizaste a %.1f m/s [DIS]. Reserva final: %.1f t de combustible."
+msgstr "You landed at %.1f m/s [DIS]. Final reserve: %.1f t of fuel."
+
+#: game/sim/training_session.gd:258
+msgid "Impacto demasiado rápido. Despliega las dos fases del paracaídas en sus ventanas."
+msgstr "Impact too fast. Deploy both parachute phases within their windows."
+
+#: game/sim/training_session.gd:263
+msgid "Sin energía para la electrónica. Revisa generación y batería."
+msgstr "No power for the electronics. Check generation and battery."
+
+#: game/ui/annunciator.gd:64
+msgid "Todas las piezas en orden."
+msgstr "All parts in order."
+
+#: game/ui/card.gd:107
+msgid "Tirada %.0f%% → %s"
+msgstr "Roll %.0f%% → %s"
+
+#: game/ui/card.gd:107 game/ui/card.gd:430
+msgid "fallo"
+msgstr "failure"
+
+#: game/ui/card.gd:107 game/ui/card.gd:430
+msgid "éxito"
+msgstr "success"
+
+#: game/ui/card.gd:140
+msgid "Pieza"
+msgstr "Part"
+
+#: game/ui/card.gd:142
+msgid "en el casco"
+msgstr "on the hull"
+
+#: game/ui/card.gd:142
+msgid "en la cabina"
+msgstr "in the cabin"
+
+#: game/ui/card.gd:144
+msgid "%s averiada, %s. V o Y: tirada al %.0f%%."
+msgstr "%s malfunctioning, %s. V or Y: roll at %.0f%%."
+
+#: game/ui/card.gd:145
+msgid "%d averías. V tira %s al %.0f%%. El tripulante va a la marca."
+msgstr "%d malfunctions. V rolls %s at %.0f%%. The crew member goes to the marker."
+
+#: game/ui/card.gd:205 game/ui/card.gd:295
+msgid "Avería"
+msgstr "Malfunction"
+
+#: game/ui/card.gd:261
+msgid "Elige una opción. V o Y la apura con peores probabilidades."
+msgstr "Choose an option. V or Y rushes it with worse odds."
+
+#: game/ui/card.gd:295
+msgid "Encuentro"
+msgstr "Encounter"
+
+#: game/ui/card.gd:297
+msgid "Evento"
+msgstr "Event"
+
+#: game/ui/card.gd:301
+msgid "Aviso"
+msgstr "Warning"
+
+#: game/ui/card.gd:323
+msgid "Escanear probabilidades (gasta 15 % de batería)"
+msgstr "Scan odds (uses 15 % of battery)"
+
+#: game/ui/card.gd:347
+msgid "Minijuego"
+msgstr "Minigame"
+
+#: game/ui/card.gd:354
+msgid "Costo: %s  "
+msgstr "Cost: %s  "
+
+#: game/ui/card.gd:356
+msgid "Éxito: %s  "
+msgstr "Success: %s  "
+
+#: game/ui/card.gd:358
+msgid "Fallo: %s"
+msgstr "Failure: %s"
+
+#: game/ui/card.gd:418
+msgid "No hay apuesta pendiente"
+msgstr "No pending bet"
+
+#: game/ui/card.gd:430
+msgid "Decisión rápida %.0f%% → %s"
+msgstr "Quick decision %.0f%% → %s"
+
+#: game/ui/card.gd:461
+msgid "Éxito"
+msgstr "Success"
+
+#: game/ui/card.gd:462
+msgid "Fallo"
+msgstr "Failure"
+
+#: game/ui/card.gd:490
+msgid "Salió bien."
+msgstr "It went well."
+
+#: game/ui/card.gd:490
+msgid "Salió mal."
+msgstr "It went badly."
+
+#: game/ui/card.gd:492
+msgid "Fallo. "
+msgstr "Failure. "
+
+#: game/ui/card.gd:492
+msgid "Éxito. "
+msgstr "Success. "
+
+#: game/ui/modal.gd:61
+msgid "Volver"
+msgstr "Back"
+
+#: game/ui/modal.gd:103
+msgid "Confirmar"
+msgstr "Confirm"
+
+#: game/ui/settings_panel.gd:18
+msgid "Audio"
+msgstr "Audio"
+
+#: game/ui/settings_panel.gd:19
+msgid "General"
+msgstr "Master"
+
+#: game/ui/settings_panel.gd:20
+msgid "Música"
+msgstr "Music"
+
+#: game/ui/settings_panel.gd:21
+msgid "Efectos"
+msgstr "Effects"
+
+#: game/ui/settings_panel.gd:22
+msgid "Idioma"
+msgstr "Language"
+
+#: game/ui/settings_panel.gd:24
+msgid "Accesibilidad"
+msgstr "Accessibility"
+
+#: game/ui/settings_panel.gd:25
+msgid "Movimiento reducido"
+msgstr "Reduced motion"
+
+#: game/ui/settings_panel.gd:25
+msgid "Sin sacudidas, destellos ni lámparas intermitentes."
+msgstr "No shaking, flashes or blinking lamps."
+
+#: game/ui/settings_panel.gd:26
+msgid "Modo Fácil Arcade"
+msgstr "Easy Arcade Mode"
+
+#: game/ui/settings_panel.gd:26
+msgid "Navegación espacial con WASD sin gravedad (con inercia) y aterrizaje directo ajustando trayectoria con motores WASD."
+msgstr "Space navigation with WASD in zero gravity (with inertia) and direct landing by adjusting your trajectory with WASD engines."
+
+#: game/ui/settings_panel.gd:27
+msgid "Menos averías, más kits, corredores más anchos y navegación asistida (N). El contrato paga un 15 % menos."
+msgstr "Fewer malfunctions, more kits, wider corridors and assisted navigation (N). The contract pays 15 % less."
+
+#: game/ui/settings_panel.gd:27
+msgid "Modo asistido"
+msgstr "Assist mode"
+
+#: game/ui/settings_panel.gd:32
+msgid "El modo asistido se cambia en el hangar, no con un contrato en curso."
+msgstr "Assist mode is changed in the hangar, not during a contract."
+
+#: game/ui/settings_panel.gd:49
+msgid "El idioma se cambia en el título o en el hangar, no con un contrato en curso."
+msgstr "Language is changed on the title screen or in the hangar, not during a contract."
+
+#: game/ui/settings_panel.gd:94
+msgid "Activo"
+msgstr "On"
+
+#: game/ui/settings_panel.gd:94
+msgid "Apagado"
+msgstr "Off"
+
+#: game/ui/tutorial.gd:6
+msgid "Descenso"
+msgstr "Descent"
+
+#: game/ui/tutorial.gd:6
+msgid "Despegue"
+msgstr "Launch"
+
+#: game/ui/tutorial.gd:6
+msgid "Espacio"
+msgstr "Space"
+
+#: game/ui/tutorial.gd:6
+msgid "Hangar"
+msgstr "Hangar"
+
+#: game/ui/tutorial.gd:6
+msgid "Pago"
+msgstr "Payout"
+
+#: game/ui/tutorial.gd:6
+msgid "Taller"
+msgstr "Workshop"
+
+#: game/ui/tutorial.gd:10
+msgid "Elige un contrato y pulsa Aceptar contrato. El adelanto se suma a tu presupuesto y el plazo marca los días límite para cobrar completo."
+msgstr "Pick a contract and press Accept contract. The advance is added to your budget and the deadline sets the days you have to be paid in full."
+
+#: game/ui/tutorial.gd:11
+msgid "El seguro devuelve parte del costo si pierdes la nave. En Ajustes (arriba a la izquierda o Esc) puedes activar Modo asistido: menos averías y ayuda al pilotar."
+msgstr "Insurance returns part of the cost if you lose the ship. In Settings (top left or Esc) you can turn on Assist mode: fewer malfunctions and piloting help."
+
+#: game/ui/tutorial.gd:11
+msgid "Seguro y modo asistido"
+msgstr "Insurance and assist mode"
+
+#: game/ui/tutorial.gd:14
+msgid "A la derecha, Siguiente paso te dice qué le falta a la nave y por qué. Cuando la lista queda en verde, pulsa Despegar."
+msgstr "On the right, Next step tells you what the ship is missing and why. When the list turns green, press Launch."
+
+#: game/ui/tutorial.gd:14
+msgid "Sigue la lista de despegue"
+msgstr "Follow the launch checklist"
+
+#: game/ui/tutorial.gd:15
+msgid "Construye por etapas"
+msgstr "Build in stages"
+
+#: game/ui/tutorial.gd:15
+msgid "Para tu primer cohete, de abajo hacia arriba: H-1, núcleo ancho, pernos de etapa, RL10, tanque Al-Li largo, escudo PICA, cápsula Apolo y extras. Cada motor usa solo el tanque de su etapa. El hangar ofrece una práctica guiada. El clic del catálogo coloca piezas automáticamente."
+msgstr "For your first rocket, from bottom to top: H-1, wide core, stage bolts, RL10, long Al-Li tank, PICA shield, Apollo capsule and extras. Each engine only uses the tank of its own stage. The hangar offers a guided practice. Clicking the catalog places parts automatically."
+
+#: game/ui/tutorial.gd:16
+msgid "Calidad y presupuesto"
+msgstr "Quality and budget"
+
+#: game/ui/tutorial.gd:16
+msgid "Chatarra y Usada cuestan menos, pero fallan más. Arrastra una pieza para moverla y usa clic derecho para quitarla y recuperar su precio."
+msgstr "Scrap and Used cost less but fail more. Drag a part to move it and right-click to remove it and get its price back."
+
+#: game/ui/tutorial.gd:19
+msgid "Pulsa Espacio cuando la aguja entre en el verde del reloj. Antes de tiempo no enciende. Retroceso aborta el lanzamiento y te devuelve el presupuesto."
+msgstr "Press Space when the needle enters the green of the dial. It will not ignite early. Backspace aborts the launch and returns your budget."
+
+#: game/ui/tutorial.gd:20
+msgid "Inclínala hacia el verde"
+msgstr "Tilt it toward the green"
+
+#: game/ui/tutorial.gd:20
+msgid "W da potencia y A/D giran. Lleva la marca al arco verde. Ese giro pone velocidad de lado: sin ella el cohete sube y vuelve a caer."
+msgstr "W gives power and A/D turn. Bring the marker to the green arc. That turn adds sideways speed: without it the rocket climbs and falls back down."
+
+#: game/ui/tutorial.gd:21
+msgid "Mira el combustible de la etapa que está encendida. Cuando llegue a cero, pulsa Espacio para soltar lo de abajo. Separar antes tira combustible que todavía servía. La etapa de arriba usa su propio motor y su propio tanque."
+msgstr "Watch the fuel of the stage that is burning. When it reaches zero, press Space to drop what is below. Separating earlier throws away fuel that was still useful. The upper stage uses its own engine and its own tank."
+
+#: game/ui/tutorial.gd:21
+msgid "Separa al acabarse el combustible"
+msgstr "Separate when the fuel runs out"
+
+#: game/ui/tutorial.gd:24
+msgid "En el modo realista la nave no se frena sola. Cae todo el tiempo; si vas bastante de lado, el planeta se curva debajo y no lo tocas: eso es una órbita. W empuja hacia la nariz. A favor del movimiento sube el lado opuesto; en contra lo baja y puedes volver a caer. A/D giran, N muestra la guía, Tab cambia el objetivo y 1-6 adelantan el tiempo mientras costas."
+msgstr "In realistic mode the ship does not slow down on its own. It is always falling; if you are going sideways fast enough, the planet curves away beneath you and you never touch it: that is an orbit. W pushes toward the nose. Pushing with your motion raises the opposite side; against it, it lowers it and you can fall back down. A/D turn, N shows the guide, Tab changes the target and 1-6 speed up time while you coast."
+
+#: game/ui/tutorial.gd:24 game/ui/tutorial.gd:228
+msgid "Órbita"
+msgstr "Orbit"
+
+#: game/ui/tutorial.gd:25
+msgid "Energía y emergencias"
+msgstr "Power and emergencies"
+
+#: game/ui/tutorial.gd:25
+msgid "Vigila batería y temperatura. Si aparece una llamarada solar, escóndete tras un planeta. R repara piezas rotas y L inicia el descenso al llegar."
+msgstr "Watch battery and temperature. If a solar flare appears, hide behind a planet. R repairs broken parts and L starts the descent on arrival."
+
+#: game/ui/tutorial.gd:28
+msgid "Ajusta el ángulo con W/S dentro de la franja verde y pulsa Espacio: muy plano rebotas al espacio y muy empinado te quemas."
+msgstr "Adjust the angle with W/S inside the green band and press Space: too flat and you bounce back into space, too steep and you burn up."
+
+#: game/ui/tutorial.gd:29
+msgid "Paracaídas y aterrizaje"
+msgstr "Parachute and landing"
+
+#: game/ui/tutorial.gd:29
+msgid "Pulsa P para abrir paracaídas cuando baje la velocidad, frena con W/S y posa la nave suave sobre la plataforma iluminada."
+msgstr "Press P to open the parachute when speed drops, brake with W/S and set the ship down gently on the lit pad."
+
+#: game/ui/tutorial.gd:32
+msgid "Aquí cobras el contrato según puntualidad, ciencia extra y seguro. Las piezas recuperadas quedan guardadas gratis en tu inventario."
+msgstr "Here you get paid for the contract based on punctuality, extra science and insurance. Recovered parts are stored free in your inventory."
+
+#: game/ui/tutorial.gd:32
+msgid "Liquidación"
+msgstr "Settlement"
+
+#: game/ui/tutorial.gd:33
+msgid "Aprender y mejorar"
+msgstr "Learn and improve"
+
+#: game/ui/tutorial.gd:33
+msgid "Si una misión falla, desbloqueas una lección permanente. Vuelve al hangar para elegir un contrato nuevo."
+msgstr "If a mission fails, you unlock a permanent lesson. Go back to the hangar to pick a new contract."
+
+#: game/ui/tutorial.gd:120
+msgid "Saltar (Esc)"
+msgstr "Skip (Esc)"
+
+#: game/ui/tutorial.gd:152
+msgid "Anterior"
+msgstr "Previous"
+
+#: game/ui/tutorial.gd:165
+msgid "Enter / Espacio / Flecha derecha: Siguiente   •   Flecha izquierda: Anterior   •   Esc: Saltar"
+msgstr "Enter / Space / Right arrow: Next   •   Left arrow: Previous   •   Esc: Skip"
+
+#: game/ui/tutorial.gd:229
+msgid "Sin gravedad"
+msgstr "Zero gravity"
+
+#: game/ui/tutorial.gd:230
+msgid "Este modo no orbita: WASD empuja con inercia y no hay gravedad. Mayús sobrecarga, Ctrl afina, 1-6 adelantan el tiempo, Tab cambia el objetivo, F escanea y L entra al llegar."
+msgstr "This mode does not orbit: WASD pushes with inertia and there is no gravity. Shift overloads, Ctrl fine-tunes, 1-6 speed up time, Tab changes the target, F scans and L enters on arrival."
+
+#: game/ui/tutorial.gd:237
+msgid "Guía rápida: %s   %d / %d"
+msgstr "Quick guide: %s   %d / %d"
+
+#: game/ui/tutorial.gd:241
+msgid "Listo"
+msgstr "Done"
+
+#: game/ui/tutorial.gd:241
+msgid "Siguiente"
+msgstr "Next"
+
+#: game/ui/ui.gd:24
+msgid "Común"
+msgstr "Common"
+
+#: game/ui/ui.gd:24
+msgid "Rara"
+msgstr "Rare"

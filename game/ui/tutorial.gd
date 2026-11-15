@@ -117,7 +117,7 @@ func _ready() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
 	var skip := Button.new()
-	skip.text = "Saltar (Esc)"
+	skip.text = tr("Saltar (Esc)")
 	skip.pressed.connect(_skip)
 	Kinetic.bind_button(skip)
 	head.add_child(skip)
@@ -127,7 +127,7 @@ func _ready() -> void:
 		col.add_child(_tabs)
 		for phase_id: StringName in ORDER:
 			var tab := Button.new()
-			tab.text = CHAPTER[phase_id]
+			tab.text = tr(CHAPTER[phase_id])
 			tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			tab.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 			tab.pressed.connect(_jump_to.bind(phase_id))
@@ -149,7 +149,7 @@ func _ready() -> void:
 	nav.add_theme_constant_override("separation", 8)
 	col.add_child(nav)
 	_prev = Button.new()
-	_prev.text = "Anterior"
+	_prev.text = tr("Anterior")
 	_prev.custom_minimum_size = Vector2(130, 44)
 	_prev.pressed.connect(_back)
 	Kinetic.bind_button(_prev)
@@ -162,7 +162,7 @@ func _ready() -> void:
 	Kinetic.bind_button(_next)
 	nav.add_child(_next)
 	_hints = Label.new()
-	_hints.text = "Enter / Espacio / Flecha derecha: Siguiente   •   Flecha izquierda: Anterior   •   Esc: Saltar"
+	_hints.text = tr("Enter / Espacio / Flecha derecha: Siguiente   •   Flecha izquierda: Anterior   •   Esc: Saltar")
 	_hints.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 	_hints.add_theme_color_override("font_color", Ui.IVORY_DIM)
 	_hints.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -226,19 +226,19 @@ func _collect() -> Array[Dictionary]:
 			var title := String(step[0])
 			var text := String(step[1])
 			if phase == &"space" and title == "Órbita" and Profile.arcade:
-				title = "Sin gravedad"
-				text = "Este modo no orbita: WASD empuja con inercia y no hay gravedad. Mayús sobrecarga, Ctrl afina, 1-6 adelantan el tiempo, Tab cambia el objetivo, F escanea y L entra al llegar."
-			pages.append({"phase": phase, "title": title, "text": text})
+				title = tr("Sin gravedad")
+				text = tr("Este modo no orbita: WASD empuja con inercia y no hay gravedad. Mayús sobrecarga, Ctrl afina, 1-6 adelantan el tiempo, Tab cambia el objetivo, F escanea y L entra al llegar.")
+			pages.append({"phase": phase, "title": tr(title), "text": tr(text)})
 	return pages
 
 
 func _paint(animate: bool = true) -> void:
 	var page := _pages[_index]
-	_count.text = ("Guía rápida: %s   %d / %d" % [CHAPTER[page.phase], _index + 1, _pages.size()]).to_upper()
+	_count.text = (tr("Guía rápida: %s   %d / %d") % [tr(CHAPTER[page.phase]), _index + 1, _pages.size()]).to_upper()
 	_title.text = String(page.title)
 	_body.text = String(page.text)
 	_prev.disabled = _index == 0
-	_next.text = "Listo" if _index >= _pages.size() - 1 else "Siguiente"
+	_next.text = tr("Listo") if _index >= _pages.size() - 1 else tr("Siguiente")
 	for phase_id: StringName in _chapter_buttons:
 		Ui.mark_selected(_chapter_buttons[phase_id], phase_id == page.phase)
 	_place.call_deferred()

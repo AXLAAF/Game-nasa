@@ -77,20 +77,20 @@ func _ready() -> void:
 func _build_hud() -> void:
 	var root := Ui.root(self)
 	var row := Ui.console(root)
-	for key: Array in [["alt", "Altitud", "km"], ["speed", "Velocidad", "m/s"], ["dv_readout", "Delta-v", "m/s"]]:
+	for key: Array in [["alt", tr("Altitud"), "km"], ["speed", tr("Velocidad"), "m/s"], ["dv_readout", tr("Delta-v"), "m/s"]]:
 		_readouts[key[0]] = Ui.readout(row, key[1], key[2], 100.0)
 	var well := Ui.well(row)
 	well.custom_minimum_size = Vector2(170, 0)
 	_info = Ui.label(well, "", Ui.SIZE_LEGEND, Ui.IVORY)
 	var gauges := Ui.console_gauges(row, 3)
-	for key: Array in [["orbit", "Vel. orbital", Ui.LAMP_GO], ["q", "Presión (Q)", Ui.LAMP_CAUTION], ["stress", "Estrés", Ui.LAMP_WARNING], ["throttle", "Acelerador (W/S)", Ui.INFO], ["fuel", "Combustible", Ui.IVORY]]:
+	for key: Array in [["orbit", tr("Vel. orbital"), Ui.LAMP_GO], ["q", tr("Presión (Q)"), Ui.LAMP_CAUTION], ["stress", tr("Estrés"), Ui.LAMP_WARNING], ["throttle", tr("Acelerador (W/S)"), Ui.INFO], ["fuel", tr("Combustible"), Ui.IVORY]]:
 		_gauges[key[0]] = Ui.console_gauge(gauges, key[1], key[2])
 	var actions := Ui.console_keys(row, 1)
-	Ui.compact(Ui.button(actions, "Estado (C)", func() -> void: Ui.toggle_status(self)))
-	Ui.compact(Ui.button(actions, "Ignición o etapa (espacio)", func() -> void:
+	Ui.compact(Ui.button(actions, tr("Estado (C)"), func() -> void: Ui.toggle_status(self)))
+	Ui.compact(Ui.button(actions, tr("Ignición o etapa (espacio)"), func() -> void:
 		if state == State.COUNTDOWN: _ignite()
 		elif state == State.ASCENT: _try_stage()))
-	Ui.compact(Ui.button(actions, "Abortar (retroceso)", _abort))
+	Ui.compact(Ui.button(actions, tr("Abortar (retroceso)"), _abort))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
 	Ui.place(ticker, Rect2(44, 12, 380, 200))
@@ -100,7 +100,7 @@ func _build_hud() -> void:
 	_dial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dial.draw.connect(_draw_dial)
 	root.add_child(_dial)
-	Ui.keys(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   Espacio ignición o etapa   C estado   Retroceso abortar")
+	Ui.keys(root, tr("W/S acelerador   A/D cabeceo   1-4 tiempo   Espacio ignición o etapa   C estado   Retroceso abortar"))
 	_place_dial()
 
 
@@ -147,7 +147,7 @@ func _unhandled_input(_event: InputEvent) -> void:
 	var next := Controls.warp_choice(LAUNCH_WARPS.size(), warp_i)
 	if next != warp_i:
 		warp_i = next
-		Events.toast.emit("Tiempo %s" % ("x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])), Ui.INFO)
+		Events.toast.emit(tr("Tiempo %s") % ("x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])), Ui.INFO)
 	if Controls.cmd_just(&"cmd_repair") and state == State.ASCENT and not lifted and stuck_time > 2.5:
 		_scrub()
 
@@ -156,12 +156,12 @@ func _ignite() -> void:
 	var timing := absf(countdown)
 	var failed: Array[ShipPart]
 	if timing <= 0.3:
-		_say("Ignición perfecta", Ui.LAMP_GO)
+		_say(tr("Ignición perfecta"), Ui.LAMP_GO)
 		ignition_bonus = 1.05
 		failed = Run.roll_stress(0.3, [&"engine"], Run.ship.active_stage())
 		Juice.flash(Ui.LAMP_GO, 0.3)
 	else:
-		_say("Arranque duro" if countdown > 0.0 else "Ignición tardía", Ui.LAMP_CAUTION)
+		_say(tr("Arranque duro") if countdown > 0.0 else tr("Ignición tardía"), Ui.LAMP_CAUTION)
 		stress += 0.25
 		failed = Run.roll_stress(0.9, [&"engine"], Run.ship.active_stage())
 		Juice.shake(0.5)
@@ -192,7 +192,7 @@ func _try_stage() -> void:
 			if ok:
 				_do_stage()
 			else:
-				Events.toast.emit("Desacoplador trabado: pulsa Espacio para reintentar", Ui.LAMP_CAUTION))
+				Events.toast.emit(tr("Desacoplador trabado: pulsa Espacio para reintentar"), Ui.LAMP_CAUTION))
 
 
 func _do_stage() -> void:
@@ -205,19 +205,19 @@ func _do_stage() -> void:
 	Juice.shake(0.35)
 	_rebuild_exhausts()
 	_raise(Run.roll_stress(0.5, [&"engine"], Run.ship.active_stage()))
-	Events.toast.emit("Separación de etapa", Ui.INFO)
+	Events.toast.emit(tr("Separación de etapa"), Ui.INFO)
 
 
 func _abort() -> void:
 	if not Run.ship.has_kind(&"escape") or not Run.ship.has_kind(&"capsule"):
 		if Run.ship.fuel_total() <= 0.01:
-			Run.destroy("Autodestrucción tras quedarse sin combustible.")
+			Run.destroy(tr("Autodestrucción tras quedarse sin combustible."))
 			return
 		Synth.play(&"deny")
-		Events.toast.emit("Sin torre de escape funcional", Ui.LAMP_WARNING)
+		Events.toast.emit(tr("Sin torre de escape funcional"), Ui.LAMP_WARNING)
 		return
 	Run.outcome = &"aborted"
-	Run.outcome_text = "Abortaste el despegue. La torre salvó la cápsula."
+	Run.outcome_text = tr("Abortaste el despegue. La torre salvó la cápsula.")
 	Synth.play(&"boom", -6.0)
 	Fx.burst(self, Vector2.ZERO, Ui.LAMP_CAUTION, 90, 500)
 	Juice.shake(0.8)
@@ -301,7 +301,7 @@ func _fly(delta: float) -> void:
 			ship.burn(throttle, dt)
 			stuck_time += delta
 			if stuck_time > 2.5:
-				_banner.text = "TWR INSUFICIENTE - R para volver al ensamblaje"
+				_banner.text = tr("TWR INSUFICIENTE - R para volver al ensamblaje")
 				_banner.modulate.a = 1.0
 			return
 	var s := {"x": x, "h": h, "vx": vx, "vy": vy, "q": q}
@@ -319,14 +319,14 @@ func _fly(delta: float) -> void:
 		stress += (q - Q_SAFE) / Q_SAFE * delta * (0.85 if Profile.assist else 1.4)
 		if not _maxq_warned:
 			_maxq_warned = true
-			_say("MAX-Q  baja el acelerador", Ui.LAMP_CAUTION)
+			_say(tr("MAX-Q  baja el acelerador"), Ui.LAMP_CAUTION)
 			Synth.play(&"beep")
 	else:
 		stress = maxf(stress - delta * 0.12, 0.0)
 	if stress >= 1.0:
 		stress = 0.45
 		overloads += 1
-		_say("Sobrecarga estructural", Ui.LAMP_WARNING)
+		_say(tr("Sobrecarga estructural"), Ui.LAMP_WARNING)
 		Synth.play(&"alarm")
 		Juice.hit(0.8)
 		Juice.hitstop(0.12)
@@ -337,7 +337,7 @@ func _fly(delta: float) -> void:
 	Juice.shake(clampf(q / Q_SAFE, 0.0, 1.5) * delta * 1.6 + throttle * acc * 0.0006)
 	if h <= 0.0 and vy < 0.0 and flight_time > 1.0:
 		h = 0.0
-		Run.destroy("La nave se estrelló contra el suelo.")
+		Run.destroy(tr("La nave se estrelló contra el suelo."))
 		return
 	if h >= top * 0.8 and vx >= v_orb * 0.97 and vy > -60.0:
 		_reach_orbit()
@@ -373,7 +373,7 @@ func _reach_orbit() -> void:
 	elif ratio > 0.3:
 		grade = "B"
 	Run.launch_grade = grade
-	_say("En órbita, ascenso %s" % grade, Ui.LAMP_GO)
+	_say(tr("En órbita, ascenso %s") % grade, Ui.LAMP_GO)
 	Synth.play(&"chime")
 	Juice.slowmo(0.35, 0.8)
 	Juice.flash(Ui.INFO, 0.4)
@@ -383,14 +383,14 @@ func _reach_orbit() -> void:
 
 func _offer_bets() -> void:
 	Card.show_card({
-		"title": "Mesa de apuestas",
-		"text": "La agencia acepta apuestas laterales sobre tu propia misión. Se cobran en la liquidación. Tienes %s." % Ui.money(Profile.credits),
+		"title": tr("Mesa de apuestas"),
+		"text": tr("La agencia acepta apuestas laterales sobre tu propia misión. Se cobran en la liquidación. Tienes %s.") % Ui.money(Profile.credits),
 		"tone": &"bet",
 		"choices": [
-			_bet("Sin apuesta", 0, "", 0.0),
-			_bet("Llegar con 25%% de combustible  (100, paga x3)", 100, "fuel", 3.0),
-			_bet("Entregar antes del plazo  (150, paga x2.5)", 150, "deadline", 2.5),
-			_bet("Aterrizaje perfecto S  (200, paga x4)", 200, "perfect", 4.0),
+			_bet(tr("Sin apuesta"), 0, "", 0.0),
+			_bet(tr("Llegar con 25%% de combustible  (100, paga x3)"), 100, "fuel", 3.0),
+			_bet(tr("Entregar antes del plazo  (150, paga x2.5)"), 150, "deadline", 2.5),
+			_bet(tr("Aterrizaje perfecto S  (200, paga x4)"), 200, "perfect", 4.0),
 		],
 	}, func(_ok: bool) -> void: _leave())
 
@@ -401,9 +401,9 @@ func _bet(label: String, stake: int, kind: String, mult: float) -> ChoiceDef:
 	if stake > 0:
 		c.cost = {"stake": stake}
 		c.win = {"bet": kind, "amount": stake, "mult": mult}
-		c.win_text = "Apuesta registrada."
+		c.win_text = tr("Apuesta registrada.")
 	else:
-		c.win_text = "Sin riesgo extra."
+		c.win_text = tr("Sin riesgo extra.")
 	return c
 
 
@@ -545,9 +545,9 @@ func _update_hud() -> void:
 	(_readouts.alt as Label).text = "%.1f" % (h / 1000.0)
 	(_readouts.speed as Label).text = "%d" % int(Vector2(vx, vy).length())
 	(_readouts.dv_readout as Label).text = "%d" % int(ship.delta_v())
-	_info.text = "Apoapsis %.1f km\nTWR %.2f\nCabeceo %d, objetivo %d\nTiempo %s" % [ap / 1000.0, ship.twr(body.surface_gravity), int(pitch), int(target_pitch()), warp_txt]
+	_info.text = tr("Apoapsis %.1f km\nTWR %.2f\nCabeceo %d, objetivo %d\nTiempo %s") % [ap / 1000.0, ship.twr(body.surface_gravity), int(pitch), int(target_pitch()), warp_txt]
 	(_gauges.orbit as Gauge).set_value(vx / v_orb, "%d %%" % int(vx / v_orb * 100.0))
-	(_gauges.q as Gauge).set_value(q / (Q_SAFE * 1.6), "%.0f kPa" % (q / 1000.0), q > Q_SAFE)
+	(_gauges.q as Gauge).set_value(q / (Q_SAFE * 1.6), tr("%.0f kPa") % (q / 1000.0), q > Q_SAFE)
 	(_gauges.stress as Gauge).set_value(stress, "%d %%" % int(stress * 100.0), stress > 0.7)
 	(_gauges.throttle as Gauge).set_value(throttle, "%d %%" % int(throttle * 100.0))
 	var stage := ship.active_stage()
@@ -555,9 +555,9 @@ func _update_hud() -> void:
 	for part: ShipPart in stage:
 		cap += part.def.fuel * part.boost
 	var fuel := ship.stage_fuel(stage)
-	(_gauges.fuel as Gauge).set_value(fuel / maxf(cap, 0.001), "%.1f t" % fuel, cap > 0.0 and fuel / cap < 0.1 and ship.can_stage())
+	(_gauges.fuel as Gauge).set_value(fuel / maxf(cap, 0.001), tr("%.1f t") % fuel, cap > 0.0 and fuel / cap < 0.1 and ship.can_stage())
 	if state == State.COUNTDOWN:
-		_banner.text = "T-%d. Pulsa Espacio en T-0" % maxi(ceili(countdown), 0) if countdown > 0.3 else "Ahora"
+		_banner.text = tr("T-%d. Pulsa Espacio en T-0") % maxi(ceili(countdown), 0) if countdown > 0.3 else tr("Ahora")
 		_banner.modulate.a = 1.0
 		_banner.add_theme_color_override("font_color", Ui.LAMP_GO if absf(countdown) <= 0.3 else Ui.IVORY)
 
@@ -577,4 +577,4 @@ func _draw_dial() -> void:
 	_dial.draw_arc(c, r - 6, target - deg_to_rad(8), target + deg_to_rad(8), 12, Color(0.4, 1.0, 0.55, 0.7), 10.0)
 	var a2 := deg_to_rad(pitch) - PI * 0.5
 	_dial.draw_line(c, c + Vector2(cos(a2), sin(a2)) * r, Ui.IVORY, 4.0)
-	_dial.draw_string(Ui.sans(), c + Vector2(-40, r + 22), "Corredor", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	_dial.draw_string(Ui.sans(), c + Vector2(-40, r + 22), tr("Corredor"), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY_DIM)

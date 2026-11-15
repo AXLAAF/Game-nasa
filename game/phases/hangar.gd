@@ -40,17 +40,17 @@ func _ready() -> void:
 	maker.offset_bottom = 134
 	var maker_row := Ui.hbox(maker, 24)
 	var brand := Ui.vbox(maker_row, 0)
-	var title := Ui.label(brand, "Contratista Orbital", Ui.SIZE_HERO, Ui.BAKELITE)
+	var title := Ui.label(brand, tr("Contratista Orbital"), Ui.SIZE_HERO, Ui.BAKELITE)
 	title.add_theme_font_override("font", Ui.bold())
-	Ui.label(brand, "Arma barato. Vuela lejos. Apuesta todo.", Ui.SIZE_TEXT, Ui.BAKELITE)
+	Ui.label(brand, tr("Arma barato. Vuela lejos. Apuesta todo."), Ui.SIZE_TEXT, Ui.BAKELITE)
 	var maker_spacer := Control.new()
 	maker_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	maker_row.add_child(maker_spacer)
-	_credit_label = Ui.readout(maker_row, "Créditos", "", 120.0)
-	_runs_label = Ui.readout(maker_row, "Partidas", "", 100.0)
-	_deliveries_label = Ui.readout(maker_row, "Entregas", "", 100.0)
-	_best_label = Ui.readout(maker_row, "Mejor pago", "", 120.0)
-	_players_label = Ui.readout(maker_row, "Jugadores", "", 110.0)
+	_credit_label = Ui.readout(maker_row, tr("Créditos"), "", 120.0)
+	_runs_label = Ui.readout(maker_row, tr("Partidas"), "", 100.0)
+	_deliveries_label = Ui.readout(maker_row, tr("Entregas"), "", 100.0)
+	_best_label = Ui.readout(maker_row, tr("Mejor pago"), "", 120.0)
+	_players_label = Ui.readout(maker_row, tr("Jugadores"), "", 110.0)
 	var left := Ui.panel(root)
 	left.set_anchors_preset(Control.PRESET_LEFT_WIDE)
 	left.offset_left = 40
@@ -58,36 +58,36 @@ func _ready() -> void:
 	left.offset_right = 370
 	left.offset_bottom = -20
 	var col := Ui.vbox(left, 8)
-	Ui.legend(col, "Jugadores")
+	Ui.legend(col, tr("Jugadores"))
 	_build_player_slots(col)
-	Ui.legend(col, "Seguro de la nave")
+	Ui.legend(col, tr("Seguro de la nave"))
 	_insurance_box = Ui.hbox(col, 4)
-	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
-	Ui.button(col, "Práctica: armar la nave", func() -> void: Router.go(&"training"))
+	Ui.button(col, tr("Manual de vuelo"), func() -> void: Tutorial.replay())
+	Ui.button(col, tr("Práctica: armar la nave"), func() -> void: Router.go(&"training"))
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	col.add_child(scroll)
 	var lessons := Ui.vbox(scroll, 8)
 	lessons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.legend(lessons, "Lecciones")
+	Ui.legend(lessons, tr("Lecciones"))
 	if Profile.lessons.is_empty():
-		var none := Ui.label(lessons, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
+		var none := Ui.label(lessons, tr("Ninguna todavía. Se aprenden perdiendo naves."), Ui.SIZE_TEXT, Ui.IVORY_DIM)
 		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		none.custom_minimum_size = Vector2(300, 0)
 	for id: String in Profile.lessons:
-		var l := Ui.label(lessons, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
+		var l := Ui.label(lessons, tr(str(Profile.LESSONS[id])), Ui.SIZE_TEXT, Ui.IVORY)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(300, 0)
-	Ui.label(col, "Inventario: %d piezas guardadas" % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
-	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
+	Ui.label(col, tr("Inventario: %d piezas guardadas") % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
+	var reset := Ui.button(col, tr("Reiniciar perfil"), func() -> void: pass)
 	reset.pressed.connect(func() -> void:
 		if _reset_armed:
 			Profile.reset()
 			Router.go(&"hangar")
 		else:
 			_reset_armed = true
-			reset.text = "¿Seguro? Pulsa otra vez para borrar todo")
+			reset.text = tr("¿Seguro? Pulsa otra vez para borrar todo"))
 	var right := Ui.panel(root)
 	right.set_anchors_preset(Control.PRESET_FULL_RECT)
 	right.offset_left = 400
@@ -98,11 +98,11 @@ func _ready() -> void:
 	var board_col := Ui.vbox(right, 10)
 	board_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var head := Ui.hbox(board_col)
-	Ui.plate(head, "Contratos")
+	Ui.plate(head, tr("Contratos"))
 	var spacer := Control.new()
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(spacer)
-	var reroll := Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
+	var reroll := Ui.button(head, tr("Pedir contratos nuevos (%s)") % Ui.money(REROLL_COST), _reroll)
 	reroll.size_flags_horizontal = Control.SIZE_SHRINK_END
 	var board_scroll := ScrollContainer.new()
 	board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -122,22 +122,22 @@ func _ready() -> void:
 
 func _build_player_slots(col: Node) -> void:
 	var p1 := Ui.hbox(col, 8)
-	Ui.label(p1, "P1 Comandante", Ui.SIZE_TEXT, Ui.IVORY)
-	_p1_lamp = Lamp.new("Conectado", Lamp.GO)
+	Ui.label(p1, tr("P1 Comandante"), Ui.SIZE_TEXT, Ui.IVORY)
+	_p1_lamp = Lamp.new(tr("Conectado"), Lamp.GO)
 	_p1_lamp.custom_minimum_size = Vector2(110, 26)
 	_p1_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	p1.add_child(_p1_lamp)
 	var p2 := Ui.hbox(col, 8)
-	Ui.label(p2, "P2 Tripulante", Ui.SIZE_TEXT, Ui.IVORY)
-	_p2_lamp = Lamp.new("Ausente", Lamp.OFF)
+	Ui.label(p2, tr("P2 Tripulante"), Ui.SIZE_TEXT, Ui.IVORY)
+	_p2_lamp = Lamp.new(tr("Ausente"), Lamp.OFF)
 	_p2_lamp.custom_minimum_size = Vector2(110, 26)
 	_p2_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	p2.add_child(_p2_lamp)
 	_p2_hint = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.INFO)
 	_p2_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_p2_hint.custom_minimum_size = Vector2(300, 0)
-	_join_button = Ui.button(col, "Unirse (jugador 2)", _toggle_join_button)
-	_join_button.tooltip_text = "El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado."
+	_join_button = Ui.button(col, tr("Unirse (jugador 2)"), _toggle_join_button)
+	_join_button.tooltip_text = tr("El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado.")
 
 
 func _refresh() -> void:
@@ -148,8 +148,8 @@ func _refresh() -> void:
 	for child: Node in _insurance_box.get_children():
 		child.queue_free()
 	for i: int in Profile.INSURANCE_NAMES.size():
-		var b := Ui.button(_insurance_box, Profile.INSURANCE_NAMES[i], _set_insurance.bind(i))
-		b.tooltip_text = "Prima %d %% del valor de la nave, cubre %d %% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
+		var b := Ui.button(_insurance_box, tr(Profile.INSURANCE_NAMES[i]), _set_insurance.bind(i))
+		b.tooltip_text = tr("Prima %d %% del valor de la nave, cubre %d %% si la pierdes.") % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
 		child.queue_free()
@@ -165,20 +165,20 @@ func _update_players_ui() -> void:
 	var duo := Run.crew >= 2
 	_players_label.text = str(Run.crew)
 	_players_label.add_theme_color_override("font_color", Ui.LAMP_GO if duo else Ui.IVORY)
-	_p1_lamp.text = "Conectado".to_upper()
+	_p1_lamp.text = tr("Conectado").to_upper()
 	_p1_lamp.state = Lamp.GO
 	if duo:
-		_p2_lamp.text = "Conectado".to_upper()
+		_p2_lamp.text = tr("Conectado").to_upper()
 		_p2_lamp.state = Lamp.GO
-		_p2_hint.text = "Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir."
+		_p2_hint.text = tr("Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir.")
 		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_GO)
-		_join_button.text = "Desconectar jugador 2"
+		_join_button.text = tr("Desconectar jugador 2")
 	else:
-		_p2_lamp.text = "Esperando".to_upper()
+		_p2_lamp.text = tr("Esperando").to_upper()
 		_p2_lamp.state = Lamp.CAUTION
-		_p2_hint.text = "Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador."
+		_p2_hint.text = tr("Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador.")
 		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
-		_join_button.text = "Unirse (jugador 2)"
+		_join_button.text = tr("Unirse (jugador 2)")
 
 
 func _contract_card(contract: Contract) -> PanelContainer:
@@ -205,20 +205,20 @@ func _contract_card(contract: Contract) -> PanelContainer:
 		var blurb := Ui.label(info, body.description, 13, Ui.IVORY_DIM)
 		blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		blurb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var dv := Ui.label(info, "Delta-v estimado %d m/s, plazo %d días" % [int(contract.dv_estimate), int(contract.deadline)], Ui.SIZE_LEGEND, Ui.INFO)
+		var dv := Ui.label(info, tr("Delta-v estimado %d m/s, plazo %d días") % [int(contract.dv_estimate), int(contract.deadline)], Ui.SIZE_LEGEND, Ui.INFO)
 		dv.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		dv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	if contract.hidden_hazard != &"":
-		var rumor := Lamp.new("Rumores de peligro", Lamp.CAUTION)
+		var rumor := Lamp.new(tr("Rumores de peligro"), Lamp.CAUTION)
 		rumor.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		info.add_child(rumor)
 	var money := Ui.vbox(row, 2)
 	money.size_flags_horizontal = Control.SIZE_SHRINK_END
 	money.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	Ui.label(money, Ui.money(contract.payout), 24, Ui.IVORY)
-	Ui.label(money, "Adelanto %s" % Ui.money(contract.advance), 13, Ui.IVORY_DIM)
-	Ui.label(money, "Presupuesto %s" % Ui.money(Profile.budget(contract)), 13, Ui.LAMP_GO)
-	var accept := Ui.primary(Ui.button(row, "Aceptar contrato", _accept.bind(contract)))
+	Ui.label(money, tr("Adelanto %s") % Ui.money(contract.advance), 13, Ui.IVORY_DIM)
+	Ui.label(money, tr("Presupuesto %s") % Ui.money(Profile.budget(contract)), 13, Ui.LAMP_GO)
+	var accept := Ui.primary(Ui.button(row, tr("Aceptar contrato"), _accept.bind(contract)))
 	accept.custom_minimum_size = Vector2(168, 44)
 	accept.size_flags_horizontal = Control.SIZE_SHRINK_END
 	accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -264,7 +264,7 @@ func _set_crew(count: int) -> void:
 	Profile.crew = next
 	Profile.save_profile()
 	Synth.play(&"chime" if next >= 2 else &"beep")
-	Events.toast.emit("2 jugadores conectados" if next >= 2 else "1 jugador conectado", Ui.LAMP_GO if next >= 2 else Ui.IVORY_DIM)
+	Events.toast.emit(tr("2 jugadores conectados") if next >= 2 else tr("1 jugador conectado"), Ui.LAMP_GO if next >= 2 else Ui.IVORY_DIM)
 	Juice.flash(Ui.LAMP_GO if next >= 2 else Ui.IVORY, 0.25)
 	_update_players_ui()
 

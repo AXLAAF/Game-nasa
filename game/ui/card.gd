@@ -104,7 +104,7 @@ static func roll_fault(roll: float = -1.0) -> bool:
 		Run.lose_streak()
 		if part != null and not part.broken:
 			Run.apply({"break": true}, part)
-	Events.toast.emit("Tirada %.0f%% → %s" % [odds * 100.0, "éxito" if ok else "fallo"], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
+	Events.toast.emit(Loc.t("Tirada %.0f%% → %s") % [odds * 100.0, Loc.t("éxito") if ok else Loc.t("fallo")], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
 	if ok:
 		Synth.play(&"win")
 	else:
@@ -137,12 +137,12 @@ static func _banner_text() -> String:
 		return ""
 	var row: Dictionary = _faults[0]
 	var part: ShipPart = row.get("part") as ShipPart
-	var name := part.def.display_name if part != null else "Pieza"
+	var name := part.def.display_name if part != null else Loc.t("Pieza")
 	var odds := _fault_odds(row)
-	var where := "en el casco" if part != null and ShipInterior.is_exterior(part.def.kind) else "en la cabina"
+	var where := Loc.t("en el casco") if part != null and ShipInterior.is_exterior(part.def.kind) else Loc.t("en la cabina")
 	if _faults.size() == 1:
-		return "%s averiada, %s. V o Y: tirada al %.0f%%." % [name, where, odds * 100.0]
-	return "%d averías. V tira %s al %.0f%%. El tripulante va a la marca." % [_faults.size(), name, odds * 100.0]
+		return Loc.t("%s averiada, %s. V o Y: tirada al %.0f%%.") % [name, where, odds * 100.0]
+	return Loc.t("%d averías. V tira %s al %.0f%%. El tripulante va a la marca.") % [_faults.size(), name, odds * 100.0]
 
 
 static func _prune_fixed() -> void:
@@ -202,7 +202,7 @@ static func malfunction(part: ShipPart, callback: Callable = Callable()) -> void
 				if candidate.odds < 1.0 and candidate.minigame == &"":
 					choice = candidate
 					break
-		var title := def.title if def != null else "Avería"
+		var title := def.title if def != null else Loc.t("Avería")
 		Events.malfunction.emit(part.def.display_name, title)
 		Synth.play(&"alarm")
 		Juice.hit(0.5)
@@ -258,7 +258,7 @@ func _ready() -> void:
 	_body = Ui.vbox(_panel, 10)
 	_build()
 	if Run.crew >= 2 and _has_risk(data.get("choices", [])):
-		var tip := Ui.label(_body, "Elige una opción. V o Y la apura con peores probabilidades.", Ui.SIZE_LEGEND, Ui.LAMP_CAUTION)
+		var tip := Ui.label(_body, tr("Elige una opción. V o Y la apura con peores probabilidades."), Ui.SIZE_LEGEND, Ui.LAMP_CAUTION)
 		tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		tip.custom_minimum_size = Vector2(560, 0)
 	Kinetic.sync_pivot(_panel)
@@ -292,13 +292,13 @@ func _build() -> void:
 	for child: Node in _body.get_children():
 		child.queue_free()
 	var header := Ui.hbox(_body)
-	var tag := "Avería" if data.get("tone") == &"malfunction" else ("Apuesta" if data.get("tone") == &"bet" else "Encuentro")
+	var tag := tr("Avería") if data.get("tone") == &"malfunction" else (tr("Apuesta") if data.get("tone") == &"bet" else tr("Encuentro"))
 	if data.get("tone") == &"malfunction" and data.get("part") == null:
-		tag = "Evento"
+		tag = tr("Evento")
 	if data.get("tone") == &"encounter":
-		tag = "%s: %s" % [tag, Ui.RARITY_NAMES[clampi(int(data.get("rarity", 0)), 0, 2)]]
+		tag = "%s: %s" % [tag, Loc.t(Ui.RARITY_NAMES[clampi(int(data.get("rarity", 0)), 0, 2)])]
 	if data.get("tone") == &"info":
-		tag = "Aviso"
+		tag = tr("Aviso")
 	var lamp := Lamp.new(tag, Lamp.GO)
 	lamp.tint = _accent()
 	lamp.blink = data.get("tone") == &"malfunction"
@@ -308,7 +308,7 @@ func _build() -> void:
 	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(spacer)
 	if Run.streak > 0:
-		Ui.label(header, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY)
+		Ui.label(header, tr("Racha x%.2f") % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY)
 	Ui.label(_body, str(data.get("title", "")), Ui.SIZE_READOUT, Ui.IVORY).add_theme_font_override("font", Ui.bold())
 	var text := Ui.label(_body, str(data.get("text", "")), Ui.SIZE_TEXT, Ui.IVORY)
 	text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -318,9 +318,9 @@ func _build() -> void:
 	for i: int in choices.size():
 		_add_choice(choices[i], i)
 	if choices.is_empty():
-		Ui.button(_choices_box, "Continuar", _close.bind(true))
+		Ui.button(_choices_box, tr("Continuar"), _close.bind(true))
 	elif not _scanned and _has_risk(choices):
-		var scan := Ui.button(_body, "Escanear probabilidades (gasta 15 % de batería)", _scan)
+		var scan := Ui.button(_body, tr("Escanear probabilidades (gasta 15 % de batería)"), _scan)
 		scan.disabled = Run.battery < 0.15 * Thermal.battery_capacity(Run.ship)
 	Kinetic.cascade(_choices_box.get_children(), 0.032, 0.16, {"scale": Vector2(0.95, 0.90), "duration": 0.24})
 
@@ -344,18 +344,18 @@ func _add_choice(choice: ChoiceDef, index: int) -> void:
 	if choice.cost.has("kits") and Run.kits < -int(choice.cost.kits):
 		b.disabled = true
 	var info := Ui.vbox(row, 0)
-	var odds_text := "Minijuego" if choice.minigame != &"" else Odds.fog_text(choice.odds, _scanned)
+	var odds_text := tr("Minijuego") if choice.minigame != &"" else Odds.fog_text(choice.odds, _scanned)
 	var odds_color := Ui.INFO if choice.minigame != &"" else Odds.risk_color(choice.odds if _scanned else 0.5 + (choice.odds - 0.5) * 0.4)
 	if choice.odds >= 1.0:
 		odds_color = Odds.risk_color(1.0)
 	Ui.label(info, odds_text, 15, odds_color)
 	var detail := ""
 	if not choice.cost.is_empty():
-		detail += "Costo: %s  " % Run.describe(choice.cost)
+		detail += tr("Costo: %s  ") % Run.describe(choice.cost)
 	if not choice.win.is_empty():
-		detail += "Éxito: %s  " % Run.describe(choice.win)
+		detail += tr("Éxito: %s  ") % Run.describe(choice.win)
 	if not choice.lose.is_empty() and choice.odds < 1.0:
-		detail += "Fallo: %s" % Run.describe(choice.lose)
+		detail += tr("Fallo: %s") % Run.describe(choice.lose)
 	var d := Ui.label(info, detail, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	d.custom_minimum_size = Vector2(220, 0)
@@ -415,7 +415,7 @@ func _quick_decide() -> void:
 			pick = choice
 			break
 	if pick == null:
-		Events.toast.emit("No hay apuesta pendiente", Ui.IVORY_DIM)
+		Events.toast.emit(tr("No hay apuesta pendiente"), Ui.IVORY_DIM)
 		return
 	_locked = true
 	for row: Node in _choices_box.get_children():
@@ -427,7 +427,7 @@ func _quick_decide() -> void:
 	var odds := clampf(pick.odds * QUICK_ODDS, 0.05, 0.95)
 	var roll := Run.rng.randf()
 	var ok := roll < odds
-	Events.toast.emit("Decisión rápida %.0f%% → %s" % [odds * 100.0, "éxito" if ok else "fallo"], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
+	Events.toast.emit(tr("Decisión rápida %.0f%% → %s") % [odds * 100.0, tr("éxito") if ok else tr("fallo")], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
 	_resolve(pick, ok)
 
 
@@ -458,8 +458,8 @@ func _draw_bar() -> void:
 	_bar.draw_rect(Rect2(0, 10, w, h), Ui.BAKELITE)
 	_bar.draw_rect(Rect2(0, 10, w * _odds, h).grow(-2), Ui.LAMP_GO)
 	_bar.draw_rect(Rect2(w * _odds, 10, w * (1.0 - _odds), h).grow(-2), Ui.LAMP_WARNING)
-	_bar.draw_string(Ui.legend_font(), Vector2(10, 28), "Éxito", HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE)
-	_bar.draw_string(Ui.legend_font(), Vector2(0, 28), "Fallo", HORIZONTAL_ALIGNMENT_RIGHT, w - 10, Ui.SIZE_LEGEND, Ui.BAKELITE)
+	_bar.draw_string(Ui.legend_font(), Vector2(10, 28), tr("Éxito"), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE)
+	_bar.draw_string(Ui.legend_font(), Vector2(0, 28), tr("Fallo"), HORIZONTAL_ALIGNMENT_RIGHT, w - 10, Ui.SIZE_LEGEND, Ui.BAKELITE)
 	var x := w * _needle
 	_bar.draw_colored_polygon(PackedVector2Array([Vector2(x - 8, 0), Vector2(x + 8, 0), Vector2(x, 12)]), Ui.IVORY)
 	_bar.draw_line(Vector2(x, 8), Vector2(x, 12 + h), Ui.BAKELITE, 5.0)
@@ -487,16 +487,16 @@ func _resolve(choice: ChoiceDef, success: bool) -> void:
 		child.queue_free()
 	var verdict := choice.win_text if success else choice.lose_text
 	if verdict == "":
-		verdict = "Salió bien." if success else "Salió mal."
+		verdict = tr("Salió bien.") if success else tr("Salió mal.")
 	var revealed: Array = []
-	var verdict_lbl := Ui.label(_body, ("Éxito. " if success else "Fallo. ") + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
+	var verdict_lbl := Ui.label(_body, (tr("Éxito. ") if success else tr("Fallo. ")) + verdict, Ui.SIZE_HEAD, Ui.LAMP_GO if success else Ui.LAMP_WARNING)
 	revealed.append(verdict_lbl)
 	var summary := Run.describe(effects)
 	if summary != "":
 		revealed.append(Ui.label(_body, summary, Ui.SIZE_TEXT, Ui.IVORY))
 	if risky and success:
-		revealed.append(Ui.label(_body, "Racha x%.2f" % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY))
-	var done := Ui.primary(Ui.button(_body, "Continuar", _close.bind(success)))
+		revealed.append(Ui.label(_body, tr("Racha x%.2f") % Run.streak_mult(), Ui.SIZE_TEXT, Ui.IVORY))
+	var done := Ui.primary(Ui.button(_body, tr("Continuar"), _close.bind(success)))
 	revealed.append(done)
 	Kinetic.cascade(revealed, 0.036, 0.15, {"scale": Vector2(0.94, 0.88), "elastic": true, "duration": 0.28})
 	Kinetic.sweep(_panel, Color((Ui.LAMP_GO if success else Ui.LAMP_WARNING), 0.28), 0.36)

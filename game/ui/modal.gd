@@ -58,7 +58,7 @@ func open() -> Modal:
 	return self
 
 
-func add_back(text: String = "Volver") -> Button:
+func add_back(text: String = tr("Volver")) -> Button:
 	return Ui.button(col, text, close)
 
 
@@ -100,14 +100,14 @@ func _find_button(node: Node) -> Button:
 
 
 static func confirm(question: String, yes_text: String, on_yes: Callable) -> Modal:
-	var modal := Modal.new("Confirmar")
+	var modal := Modal.new(Loc.t("Confirmar"))
 	var label := Ui.label(modal.col, question, Ui.SIZE_TEXT, Ui.IVORY)
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	label.custom_minimum_size.x = 400
 	Ui.button(modal.col, yes_text, func() -> void:
 		modal.close()
 		on_yes.call())
-	var cancel := modal.add_back("Cancelar")
+	var cancel := modal.add_back(Loc.t("Cancelar"))
 	modal.open()
 	cancel.grab_focus.call_deferred()
 	return modal

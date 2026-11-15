@@ -271,11 +271,11 @@ func _interact_inside(at: Vector2) -> void:
 			_begin(hatch_part)
 			return
 		_rebuild(true)
-		Events.toast.emit("Saliste al casco", Ui.INFO)
+		Events.toast.emit(tr("Saliste al casco"), Ui.INFO)
 		return
 	if index < 0 and _hatch_rect().grow(6.0).has_point(at):
 		_rebuild(true)
-		Events.toast.emit("Saliste al casco", Ui.INFO)
+		Events.toast.emit(tr("Saliste al casco"), Ui.INFO)
 		return
 	if index < 0:
 		return
@@ -294,10 +294,10 @@ func _interact_hull(at: Vector2) -> void:
 		return
 	if _near_hatch(at):
 		_rebuild(false)
-		Events.toast.emit("Volviste a la cabina", Ui.INFO)
+		Events.toast.emit(tr("Volviste a la cabina"), Ui.INFO)
 		return
 	if part != null:
-		Events.toast.emit("%s en orden" % part.def.display_name, Ui.IVORY_DIM)
+		Events.toast.emit(tr("%s en orden") % part.def.display_name, Ui.IVORY_DIM)
 
 
 func _station_distance(at: Vector2, part: ShipPart) -> float:
@@ -326,18 +326,18 @@ func _finished(success: bool, part: ShipPart) -> void:
 		return
 	if not success:
 		part.wear = minf(part.wear + 0.2, 1.0)
-		Events.toast.emit("La reparación falló", Ui.LAMP_WARNING)
+		Events.toast.emit(tr("La reparación falló"), Ui.LAMP_WARNING)
 		return
 	var was_broken := part.broken
 	if was_broken and Run.kits > 0:
 		Run.kits -= 1
 		Run.apply({"fix": true}, part)
-		Events.toast.emit("%s reparada" % part.def.display_name, Ui.LAMP_GO)
+		Events.toast.emit(tr("%s reparada") % part.def.display_name, Ui.LAMP_GO)
 	elif was_broken:
 		Run.apply({"fix": true, "wear": 0.15}, part)
-		Events.toast.emit("Improvisada, sin kits", Ui.LAMP_CAUTION)
+		Events.toast.emit(tr("Improvisada, sin kits"), Ui.LAMP_CAUTION)
 	else:
-		Events.toast.emit("%s revisada" % part.def.display_name, Ui.LAMP_GO)
+		Events.toast.emit(tr("%s revisada") % part.def.display_name, Ui.LAMP_GO)
 	_settle(part)
 	Card.release_fault(part, true)
 
@@ -405,7 +405,7 @@ func _paint_damage(canvas: Node2D, part: ShipPart, rect: Rect2, pulse: float, ur
 		radius *= 1.35
 	canvas.draw_circle(c, radius * (0.85 + pulse * 0.35), Color(color, 0.28 + pulse * 0.25))
 	canvas.draw_arc(c, radius, 0.0, TAU, 20, color, 2.0 if not urgent else 3.0)
-	var note := "Aquí" if urgent else ("Roto" if part.broken else "Falla")
+	var note := tr("Aquí") if urgent else (tr("Roto") if part.broken else tr("Falla"))
 	canvas.draw_string(Ui.sans(), c + Vector2(-18, -radius - 2.0), note, HORIZONTAL_ALIGNMENT_LEFT, 48, 12, color)
 
 
@@ -431,10 +431,10 @@ func _rebuild(hull: bool) -> void:
 	_crew.add_child(shape)
 	var hatch := _center(_airlock())
 	if on_hull:
-		_title.text = "Casco"
+		_title.text = tr("Casco")
 		_crew.position = stick_to_hull(hatch)
 	else:
-		_title.text = "Cabina"
+		_title.text = tr("Cabina")
 		_crew.position = hatch
 		_wall_frame(_stack_bounds())
 	_refresh_hint()
@@ -457,21 +457,21 @@ func _refresh_hint() -> void:
 			inside = true
 	if on_hull:
 		if inside:
-			_hint.text = "Falla en cabina. Enter en el anillo cian para entrar."
+			_hint.text = tr("Falla en cabina. Enter en el anillo cian para entrar.")
 		elif _has_fault(true):
-			_hint.text = "Rodea el casco hasta el aro y pulsa Enter."
+			_hint.text = tr("Rodea el casco hasta el aro y pulsa Enter.")
 		else:
-			_hint.text = "Enter en el anillo cian para volver a la cabina."
+			_hint.text = tr("Enter en el anillo cian para volver a la cabina.")
 	elif outside:
-		_hint.text = "Enter sobre el aro naranja. Si no llegas, sal por el marco cian."
+		_hint.text = tr("Enter sobre el aro naranja. Si no llegas, sal por el marco cian.")
 	else:
 		var hatch := _airlock()
 		if hatch >= 0 and hatch < Run.ship.parts.size() and Run.ship.parts[hatch].broken:
-			_hint.text = "Cápsula rota: Enter sobre ella repara. El marco cian es la salida."
+			_hint.text = tr("Cápsula rota: Enter sobre ella repara. El marco cian es la salida.")
 		elif _has_fault(false):
-			_hint.text = "Falla naranja: Enter sobre el aro para repararla."
+			_hint.text = tr("Falla naranja: Enter sobre el aro para repararla.")
 		else:
-			_hint.text = "Enter en la cápsula (marco cian) para salir al casco."
+			_hint.text = tr("Enter en la cápsula (marco cian) para salir al casco.")
 
 
 func _fit() -> void:

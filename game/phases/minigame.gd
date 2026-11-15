@@ -168,7 +168,7 @@ func _drill_tap() -> void:
 	_round += 1
 	_zone = _new_zone(0.22 - _round * 0.05)
 	if _round >= 3:
-		_finish(_hits >= 2, "%d de 3 perforaciones limpias" % _hits)
+		_finish(_hits >= 2, tr("%d de 3 perforaciones limpias") % _hits)
 
 
 func _new_zone(width: float) -> Vector2:
@@ -209,10 +209,10 @@ func _tick_asteroids(delta: float) -> void:
 				Synth.play(&"thud")
 				Juice.hit(0.5)
 				if _lives <= 0:
-					_finish(false, "El casco no aguantó más golpes")
+					_finish(false, tr("El casco no aguantó más golpes"))
 					return
 	if _time >= 15.0:
-		_finish(true, "Cruzaste el campo. Cristales: %d (+%s)" % [_crystals, Ui.money(_crystals * 40)])
+		_finish(true, tr("Cruzaste el campo. Cristales: %d (+%s)") % [_crystals, Ui.money(_crystals * 40)])
 
 
 func _tick_dock(delta: float) -> void:
@@ -227,12 +227,12 @@ func _tick_dock(delta: float) -> void:
 		var aligned := absf(_ship.y - port.y) < 16.0
 		var soft := _vel.length() < 70.0
 		if aligned and soft:
-			_finish(true, "Acople perfecto a %d m/s" % int(_vel.length()))
+			_finish(true, tr("Acople perfecto a %d m/s") % int(_vel.length()))
 		else:
 			Juice.hit(0.6)
-			_finish(false, "Choque contra el puerto" if not soft else "Desalineado: rebotaste")
+			_finish(false, tr("Choque contra el puerto") if not soft else tr("Desalineado: rebotaste"))
 	elif _ship.x < 0.0 or _time > 25.0:
-		_finish(false, "Se acabó el tiempo de acople")
+		_finish(false, tr("Se acabó el tiempo de acople"))
 
 
 func _finish(success: bool, message: String) -> void:
@@ -257,7 +257,7 @@ func _draw_view() -> void:
 		_view.draw_string(font, Vector2(10, 22), str(_repair_titles().get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
 		_draw_repair(font)
 		if not _done:
-			_view.draw_string(font, Vector2(10, 360), "Palanca, cruceta o flechas. A.", HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.INFO)
+			_view.draw_string(font, Vector2(10, 360), tr("Palanca, cruceta o flechas. A."), HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.INFO)
 		if _done:
 			_view.draw_string(font, Vector2(10, 352), _msg, HORIZONTAL_ALIGNMENT_LEFT, 256, Ui.SIZE_LEGEND, Ui.IVORY)
 		return
@@ -265,7 +265,7 @@ func _draw_view() -> void:
 	_view.draw_rect(Rect2(Vector2.ZERO, _view.size), Color(0, 0, 0, 0.75))
 	_view.draw_rect(Rect2(o, AREA), Color(0.02, 0.04, 0.09))
 	_view.draw_rect(Rect2(o, AREA), Ui.INFO, false, 2.0)
-	var title := {&"asteroids": "Campo de asteroides, W/A/S/D", &"drill": "Perforación, espacio en la zona verde", &"dock": "Acople, W/S alinear, D avanzar, A frenar"}
+	var title := {&"asteroids": tr("Campo de asteroides, W/A/S/D"), &"drill": tr("Perforación, espacio en la zona verde"), &"dock": tr("Acople, W/S alinear, D avanzar, A frenar")}
 	_view.draw_string(font, o + Vector2(0, -12), str(title.get(mode, "")), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_HEAD, Ui.IVORY)
 	match mode:
 		&"asteroids":
@@ -294,7 +294,7 @@ func _draw_asteroids(o: Vector2, font: Font) -> void:
 	if _invuln <= 0.0 or int(_time * 12.0) % 2 == 0:
 		_view.draw_colored_polygon(PackedVector2Array([ship + Vector2(16, 0), ship + Vector2(-10, -9), ship + Vector2(-10, 9)]), Ui.INFO)
 		_view.draw_circle(ship + Vector2(-14, 0), 4.0 + randf() * 3.0, Color(2.5, 1.2, 0.3))
-	_view.draw_string(font, o + Vector2(12, 24), "Casco %s   Tiempo %d" % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY)
+	_view.draw_string(font, o + Vector2(12, 24), tr("Casco %s   Tiempo %d") % ["#".repeat(maxi(_lives, 0)), maxi(15 - int(_time), 0)], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.IVORY)
 
 
 func _draw_drill(o: Vector2, font: Font) -> void:
@@ -303,7 +303,7 @@ func _draw_drill(o: Vector2, font: Font) -> void:
 	_view.draw_rect(Rect2(bar.position.x + bar.size.x * _zone.x, bar.position.y, bar.size.x * (_zone.y - _zone.x), bar.size.y), Color(0.2, 0.9 + _flash, 0.4))
 	var x := bar.position.x + bar.size.x * _needle
 	_view.draw_line(Vector2(x, bar.position.y - 20), Vector2(x, bar.end.y + 20), Color(2.0, 1.8, 1.0), 4.0)
-	_view.draw_string(font, o + Vector2(60, 60), "Ronda %d/3   Limpias %d" % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_HEAD, Ui.IVORY)
+	_view.draw_string(font, o + Vector2(60, 60), tr("Ronda %d/3   Limpias %d") % [mini(_round + 1, 3), _hits], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_HEAD, Ui.IVORY)
 
 
 func _draw_dock(o: Vector2, font: Font) -> void:
@@ -315,7 +315,7 @@ func _draw_dock(o: Vector2, font: Font) -> void:
 	_view.draw_rect(Rect2(ship + Vector2(-24, -10), Vector2(40, 20)), Color(0.8, 0.85, 0.9))
 	_view.draw_rect(Rect2(ship + Vector2(16, -5), Vector2(6, 10)), Ui.INFO)
 	var speed := _vel.length()
-	_view.draw_string(font, o + Vector2(12, 24), "Velocidad %d (máx. 70)   Desvío %d" % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.LAMP_WARNING if speed > 70 else Ui.IVORY)
+	_view.draw_string(font, o + Vector2(12, 24), tr("Velocidad %d (máx. 70)   Desvío %d") % [int(speed), int(absf(_ship.y - AREA.y * 0.5))], HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_TEXT, Ui.LAMP_WARNING if speed > 70 else Ui.IVORY)
 
 
 func _osc(speed: float) -> float:
@@ -328,23 +328,23 @@ func _repair() -> bool:
 
 func _repair_titles() -> Dictionary:
 	return {
-		&"thrust": "Motor: llama en la banda",
-		&"valve": "Tanque: cierra la fuga",
-		&"seal": "Cápsula: sella la escotilla",
-		&"tile": "Casco: asienta la loseta",
-		&"align": "Panel: apunta al sol",
-		&"vent": "Radiador: purga en verde",
-		&"signal": "Antena: sostén el enlace",
-		&"fold": "Paracaídas: pliega en la marca",
-		&"gear": "Patas: extiende y confirma",
-		&"spin": "RCS: anula el giro",
-		&"cells": "Batería: conecta la celda",
-		&"pellet": "MMRTG: abrazadera en el zócalo",
-		&"reboot": "Computadora: repite",
-		&"calibrate": "Sensores: centra y fija",
-		&"bolt": "Desacoplador: corta el perno",
-		&"wrap": "Aislante: esquinas en orden",
-		&"arm": "Escape: carga y dispara",
+		&"thrust": tr("Motor: llama en la banda"),
+		&"valve": tr("Tanque: cierra la fuga"),
+		&"seal": tr("Cápsula: sella la escotilla"),
+		&"tile": tr("Casco: asienta la loseta"),
+		&"align": tr("Panel: apunta al sol"),
+		&"vent": tr("Radiador: purga en verde"),
+		&"signal": tr("Antena: sostén el enlace"),
+		&"fold": tr("Paracaídas: pliega en la marca"),
+		&"gear": tr("Patas: extiende y confirma"),
+		&"spin": tr("RCS: anula el giro"),
+		&"cells": tr("Batería: conecta la celda"),
+		&"pellet": tr("MMRTG: abrazadera en el zócalo"),
+		&"reboot": tr("Computadora: repite"),
+		&"calibrate": tr("Sensores: centra y fija"),
+		&"bolt": tr("Desacoplador: corta el perno"),
+		&"wrap": tr("Aislante: esquinas en orden"),
+		&"arm": tr("Escape: carga y dispara"),
 	}
 
 
@@ -426,7 +426,7 @@ func _tick_repair(delta: float) -> void:
 		&"arm":
 			_tick_arm(delta)
 		_:
-			_finish(false, "No hay procedimiento para esta pieza")
+			_finish(false, tr("No hay procedimiento para esta pieza"))
 
 
 func _pressed() -> bool:
@@ -457,9 +457,9 @@ func _tick_thrust(delta: float) -> void:
 	if absf(marker - band) < 0.09:
 		_job.held = float(_job.held) + delta
 	if float(_job.held) >= 3.0:
-		_finish(true, "La cámara aguanta el régimen")
+		_finish(true, tr("La cámara aguanta el régimen"))
 	elif _time > 10.0:
-		_finish(false, "El motor no entró en régimen")
+		_finish(false, tr("El motor no entró en régimen"))
 
 
 func _tick_valve(delta: float) -> void:
@@ -470,9 +470,9 @@ func _tick_valve(delta: float) -> void:
 	if _pressed() and absf(x - leak) < 20.0:
 		_job.closed = int(_job.closed) + 1
 		if int(_job.closed) >= 3:
-			_finish(true, "El tanque deja de perder propelente")
+			_finish(true, tr("El tanque deja de perder propelente"))
 	elif _time > 12.0:
-		_finish(false, "El propelente sigue escapando")
+		_finish(false, tr("El propelente sigue escapando"))
 
 
 func _tick_seal(delta: float) -> void:
@@ -484,11 +484,11 @@ func _tick_seal(delta: float) -> void:
 		_job.done = int(_job.done) + 1
 		_job.hatch = Vector2(_rng.randf_range(BOX.position.x + 28.0, BOX.end.x - 28.0), _rng.randf_range(BOX.position.y + 28.0, BOX.end.y - 28.0))
 		if int(_job.done) >= 3:
-			_finish(true, "La cabina recupera presión")
+			_finish(true, tr("La cabina recupera presión"))
 			return
 	_job.pressure = pressure
 	if pressure <= 0.0:
-		_finish(false, "La cabina se quedó sin aire")
+		_finish(false, tr("La cabina se quedó sin aire"))
 
 
 func _tick_tile(delta: float) -> void:
@@ -510,9 +510,9 @@ func _tick_tile(delta: float) -> void:
 			tiles.erase(tile)
 			_job.miss = int(_job.miss) + 1
 	if int(_job.got) >= 4:
-		_finish(true, "El escudo vuelve a ser continuo")
+		_finish(true, tr("El escudo vuelve a ser continuo"))
 	elif int(_job.miss) >= 3:
-		_finish(false, "Las losetas se perdieron")
+		_finish(false, tr("Las losetas se perdieron"))
 
 
 func _tick_align(delta: float) -> void:
@@ -527,9 +527,9 @@ func _tick_align(delta: float) -> void:
 		_job.held = 0.0
 		_job.sun = _rng.randf_range(0.15, 0.85)
 		if int(_job.locks) >= 2:
-			_finish(true, "El panel ve el sol de frente")
+			_finish(true, tr("El panel ve el sol de frente"))
 	elif _time > 12.0:
-		_finish(false, "El panel sigue de canto")
+		_finish(false, tr("El panel sigue de canto"))
 
 
 func _tick_vent(delta: float) -> void:
@@ -542,9 +542,9 @@ func _tick_vent(delta: float) -> void:
 			_job.strikes = int(_job.strikes) + 1
 	_job.temp = temp
 	if int(_job.good) >= 3:
-		_finish(true, "El radiador suelta el calor")
+		_finish(true, tr("El radiador suelta el calor"))
 	elif temp >= 1.0 or int(_job.strikes) >= 2:
-		_finish(false, "El lazo térmico se pasó")
+		_finish(false, tr("El lazo térmico se pasó"))
 
 
 func _tick_signal(delta: float) -> void:
@@ -558,9 +558,9 @@ func _tick_signal(delta: float) -> void:
 	_job.lock = lock
 	_job.dot = dot
 	if lock >= 2.6:
-		_finish(true, "La antena recupera el enlace")
+		_finish(true, tr("La antena recupera el enlace"))
 	elif _time > 11.0:
-		_finish(false, "Se perdió el enlace")
+		_finish(false, tr("Se perdió el enlace"))
 
 
 func _tick_fold(_delta: float) -> void:
@@ -572,11 +572,11 @@ func _tick_fold(_delta: float) -> void:
 			_job.folds = int(_job.folds) + 1
 			_job.slot = _rng.randf_range(0.15, 0.75)
 			if int(_job.folds) >= 4:
-				_finish(true, "El paracaídas queda plegado")
+				_finish(true, tr("El paracaídas queda plegado"))
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 3:
-				_finish(false, "La tela quedó mal plegada")
+				_finish(false, tr("La tela quedó mal plegada"))
 
 
 func _tick_gear(delta: float) -> void:
@@ -588,11 +588,11 @@ func _tick_gear(delta: float) -> void:
 			_job.ext = 0.0
 			_job.target = 0.4 if int(_job.legs) == 1 else 0.72
 			if int(_job.legs) >= 2:
-				_finish(true, "Las patas quedan trabadas")
+				_finish(true, tr("Las patas quedan trabadas"))
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 2:
-				_finish(false, "La pata no entró en el tope")
+				_finish(false, tr("La pata no entró en el tope"))
 
 
 func _tick_spin(delta: float) -> void:
@@ -603,13 +603,13 @@ func _tick_spin(delta: float) -> void:
 			_job.locks = int(_job.locks) + 1
 			_job.rate = -1.7 if int(_job.locks) == 1 else rate
 			if int(_job.locks) >= 2:
-				_finish(true, "El giro está anulado")
+				_finish(true, tr("El giro está anulado"))
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 2:
-				_finish(false, "El pulso de RCS quedó a medias")
+				_finish(false, tr("El pulso de RCS quedó a medias"))
 	elif _time > 10.0:
-		_finish(false, "La nave sigue girando")
+		_finish(false, tr("La nave sigue girando"))
 
 
 func _tick_cells(delta: float) -> void:
@@ -620,9 +620,9 @@ func _tick_cells(delta: float) -> void:
 		_job.lit = int(_job.lit) + 1
 		_job.left = 3.2
 		if int(_job.lit) >= 3:
-			_finish(true, "El banco vuelve a dar tensión")
+			_finish(true, tr("El banco vuelve a dar tensión"))
 	elif float(_job.left) <= 0.0:
-		_finish(false, "La celda se descargó")
+		_finish(false, tr("La celda se descargó"))
 
 
 func _tick_pellet(_delta: float) -> void:
@@ -635,11 +635,11 @@ func _tick_pellet(_delta: float) -> void:
 			_job.clamps = int(_job.clamps) + 1
 			_job.socket = 0.55 if int(_job.clamps) == 1 else 0.78
 			if int(_job.clamps) >= 3:
-				_finish(true, "El MMRTG queda sujeto")
+				_finish(true, tr("El MMRTG queda sujeto"))
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 2:
-				_finish(false, "La abrazadera mordió fuera")
+				_finish(false, tr("La abrazadera mordió fuera"))
 
 
 func _tick_reboot(_delta: float) -> void:
@@ -652,9 +652,9 @@ func _tick_reboot(_delta: float) -> void:
 	if code == int(seq[int(_job.step)]):
 		_job.step = int(_job.step) + 1
 		if int(_job.step) >= seq.size():
-			_finish(true, "La computadora arranca")
+			_finish(true, tr("La computadora arranca"))
 	else:
-		_finish(false, "La secuencia no coincide")
+		_finish(false, tr("La secuencia no coincide"))
 
 
 func _tick_calibrate(delta: float) -> void:
@@ -669,9 +669,9 @@ func _tick_calibrate(delta: float) -> void:
 		_job.locks = int(_job.locks) + 1
 		_job.fix = Vector2.ZERO
 		if int(_job.locks) >= 3:
-			_finish(true, "El sensor vuelve a cero")
+			_finish(true, tr("El sensor vuelve a cero"))
 	elif _time > 12.0:
-		_finish(false, "El sensor sigue desviado")
+		_finish(false, tr("El sensor sigue desviado"))
 
 
 func _tick_bolt(delta: float) -> void:
@@ -682,11 +682,11 @@ func _tick_bolt(delta: float) -> void:
 		if absf(x - target) < 18.0:
 			_job.step = int(_job.step) + 1
 			if int(_job.step) >= 3:
-				_finish(true, "Los pernos quedan cortados")
+				_finish(true, tr("Los pernos quedan cortados"))
 		else:
 			_job.strikes = int(_job.strikes) + 1
 			if int(_job.strikes) >= 2:
-				_finish(false, "Cortaste el perno equivocado")
+				_finish(false, tr("Cortaste el perno equivocado"))
 
 
 func _tick_wrap(delta: float) -> void:
@@ -695,9 +695,9 @@ func _tick_wrap(delta: float) -> void:
 	if _pressed() and cursor.distance_to(corner) < 28.0:
 		_job.step = int(_job.step) + 1
 		if int(_job.step) >= 4:
-			_finish(true, "El aislante cubre el tanque")
+			_finish(true, tr("El aislante cubre el tanque"))
 	elif _time > 12.0:
-		_finish(false, "El aislante quedó suelto")
+		_finish(false, tr("El aislante quedó suelto"))
 
 
 func _tick_arm(delta: float) -> void:
@@ -708,14 +708,14 @@ func _tick_arm(delta: float) -> void:
 		charge = maxf(charge - delta * 0.18, 0.0)
 	_job.charge = charge
 	if charge > 1.02:
-		_finish(false, "La carga se pasó de la ventana")
+		_finish(false, tr("La carga se pasó de la ventana"))
 	elif _pressed():
 		if charge >= 0.78 and charge <= 0.94:
-			_finish(true, "La torre queda armada")
+			_finish(true, tr("La torre queda armada"))
 		else:
-			_finish(false, "Disparo fuera de la ventana")
+			_finish(false, tr("Disparo fuera de la ventana"))
 	elif _time > 8.0:
-		_finish(false, "La torre no llegó a armarse")
+		_finish(false, tr("La torre no llegó a armarse"))
 
 
 func _flick() -> int:
@@ -759,38 +759,38 @@ func _draw_repair(font: Font) -> void:
 	match mode:
 		&"thrust":
 			_bar_v(float(_job.marker), float(_job.get("band", 0.5)), 0.09)
-			_note(mono, "En banda %.1f s" % float(_job.held))
+			_note(mono, tr("En banda %.1f s") % float(_job.held))
 		&"valve":
 			_hline(float(_job.x), float(_job.get("leak", BOX.get_center().x)))
-			_note(mono, "Cierres %d/3" % int(_job.closed))
+			_note(mono, tr("Cierres %d/3") % int(_job.closed))
 		&"seal":
 			_cursor(font)
 			_view.draw_rect(Rect2((_job.hatch as Vector2) - Vector2(14, 14), Vector2(28, 28)), Ui.LAMP_CAUTION, false, 3.0)
-			_note(mono, "Presión %d %%" % int(float(_job.pressure) * 100.0))
+			_note(mono, tr("Presión %d %%") % int(float(_job.pressure) * 100.0))
 		&"tile":
 			for tile: Dictionary in _job.tiles:
 				_view.draw_rect(Rect2(float(tile.x) - 10.0, float(tile.y) - 6.0, 20, 12), Ui.LAMP_WARNING)
 			_cursor(font)
-			_note(mono, "Losetas %d/4" % int(_job.got))
+			_note(mono, tr("Losetas %d/4") % int(_job.got))
 		&"align":
 			_bar_h(float(_job.get("aim", 0.5)), float(_job.sun), 0.08)
-			_note(mono, "Fijos %d/2" % int(_job.locks))
+			_note(mono, tr("Fijos %d/2") % int(_job.locks))
 		&"vent":
 			_thermo(float(_job.temp), 0.34, 0.62)
-			_note(mono, "Purgas %d/3" % int(_job.good))
+			_note(mono, tr("Purgas %d/3") % int(_job.good))
 		&"signal":
 			var dot: Vector2 = _job.get("dot", BOX.get_center())
 			_view.draw_circle(dot, 10.0, Ui.INFO)
 			_cursor(font)
-			_note(mono, "Enlace %.1f s" % float(_job.lock))
+			_note(mono, tr("Enlace %.1f s") % float(_job.lock))
 		&"fold":
 			_bar_h(float(_job.get("needle", 0.0)), float(_job.slot) + 0.07, 0.07)
-			_note(mono, "Pliegues %d/4" % int(_job.folds))
+			_note(mono, tr("Pliegues %d/4") % int(_job.folds))
 		&"gear":
 			_thermo(float(_job.ext), float(_job.target) - 0.08, float(_job.target) + 0.08)
-			_note(mono, "Patas %d/2" % int(_job.legs))
+			_note(mono, tr("Patas %d/2") % int(_job.legs))
 		&"spin":
-			_note(mono, "Giro %d" % int(float(_job.rate) * 10.0))
+			_note(mono, tr("Giro %d") % int(float(_job.rate) * 10.0))
 			var hub := BOX.get_center()
 			_view.draw_line(hub, hub + Vector2.from_angle(float(_job.rate)) * 70.0, Ui.IVORY, 4.0)
 		&"cells":
@@ -798,10 +798,10 @@ func _draw_repair(font: Font) -> void:
 				var p := _cell_pos(i)
 				_view.draw_circle(p, 16.0, Ui.LAMP_GO if i == int(_job.lit) else Color(0.2, 0.22, 0.26))
 			_cursor(font)
-			_note(mono, "Tiempo %.1f" % maxf(float(_job.left), 0.0))
+			_note(mono, tr("Tiempo %.1f") % maxf(float(_job.left), 0.0))
 		&"pellet":
 			_hline(float(_job.get("pellet", BOX.position.x)), BOX.position.x + 18.0 + float(_job.socket) * (BOX.size.x - 36.0))
-			_note(mono, "Abrazaderas %d/3" % int(_job.clamps))
+			_note(mono, tr("Abrazaderas %d/3") % int(_job.clamps))
 		&"reboot":
 			var seq: Array = _job.seq
 			var shown := ""
@@ -809,7 +809,7 @@ func _draw_repair(font: Font) -> void:
 				for code: int in seq:
 					shown += _dir_name(code) + "  "
 			else:
-				shown = "Ahora, paso %d" % (int(_job.step) + 1)
+				shown = tr("Ahora, paso %d") % (int(_job.step) + 1)
 			_view.draw_string(font, BOX.position + Vector2(12, 80), shown, HORIZONTAL_ALIGNMENT_LEFT, 230, Ui.SIZE_TEXT, Ui.IVORY)
 		&"calibrate":
 			var err: Vector2 = _job.get("error", Vector2.ZERO)
@@ -817,21 +817,21 @@ func _draw_repair(font: Font) -> void:
 			_view.draw_line(c + Vector2(-18, 0), c + Vector2(18, 0), Ui.IVORY_DIM, 2.0)
 			_view.draw_line(c + Vector2(0, -18), c + Vector2(0, 18), Ui.IVORY_DIM, 2.0)
 			_view.draw_circle(c + err, 7.0, Ui.LAMP_CAUTION)
-			_note(mono, "Fijos %d/3" % int(_job.locks))
+			_note(mono, tr("Fijos %d/3") % int(_job.locks))
 		&"bolt":
 			for i: int in 3:
 				var bx := _bolt_x(i)
 				_view.draw_circle(Vector2(bx, BOX.get_center().y), 12.0, Ui.LAMP_WARNING if i == int(_job.step) else Color(0.25, 0.27, 0.3))
 			_view.draw_line(Vector2(float(_job.x), BOX.position.y + 8.0), Vector2(float(_job.x), BOX.end.y - 8.0), Ui.IVORY, 3.0)
-			_note(mono, "Perno %d/3" % mini(int(_job.step) + 1, 3))
+			_note(mono, tr("Perno %d/3") % mini(int(_job.step) + 1, 3))
 		&"wrap":
 			for i: int in 4:
 				_view.draw_circle(_corner(i), 10.0, Ui.LAMP_GO if i == int(_job.step) else Color(0.25, 0.27, 0.3))
 			_cursor(font)
-			_note(mono, "Esquina %d/4" % mini(int(_job.step) + 1, 4))
+			_note(mono, tr("Esquina %d/4") % mini(int(_job.step) + 1, 4))
 		&"arm":
 			_thermo(float(_job.charge), 0.78, 0.94)
-			_note(mono, "Mantén arriba y dispara")
+			_note(mono, tr("Mantén arriba y dispara"))
 
 
 func _bar_v(marker: float, band: float, half: float) -> void:
@@ -875,10 +875,10 @@ func _note(font: Font, text: String) -> void:
 func _dir_name(code: int) -> String:
 	match code:
 		0:
-			return "arriba"
+			return tr("arriba")
 		1:
-			return "derecha"
+			return tr("derecha")
 		2:
-			return "abajo"
+			return tr("abajo")
 		_:
-			return "izquierda"
+			return tr("izquierda")

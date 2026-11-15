@@ -194,7 +194,7 @@ class ShipView extends Control:
 		var stage := 1
 		for i: int in Run.ship.parts.size():
 			if Run.ship.parts[i].def.kind == &"decoupler":
-				draw_string(Ui.sans(), Vector2(rects[i].end.x + 40, rects[i].get_center().y + 4), "etapa %d" % (stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY)
+				draw_string(Ui.sans(), Vector2(rects[i].end.x + 40, rects[i].get_center().y + 4), tr("etapa %d") % (stage + 1), HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY)
 				stage += 1
 		if hint.get("radial", false) and hint.get("host", -1) >= 0:
 			var hr: Rect2 = hint.host_rect
@@ -205,15 +205,15 @@ class ShipView extends Control:
 			if int(hint.side) == 0:
 				draw_rect(ShipRenderer.mirror(ghost), Color(Ui.IVORY, 0.35))
 				draw_rect(ShipRenderer.mirror(ghost), Ui.IVORY, false, 1.5)
-			var tag := "ambos lados" if hint.side == 0 else ("izquierda" if hint.side < 0 else "derecha")
+			var tag := tr("ambos lados") if hint.side == 0 else (tr("izquierda") if hint.side < 0 else tr("derecha"))
 			draw_string(Ui.sans(), Vector2(hr.end.x + 12, ghost.get_center().y), tag, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY)
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 		if not hint.is_empty() and not hint.get("radial", false):
 			draw_line(Vector2(o.x - 120, float(hint.y)), Vector2(o.x + 120, float(hint.y)), Ui.IVORY, 2.0)
 		if Run.ship.parts.is_empty():
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), "Empieza por la cápsula, un motor y un tanque.", HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_TEXT, Ui.IVORY_DIM)
-			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), "Haz clic en el catálogo y se colocan solas. Arrastra para moverlas.", HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_LEGEND, Ui.INFO)
-		draw_string(Ui.sans(), Vector2(12, size.y - 16), "Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar", HORIZONTAL_ALIGNMENT_LEFT, size.x - 24, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 200), tr("Empieza por la cápsula, un motor y un tanque."), HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_TEXT, Ui.IVORY_DIM)
+			draw_string(Ui.sans(), Vector2(o.x - 200, o.y - 176), tr("Haz clic en el catálogo y se colocan solas. Arrastra para moverlas."), HORIZONTAL_ALIGNMENT_LEFT, 400, Ui.SIZE_LEGEND, Ui.INFO)
+		draw_string(Ui.sans(), Vector2(12, size.y - 16), tr("Pila: centro | Montaje: izquierda/derecha del bloque | Clic derecho/Supr: quitar"), HORIZONTAL_ALIGNMENT_LEFT, size.x - 24, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 
 
 func _ready() -> void:
@@ -245,17 +245,17 @@ func _build_left(root: Control) -> void:
 	zone.offset_bottom = -10
 	root.add_child(zone)
 	var col := Ui.vbox(zone, 8)
-	Ui.plate(col, "Catálogo")
-	Ui.legend(col, "Calidad de compra")
+	Ui.plate(col, tr("Catálogo"))
+	Ui.legend(col, tr("Calidad de compra"))
 	var row := GridContainer.new()
 	row.columns = 2
 	row.add_theme_constant_override("h_separation", 4)
 	row.add_theme_constant_override("v_separation", 4)
 	col.add_child(row)
 	for q: int in [ShipPart.Quality.SCRAP, ShipPart.Quality.USED, ShipPart.Quality.NEW, ShipPart.Quality.MYSTERY]:
-		var b := Ui.button(row, ShipPart.NAMES[q], _set_quality.bind(q))
+		var b := Ui.button(row, tr(ShipPart.NAMES[q]), _set_quality.bind(q))
 		b.toggle_mode = true
-		b.tooltip_text = "%s: precio x%.2f, estado %d-%d %%" % [ShipPart.NAMES[q], ShipPart.PRICE[q], int(ShipPart.CONDITION[q].x * 100), int(ShipPart.CONDITION[q].y * 100)]
+		b.tooltip_text = tr("%s: precio x%.2f, estado %d-%d %%") % [tr(ShipPart.NAMES[q]), ShipPart.PRICE[q], int(ShipPart.CONDITION[q].x * 100), int(ShipPart.CONDITION[q].y * 100)]
 		b.add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 		Ui.mark_selected(b, q == _quality)
 		_quality_buttons.append(b)
@@ -280,19 +280,19 @@ func _fill_catalog() -> void:
 		_quality_buttons[i].button_pressed = [ShipPart.Quality.SCRAP, ShipPart.Quality.USED, ShipPart.Quality.NEW, ShipPart.Quality.MYSTERY][i] == _quality
 		Ui.mark_selected(_quality_buttons[i], _quality_buttons[i].button_pressed)
 	if not _inventory.is_empty():
-		Ui.legend(_catalog, "Inventario (gratis)")
+		Ui.legend(_catalog, tr("Inventario (gratis)"))
 		for part: ShipPart in _inventory:
 			_catalog_button(part.def, "%s  [%s]" % [part.def.display_name, part.quality_text()], part)
 	var added: Array = []
 	for group: Array in GROUPS:
-		added.append(Ui.legend(_catalog, String(group[0])))
+		added.append(Ui.legend(_catalog, tr(String(group[0]))))
 		for kind: StringName in group[1]:
 			for def: PartDef in Catalog.part_list():
 				if def.kind == kind:
 					var price := int(round(def.cost * ShipPart.PRICE[_quality]))
 					added.append(_catalog_button(def, "%s  %s" % [def.display_name, Ui.money(price)], null))
-	Ui.legend(_catalog, "Apuesta")
-	var box := Ui.button(_catalog, "Caja misteriosa  %s" % Ui.money(BOX_COST), _buy_box)
+	Ui.legend(_catalog, tr("Apuesta"))
+	var box := Ui.button(_catalog, tr("Caja misteriosa  %s") % Ui.money(BOX_COST), _buy_box)
 	box.add_theme_color_override("font_color", Ui.MYSTERY)
 	box.mouse_entered.connect(_show_box_hover.bind(box))
 	box.mouse_exited.connect(hide_part_hover.bind(box))
@@ -335,10 +335,10 @@ func _catalog_button(def: PartDef, text: String, stock: ShipPart) -> PartButton:
 
 func _quality_note_text() -> String:
 	match _quality:
-		ShipPart.Quality.SCRAP: return "Chatarra: 65 % más barata, falla seguido."
-		ShipPart.Quality.USED: return "Usada: 35 % más barata, puede venir gastada."
-		ShipPart.Quality.NEW: return "Nueva: precio completo, casi no falla."
-		ShipPart.Quality.MYSTERY: return "Misteriosa: mitad de precio, calidad oculta hasta inspeccionarla."
+		ShipPart.Quality.SCRAP: return tr("Chatarra: 65 % más barata, falla seguido.")
+		ShipPart.Quality.USED: return tr("Usada: 35 % más barata, puede venir gastada.")
+		ShipPart.Quality.NEW: return tr("Nueva: precio completo, casi no falla.")
+		ShipPart.Quality.MYSTERY: return tr("Misteriosa: mitad de precio, calidad oculta hasta inspeccionarla.")
 	return ""
 
 
@@ -352,22 +352,22 @@ func _paint_part_lamps() -> void:
 		var state := Lamp.OFF
 		var legend := ""
 		if not bool(v.affordable):
-			legend = "Cara"
+			legend = tr("Cara")
 			state = Lamp.WARNING
-		elif badge == "NECESARIA":
-			legend = "Vital"
+		elif badge == tr("NECESARIA"):
+			legend = tr("Vital")
 			state = Lamp.GO
 		elif int(v.tone) == Lamp.GO:
-			legend = "Útil"
+			legend = tr("Útil")
 			state = Lamp.GO
-		elif badge == "NO NECESARIA":
-			legend = "Sobra"
+		elif badge == tr("NO NECESARIA"):
+			legend = tr("Sobra")
 			state = Lamp.CAUTION
 		elif int(v.tone) == Lamp.CAUTION:
-			legend = "Ojo"
+			legend = tr("Ojo")
 			state = Lamp.CAUTION
-		elif badge == "YA CUBIERTA":
-			legend = "Ya hay"
+		elif badge == tr("YA CUBIERTA"):
+			legend = tr("Ya hay")
 			state = Lamp.OFF
 		lamp.text = legend.to_upper()
 		lamp.state = state
@@ -403,17 +403,17 @@ func _build_right(root: Control) -> void:
 	col.add_child(scroll)
 	var info := Ui.vbox(scroll, 6)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	Ui.plate(info, "Ingeniería")
+	Ui.plate(info, tr("Ingeniería"))
 	_contract_label = Ui.label(info, "", 13, Ui.IVORY)
 	_fit_copy(_contract_label)
-	Ui.legend(info, "Presupuesto libre / total")
+	Ui.legend(info, tr("Presupuesto libre / total"))
 	_budget_label = Ui.label(info, "", Ui.SIZE_HEAD, Ui.IVORY)
 	_budget_label.add_theme_font_override("font", Ui.mono())
-	Ui.legend(info, "Siguiente paso")
+	Ui.legend(info, tr("Siguiente paso"))
 	_next_label = Ui.label(info, "", Ui.SIZE_TEXT, Ui.IVORY)
 	_fit_copy(_next_label)
 	_req_box = Ui.vbox(info, 1)
-	_dv = Gauge.new("Delta-v", Ui.INFO)
+	_dv = Gauge.new(tr("Delta-v"), Ui.INFO)
 	info.add_child(_dv)
 	_twr_label = Ui.label(info, "", 14)
 	_stages_label = Ui.label(info, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
@@ -424,10 +424,10 @@ func _build_right(root: Control) -> void:
 	_part_box = Ui.vbox(info, 4)
 	_launch_note = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	_fit_copy(_launch_note)
-	_launch = Ui.primary(Ui.button(col, "Despegar", _on_launch))
+	_launch = Ui.primary(Ui.button(col, tr("Despegar"), _on_launch))
 	_launch.custom_minimum_size = Vector2(0, 48)
 	_launch.add_theme_font_size_override("font_size", 22)
-	Ui.button(col, "Volver al hangar", func() -> void:
+	Ui.button(col, tr("Volver al hangar"), func() -> void:
 		Run.ship.parts.clear()
 		Router.go(&"hangar"))
 	Kinetic.enter_deferred(panel, 0.08, {"slide": true, "slide_offset": Vector2(24.0, 14.0), "scale": Vector2(0.95, 0.92), "tilt": 0.016, "beam": true, "duration": 0.34})
@@ -467,9 +467,9 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 	var has_capsule := ship.has_kind(&"capsule")
 	var has_thrust := ship.thrust() > 0.0
 	var has_fuel := ship.fuel_capacity() > 0.0
-	rows.append({"label": "Cápsula", "state": Lamp.GO if has_capsule else Lamp.WARNING, "hint": "" if has_capsule else "Sin cápsula no hay tripulación ni mando. Agrega la cápsula Apolo.", "blocks": not has_capsule})
-	rows.append({"label": "Motor", "state": Lamp.GO if has_thrust else Lamp.WARNING, "hint": "" if has_thrust else "Sin motor la nave no se mueve. Agrega un motor de Lo básico.", "blocks": not has_thrust})
-	rows.append({"label": "Combustible", "state": Lamp.GO if has_fuel else Lamp.WARNING, "hint": "" if has_fuel else "Un motor sin tanque no tiene qué quemar. Agrega un tanque.", "blocks": false})
+	rows.append({"label": Loc.t("Cápsula"), "state": Lamp.GO if has_capsule else Lamp.WARNING, "hint": "" if has_capsule else Loc.t("Sin cápsula no hay tripulación ni mando. Agrega la cápsula Apolo."), "blocks": not has_capsule})
+	rows.append({"label": Loc.t("Motor"), "state": Lamp.GO if has_thrust else Lamp.WARNING, "hint": "" if has_thrust else Loc.t("Sin motor la nave no se mueve. Agrega un motor de Lo básico."), "blocks": not has_thrust})
+	rows.append({"label": Loc.t("Combustible"), "state": Lamp.GO if has_fuel else Lamp.WARNING, "hint": "" if has_fuel else Loc.t("Un motor sin tanque no tiene qué quemar. Agrega un tanque."), "blocks": false})
 	var home := Catalog.home()
 	var twr := ship.twr(home.surface_gravity) if home != null else 0.0
 	var lift_state := Lamp.OFF
@@ -477,14 +477,14 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 	if has_thrust and has_fuel:
 		if twr < 1.0:
 			lift_state = Lamp.WARNING
-			lift_hint = "Los motores no levantan el peso de la nave (empuje entre peso %.2f, hace falta más de 1). Pon un motor más fuerte o quita peso." % twr
+			lift_hint = Loc.t("Los motores no levantan el peso de la nave (empuje entre peso %.2f, hace falta más de 1). Pon un motor más fuerte o quita peso.") % twr
 		elif twr < 1.2:
 			lift_state = Lamp.CAUTION
-			lift_hint = "Despega justo (empuje entre peso %.2f). Con más de 1.2 sube con margen." % twr
+			lift_hint = Loc.t("Despega justo (empuje entre peso %.2f). Con más de 1.2 sube con margen.") % twr
 		else:
 			lift_state = Lamp.GO
-	rows.append({"label": "Levanta el vuelo", "state": lift_state, "hint": lift_hint, "blocks": false})
-	var destination := "Alcanza el destino" if target == null else "Alcanza %s" % target.display_name
+	rows.append({"label": Loc.t("Levanta el vuelo"), "state": lift_state, "hint": lift_hint, "blocks": false})
+	var destination := Loc.t("Alcanza el destino") if target == null else Loc.t("Alcanza %s") % target.display_name
 	var reach_state := Lamp.OFF
 	var reach_hint := ""
 	if has_thrust and has_fuel:
@@ -492,10 +492,10 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 		var need := contract.dv_estimate
 		if dv < need * 0.85:
 			reach_state = Lamp.WARNING
-			reach_hint = "El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con pernos de etapa." % [int(dv), int(need)]
+			reach_hint = Loc.t("El combustible alcanza para %d de %d m/s. Agrega un tanque o una segunda etapa con pernos de etapa.") % [int(dv), int(need)]
 		elif dv < need:
 			reach_state = Lamp.CAUTION
-			reach_hint = "Vas justo de combustible: %d de %d m/s." % [int(dv), int(need)]
+			reach_hint = Loc.t("Vas justo de combustible: %d de %d m/s.") % [int(dv), int(need)]
 		else:
 			reach_state = Lamp.GO
 	rows.append({"label": destination, "state": reach_state, "hint": reach_hint, "blocks": false})
@@ -505,7 +505,7 @@ static func checklist(ship: ShipModel, contract: Contract, target: BodyDef, rema
 		var req_hint: String = String(req[2])
 		rows.append({"label": req_label, "state": Lamp.GO if req_ok else Lamp.WARNING, "hint": "" if req_ok else req_hint, "blocks": false})
 	var budget_ok := remaining >= 0
-	rows.append({"label": "Presupuesto", "state": Lamp.GO if budget_ok else Lamp.WARNING, "hint": "" if budget_ok else "Te pasaste por %s. Quita piezas o compra calidad Usada o Chatarra." % Ui.money(-remaining), "blocks": not budget_ok})
+	rows.append({"label": Loc.t("Presupuesto"), "state": Lamp.GO if budget_ok else Lamp.WARNING, "hint": "" if budget_ok else Loc.t("Te pasaste por %s. Quita piezas o compra calidad Usada o Chatarra.") % Ui.money(-remaining), "blocks": not budget_ok})
 	return rows
 
 
@@ -515,7 +515,7 @@ func add_part(def: PartDef, index: int, stock: ShipPart = null, mount: float = 0
 		part = ShipPart.create(def, _quality, Run.rng)
 		if _remaining() - part.price() - _premium(part.price()) < 0:
 			Synth.play(&"deny")
-			Events.toast.emit("Sin presupuesto para %s" % def.display_name, Ui.LAMP_WARNING)
+			Events.toast.emit(tr("Sin presupuesto para %s") % def.display_name, Ui.LAMP_WARNING)
 			return
 	else:
 		_inventory.erase(part)
@@ -539,7 +539,7 @@ func _buy_box() -> void:
 	Run.ship.parts.append(part)
 	_selected = Run.ship.parts.size() - 1
 	Synth.play(&"whoosh")
-	Events.toast.emit("La caja contenia: %s" % part.def.display_name, Ui.MYSTERY)
+	Events.toast.emit(tr("La caja contenia: %s") % part.def.display_name, Ui.MYSTERY)
 	_refresh()
 
 
@@ -597,18 +597,18 @@ func _inspect() -> void:
 
 
 func stats_text(def: PartDef) -> String:
-	var bits: PackedStringArray = PackedStringArray(["Masa %.1f t" % def.mass])
-	if def.thrust > 0.0: bits.append("Empuje %d kN  Isp %d s" % [int(def.thrust), int(def.isp)])
-	if def.fuel > 0.0: bits.append("Propelente %.0f t" % def.fuel)
-	if def.solar > 0.0: bits.append("Solar %.1f" % def.solar)
-	if def.power > 0.0: bits.append("Energía %.1f" % def.power)
-	if def.battery > 0.0: bits.append("Batería %.1f" % def.battery)
-	if def.cooling > 0.0: bits.append("Enfriamiento %.1f" % def.cooling)
-	if def.cold_resist > 0.0: bits.append("Aislamiento %d %%" % int(def.cold_resist * 100))
-	if def.heat_resist > 0.0: bits.append("Resist. calor %d %%" % int(def.heat_resist * 100))
-	if def.rad_resist > 0.0: bits.append("Blindaje %d %%" % int(def.rad_resist * 100))
-	if def.ablative > 0.0: bits.append("Ablativo %.0f" % def.ablative)
-	bits.append("Fragilidad x%.1f" % def.fragility)
+	var bits: PackedStringArray = PackedStringArray([tr("Masa %.1f t") % def.mass])
+	if def.thrust > 0.0: bits.append(tr("Empuje %d kN  Isp %d s") % [int(def.thrust), int(def.isp)])
+	if def.fuel > 0.0: bits.append(tr("Propelente %.0f t") % def.fuel)
+	if def.solar > 0.0: bits.append(tr("Solar %.1f") % def.solar)
+	if def.power > 0.0: bits.append(tr("Energía %.1f") % def.power)
+	if def.battery > 0.0: bits.append(tr("Batería %.1f") % def.battery)
+	if def.cooling > 0.0: bits.append(tr("Enfriamiento %.1f") % def.cooling)
+	if def.cold_resist > 0.0: bits.append(tr("Aislamiento %d %%") % int(def.cold_resist * 100))
+	if def.heat_resist > 0.0: bits.append(tr("Resist. calor %d %%") % int(def.heat_resist * 100))
+	if def.rad_resist > 0.0: bits.append(tr("Blindaje %d %%") % int(def.rad_resist * 100))
+	if def.ablative > 0.0: bits.append(tr("Ablativo %.0f") % def.ablative)
+	bits.append(tr("Fragilidad x%.1f") % def.fragility)
 	return "  ".join(bits)
 
 
@@ -620,32 +620,32 @@ func _refresh() -> void:
 	_view.fit()
 	var hazards: PackedStringArray = PackedStringArray()
 	for h: StringName in target.hazards:
-		hazards.append(String(HAZARD_NAMES.get(h, h)))
+		hazards.append(tr(String(HAZARD_NAMES.get(h, h))))
 	if Run.contract.hidden_hazard != &"":
-		hazards.append("rumores sin confirmar")
-	_contract_label.text = "%s\nPago %s, adelanto %s\nPeligros: %s" % [
+		hazards.append(tr("rumores sin confirmar"))
+	_contract_label.text = tr("%s\nPago %s, adelanto %s\nPeligros: %s") % [
 		Run.contract.title, Ui.money(Run.contract.payout), Ui.money(Run.contract.advance),
-		", ".join(hazards) if not hazards.is_empty() else "ninguno conocido"]
+		", ".join(hazards) if not hazards.is_empty() else tr("ninguno conocido")]
 	_budget_label.text = "%s / %s" % [Ui.money(remaining), Ui.money(Profile.budget(Run.contract))]
 	_budget_label.add_theme_color_override("font_color", Ui.IVORY if remaining >= 0 else Ui.LAMP_WARNING)
 	var dv := ship.delta_v()
 	var need := Run.contract.dv_estimate
 	var top := maxf(need * 1.6, dv)
-	_dv.set_value(dv / top, "%d de %d m/s" % [int(dv), int(need)], dv < need * 0.85)
+	_dv.set_value(dv / top, tr("%d de %d m/s") % [int(dv), int(need)], dv < need * 0.85)
 	_dv.band = Vector2(need * 0.85 / top, need * 1.15 / top)
 	var home := Catalog.home()
 	var twr := ship.twr(home.surface_gravity)
-	_twr_label.text = "TWR al despegar %.2f%s" % [twr, " (no despega)" if twr < 1.0 else ""]
+	_twr_label.text = tr("TWR al despegar %.2f%s") % [twr, tr(" (no despega)") if twr < 1.0 else ""]
 	_twr_label.add_theme_color_override("font_color", Ui.LAMP_GO if twr >= 1.2 else (Ui.LAMP_CAUTION if twr >= 1.0 else Ui.LAMP_WARNING))
 	var lines: PackedStringArray = PackedStringArray()
 	var dvs := ship.stage_dvs()
 	for i: int in dvs.size():
-		lines.append("Etapa %d   %5d m/s   TWR %.2f" % [i + 1, int(dvs[i]), ship.stage_twr(i, home.surface_gravity)])
-	lines.append("Masa %.1f t   Valor %s   Prima seguro %s" % [ship.mass(), Ui.money(ship.value()), Ui.money(_premium(ship.value()))])
+		lines.append(tr("Etapa %d   %5d m/s   TWR %.2f") % [i + 1, int(dvs[i]), ship.stage_twr(i, home.surface_gravity)])
+	lines.append(tr("Masa %.1f t   Valor %s   Prima seguro %s") % [ship.mass(), Ui.money(ship.value()), Ui.money(_premium(ship.value()))])
 	_stages_label.text = "\n".join(lines)
 	for child: Node in _req_box.get_children():
 		child.queue_free()
-	Ui.legend(_req_box, "Lista de despegue")
+	Ui.legend(_req_box, tr("Lista de despegue"))
 	var first_warning := ""
 	var first_caution := ""
 	var blocked_hint := ""
@@ -654,7 +654,7 @@ func _refresh() -> void:
 	var has_block := false
 	for row: Dictionary in rows:
 		var state: int = int(row.state)
-		var legend := "OK" if state == Lamp.GO else ("Falta" if state == Lamp.WARNING else ("Justo" if state == Lamp.CAUTION else "Luego"))
+		var legend := "OK" if state == Lamp.GO else (tr("Falta") if state == Lamp.WARNING else (tr("Justo") if state == Lamp.CAUTION else tr("Luego")))
 		var req_row := Ui.hbox(_req_box, 6)
 		var lamp := Lamp.new(legend, state)
 		lamp.custom_minimum_size.x = 64
@@ -682,21 +682,21 @@ func _refresh() -> void:
 		_next_label.text = first_caution
 		_next_label.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
 	else:
-		_next_label.text = "La nave cumple la lista. Puedes despegar."
+		_next_label.text = tr("La nave cumple la lista. Puedes despegar.")
 		_next_label.add_theme_color_override("font_color", Ui.LAMP_GO)
 	var rel := Odds.ship_reliability(ship)
-	_risk_label.text = "Fiabilidad estimada: %d a %d %%" % [int(rel.x * 100.0), int(rel.y * 100.0)]
+	_risk_label.text = tr("Fiabilidad estimada: %d a %d %%") % [int(rel.x * 100.0), int(rel.y * 100.0)]
 	_risk_label.add_theme_color_override("font_color", Odds.risk_color((rel.x + rel.y) * 0.5))
 	_refresh_part()
 	_launch.disabled = has_block
 	if has_block:
-		_launch_note.text = "No puedes despegar todavía. " + blocked_hint
+		_launch_note.text = tr("No puedes despegar todavía. ") + blocked_hint
 		_launch_note.add_theme_color_override("font_color", Ui.LAMP_WARNING)
 	elif has_warning or has_caution:
-		_launch_note.text = "Puedes despegar, pero la lista tiene avisos."
+		_launch_note.text = tr("Puedes despegar, pero la lista tiene avisos.")
 		_launch_note.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
 	else:
-		_launch_note.text = "Lista para despegar."
+		_launch_note.text = tr("Lista para despegar.")
 		_launch_note.add_theme_color_override("font_color", Ui.LAMP_GO)
 	_paint_part_lamps()
 	if _hover_card != null and _hover_card.visible and is_instance_valid(_hover_owner):
@@ -711,23 +711,23 @@ func _refresh_part() -> void:
 	for child: Node in _part_box.get_children():
 		child.queue_free()
 	if _selected < 0 or _selected >= Run.ship.parts.size():
-		Ui.label(_part_box, "Selecciona una pieza para ver su estado.", Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+		Ui.label(_part_box, tr("Selecciona una pieza para ver su estado."), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 		return
 	var part: ShipPart = Run.ship.parts[_selected]
 	Ui.label(_part_box, part.def.display_name, 17, Ui.IVORY)
-	var place := "pila / %s" % Run.ship.zone_of(part)
+	var place := tr("pila / %s") % Run.ship.zone_of(part)
 	if part.def.radial:
-		var side := "ambos" if part.side == 0 else ("izq" if part.side < 0 else "der")
-		place = "montaje %s  altura %d %%" % [side, int(part.mount * 100.0)]
-	var detail := Ui.label(_part_box, "Calidad %s   %s   Estado %s   %s" % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
+		var side := tr("ambos") if part.side == 0 else (tr("izq") if part.side < 0 else tr("der"))
+		place = tr("montaje %s  altura %d %%") % [side, int(part.mount * 100.0)]
+	var detail := Ui.label(_part_box, tr("Calidad %s   %s   Estado %s   %s") % [part.quality_text(), part.health_text(true), part.condition_text(), place], Ui.SIZE_LEGEND)
 	_fit_copy(detail)
 	var stats := Ui.label(_part_box, stats_text(part.def), Ui.SIZE_LEGEND, Ui.IVORY_DIM)
 	_fit_copy(stats)
 	var row := Ui.hbox(_part_box, 6)
 	if not part.inspected:
-		var cost := "gratis" if Run.free_inspections > 0 else Ui.money(INSPECT_COST)
-		Ui.button(row, "Inspeccionar (%s)" % cost, _inspect)
-	Ui.button(row, "Quitar", remove_part.bind(_selected))
+		var cost := tr("gratis") if Run.free_inspections > 0 else Ui.money(INSPECT_COST)
+		Ui.button(row, tr("Inspeccionar (%s)") % cost, _inspect)
+	Ui.button(row, tr("Quitar"), remove_part.bind(_selected))
 
 
 func _fit_copy(label: Label) -> void:
@@ -791,7 +791,7 @@ func show_part_hover(anchor: Control, def: PartDef, stock: ShipPart = null) -> v
 		return
 	_hover_owner = anchor
 	var v := part_viability(def, stock)
-	_hover_title.text = "%s (%s)" % [def.display_name, "gratis" if stock != null else Ui.money(int(v.price))]
+	_hover_title.text = "%s (%s)" % [def.display_name, tr("gratis") if stock != null else Ui.money(int(v.price))]
 	_hover_badge.text = String(v.badge)
 	_hover_badge.state = int(v.tone)
 	var accent := Lamp.color_of(int(v.tone)) if int(v.tone) != Lamp.OFF else Ui.INFO
@@ -809,15 +809,15 @@ func _show_box_hover(anchor: Control) -> void:
 	_hover_owner = anchor
 	var need := BOX_COST + _premium(BOX_COST)
 	var affordable := _remaining() >= need
-	_hover_title.text = "Caja misteriosa (%s)" % Ui.money(BOX_COST)
-	_hover_badge.text = "APUESTA" if affordable else "SIN SALDO"
+	_hover_title.text = tr("Caja misteriosa (%s)") % Ui.money(BOX_COST)
+	_hover_badge.text = tr("APUESTA") if affordable else tr("SIN SALDO")
 	_hover_badge.state = Lamp.CAUTION if affordable else Lamp.WARNING
 	var accent := Ui.MYSTERY if affordable else Ui.LAMP_WARNING
 	_hover_card.add_theme_stylebox_override("panel", Ui.bezel(accent))
-	_hover_role.text = "Entrega una pieza aleatoria de calidad oculta."
-	_hover_reason.text = "Viable si quieres arriesgar para ahorrar o sacar piezas raras." if affordable else "No viable: supera el presupuesto libre (%s)." % Ui.money(_remaining())
+	_hover_role.text = tr("Entrega una pieza aleatoria de calidad oculta.")
+	_hover_reason.text = tr("Viable si quieres arriesgar para ahorrar o sacar piezas raras.") if affordable else tr("No viable: supera el presupuesto libre (%s).") % Ui.money(_remaining())
 	_hover_reason.add_theme_color_override("font_color", accent)
-	_hover_stats.text = "Costo %s (+ prima %s)" % [Ui.money(BOX_COST), Ui.money(_premium(BOX_COST))]
+	_hover_stats.text = tr("Costo %s (+ prima %s)") % [Ui.money(BOX_COST), Ui.money(_premium(BOX_COST))]
 	_present_hover_card(anchor, accent)
 
 
@@ -882,9 +882,9 @@ func part_viability(def: PartDef, stock: ShipPart = null) -> Dictionary:
 	var total_cost := price + _premium(price)
 	var affordable := _remaining() >= total_cost
 	var role := def.description
-	var badge := "OPCIONAL"
+	var badge := tr("OPCIONAL")
 	var tone := Lamp.OFF
-	var reason := "Suma capacidad adicional a la nave."
+	var reason := tr("Suma capacidad adicional a la nave.")
 
 	var r := target.orbit_radius if target != null else Thermal.HOME_R
 	if target != null and target.parent_id != &"" and Catalog.body(target.parent_id) != null and not Catalog.body(target.parent_id).is_star:
@@ -900,176 +900,176 @@ func part_viability(def: PartDef, stock: ShipPart = null) -> Dictionary:
 	match def.kind:
 		&"capsule":
 			if not ship.has_kind(&"capsule"):
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "Obligatoria: centro de mando sin el cual no puedes despegar."
+				reason = tr("Obligatoria: centro de mando sin el cual no puedes despegar.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Ya llevas cápsula; otra añade masa extra y consumo eléctrico."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Ya llevas cápsula; otra añade masa extra y consumo eléctrico.")
 		&"engine":
 			var home := Catalog.home()
 			var twr := ship.twr(home.surface_gravity) if home != null else 0.0
 			if ship.thrust() <= 0.0:
 				if def.id == &"motor_susurro":
-					badge = "POCO VIABLE"
+					badge = tr("POCO VIABLE")
 					tone = Lamp.CAUTION
-					reason = "Empuje muy bajo para despegar desde la Tierra; úsalo arriba tras un motor grande."
+					reason = tr("Empuje muy bajo para despegar desde la Tierra; úsalo arriba tras un motor grande.")
 				else:
-					badge = "NECESARIA"
+					badge = tr("NECESARIA")
 					tone = Lamp.GO
-					reason = "Indispensable para tener empuje en el despegue."
+					reason = tr("Indispensable para tener empuje en el despegue.")
 			elif twr < 1.2 and def.thrust >= 300.0:
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Tu empuje inicial aún es justo (TWR %.2f); este motor ayuda a despegar." % twr
+				reason = tr("Tu empuje inicial aún es justo (TWR %.2f); este motor ayuda a despegar.") % twr
 			elif def.id == &"motor_susurro" and ship.can_stage():
-				badge = "VIABLE ARRIBA"
+				badge = tr("VIABLE ARRIBA")
 				tone = Lamp.GO
-				reason = "Muy eficiente en el vacío para segunda etapa y ahorro de combustible."
+				reason = tr("Muy eficiente en el vacío para segunda etapa y ahorro de combustible.")
 			else:
-				badge = "VIABLE"
-				reason = "Añade empuje para etapa superior o aterrizaje en cuerpos sin aire."
+				badge = tr("VIABLE")
+				reason = tr("Añade empuje para etapa superior o aterrizaje en cuerpos sin aire.")
 		&"tank":
 			if dv_missing:
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "Te falta Delta-v (%d / %d m/s); agrega propelente." % [int(ship.delta_v()), int(Run.contract.dv_estimate)]
+				reason = tr("Te falta Delta-v (%d / %d m/s); agrega propelente.") % [int(ship.delta_v()), int(Run.contract.dv_estimate)]
 			else:
-				badge = "OPCIONAL"
-				reason = "Ya cubres el Delta-v del contrato; más masa baja el TWR al despegar."
+				badge = tr("OPCIONAL")
+				reason = tr("Ya cubres el Delta-v del contrato; más masa baja el TWR al despegar.")
 		&"decoupler":
 			if ship.of_kind(&"engine").size() >= 1 and ship.of_kind(&"tank").size() >= 1 and not ship.can_stage():
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Separa los tanques vacíos del despegue para ganar mucho Delta-v."
+				reason = tr("Separa los tanques vacíos del despegue para ganar mucho Delta-v.")
 			else:
-				badge = "VIABLE"
-				reason = "Útil si quieres dividir la nave en dos etapas independientes."
+				badge = tr("VIABLE")
+				reason = tr("Útil si quieres dividir la nave en dos etapas independientes.")
 		&"heatshield":
 			if target != null and target.atmosphere > 0.0:
 				if not ship.has_kind(&"heatshield"):
-					badge = "NECESARIA"
+					badge = tr("NECESARIA")
 					tone = Lamp.GO
-					reason = "%s tiene atmósfera: sin escudo te quemas al reentrar." % target.display_name
+					reason = tr("%s tiene atmósfera: sin escudo te quemas al reentrar.") % target.display_name
 				else:
-					badge = "YA CUBIERTA"
-					reason = "Ya tienes protección térmica de entrada."
+					badge = tr("YA CUBIERTA")
+					reason = tr("Ya tienes protección térmica de entrada.")
 			else:
-				badge = "NO NECESARIA"
+				badge = tr("NO NECESARIA")
 				tone = Lamp.CAUTION
-				reason = "Este destino no tiene atmósfera; el escudo solo suma peso muerto."
+				reason = tr("Este destino no tiene atmósfera; el escudo solo suma peso muerto.")
 		&"parachute":
 			if target != null and target.atmosphere > 0.0:
 				if not ship.has_kind(&"parachute"):
-					badge = "NECESARIA"
+					badge = tr("NECESARIA")
 					tone = Lamp.GO
-					reason = "%s tiene aire: frena la caída gratis sin gastar combustible." % target.display_name
+					reason = tr("%s tiene aire: frena la caída gratis sin gastar combustible.") % target.display_name
 				else:
-					badge = "YA CUBIERTA"
-					reason = "Ya llevas paracaídas para el descenso."
+					badge = tr("YA CUBIERTA")
+					reason = tr("Ya llevas paracaídas para el descenso.")
 			else:
-				badge = "NO NECESARIA"
+				badge = tr("NO NECESARIA")
 				tone = Lamp.CAUTION
-				reason = "Sin atmósfera no abre el paracaídas; necesitarás motor en la última etapa."
+				reason = tr("Sin atmósfera no abre el paracaídas; necesitarás motor en la última etapa.")
 		&"legs":
 			if not ship.has_kind(&"legs"):
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Suaviza el golpe al tocar suelo y evita que se dañe el motor al aterrizar."
+				reason = tr("Suaviza el golpe al tocar suelo y evita que se dañe el motor al aterrizar.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Ya llevas tren de aterrizaje instalado."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Ya llevas tren de aterrizaje instalado.")
 		&"solar":
 			if f_max > 2.5:
-				badge = "RIESGOSA"
+				badge = tr("RIESGOSA")
 				tone = Lamp.CAUTION
-				reason = "Cerca del Sol (%s) puede sobrecalentarse; considera un MMRTG o un radiador de amoníaco." % (target.display_name if target != null else "destino")
+				reason = tr("Cerca del Sol (%s) puede sobrecalentarse; considera un MMRTG o un radiador de amoníaco.") % (target.display_name if target != null else "destino")
 			elif f_min < 0.2:
-				badge = "POCO VIABLE"
+				badge = tr("POCO VIABLE")
 				tone = Lamp.CAUTION
-				reason = "Tan lejos del Sol rinde menos del 20 %; conviene usar un MMRTG."
+				reason = tr("Tan lejos del Sol rinde menos del 20 %; conviene usar un MMRTG.")
 			elif power_deficit:
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "Genera energía barata para cubrir la electrónica en ruta."
+				reason = tr("Genera energía barata para cubrir la electrónica en ruta.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Tu generación eléctrica actual ya alcanza en ruta."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Tu generación eléctrica actual ya alcanza en ruta.")
 		&"rtg":
 			if f_min < 0.25 or power_deficit:
-				badge = "MUY VIABLE"
+				badge = tr("MUY VIABLE")
 				tone = Lamp.GO
-				reason = "Energía continua sin depender del Sol; ideal para viajes lejanos o sombra."
+				reason = tr("Energía continua sin depender del Sol; ideal para viajes lejanos o sombra.")
 			else:
-				badge = "VIABLE"
-				reason = "Cara en presupuesto, pero nunca falla por falta de luz solar."
+				badge = tr("VIABLE")
+				reason = tr("Cara en presupuesto, pero nunca falla por falta de luz solar.")
 		&"battery":
 			if ship.sum_stat(&"battery") < 0.5:
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Da reserva eléctrica para usar el escáner y cruzar zonas de sombra."
+				reason = tr("Da reserva eléctrica para usar el escáner y cruzar zonas de sombra.")
 			else:
-				badge = "OPCIONAL"
-				reason = "Ya llevas buena reserva de batería."
+				badge = tr("OPCIONAL")
+				reason = tr("Ya llevas buena reserva de batería.")
 		&"radiator":
 			if t_hot >= Thermal.HOT:
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "La ruta sobrecalienta la nave (%d %%): sin radiador fallarán piezas." % int(t_hot * 100.0)
+				reason = tr("La ruta sobrecalienta la nave (%d %%): sin radiador fallarán piezas.") % int(t_hot * 100.0)
 			else:
-				badge = "OPCIONAL"
-				reason = "No pasas el límite térmico en esta ruta, salvo que te acerques al Sol."
+				badge = tr("OPCIONAL")
+				reason = tr("No pasas el límite térmico en esta ruta, salvo que te acerques al Sol.")
 		&"insulation":
 			if t_cold <= Thermal.COLD:
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "Ruta muy fría (%d %%): evita que la nave se congele." % int(t_cold * 100.0)
+				reason = tr("Ruta muy fría (%d %%): evita que la nave se congele.") % int(t_cold * 100.0)
 			else:
-				badge = "OPCIONAL"
-				reason = "La temperatura mínima en esta ruta sigue dentro de rango."
+				badge = tr("OPCIONAL")
+				reason = tr("La temperatura mínima en esta ruta sigue dentro de rango.")
 		&"shielding":
 			if target != null and target.hazards.has(&"radiation") and ship.sum_stat(&"rad_resist") < 0.5:
-				badge = "NECESARIA"
+				badge = tr("NECESARIA")
 				tone = Lamp.GO
-				reason = "%s tiene radiación alta; sin blindaje se fríe la electrónica." % target.display_name
+				reason = tr("%s tiene radiación alta; sin blindaje se fríe la electrónica.") % target.display_name
 			else:
-				badge = "OPCIONAL"
-				reason = "Protege frente a llamaradas solares, aunque añade bastante masa."
+				badge = tr("OPCIONAL")
+				reason = tr("Protege frente a llamaradas solares, aunque añade bastante masa.")
 		&"sensor":
 			if not ship.has_kind(&"sensor"):
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Avisa antes de llamaradas solares y muestra probabilidades de eventos."
+				reason = tr("Avisa antes de llamaradas solares y muestra probabilidades de eventos.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Ya llevas sensores activos."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Ya llevas sensores activos.")
 		&"antenna":
 			if not ship.has_kind(&"antenna"):
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Evita que los mensajes y alertas de vuelo lleguen cortados."
+				reason = tr("Evita que los mensajes y alertas de vuelo lleguen cortados.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Ya tienes enlace de comunicaciones."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Ya tienes enlace de comunicaciones.")
 		&"computer":
 			if not ship.has_kind(&"computer"):
-				badge = "RECOMENDADA"
+				badge = tr("RECOMENDADA")
 				tone = Lamp.GO
-				reason = "Mantiene precisa la línea de trayectoria en el mapa espacial."
+				reason = tr("Mantiene precisa la línea de trayectoria en el mapa espacial.")
 			else:
-				badge = "YA CUBIERTA"
-				reason = "Ya llevas computadora de navegación."
+				badge = tr("YA CUBIERTA")
+				reason = tr("Ya llevas computadora de navegación.")
 		&"rcs":
-			badge = "ÚTIL"
-			reason = "Mejora el giro y la estabilidad cuando la nave es larga o pesada."
+			badge = tr("ÚTIL")
+			reason = tr("Mejora el giro y la estabilidad cuando la nave es larga o pesada.")
 		&"escape":
-			badge = "SEGURIDAD"
-			reason = "Permite abortar el despegue salvando la cápsula si algo sale mal."
+			badge = tr("SEGURIDAD")
+			reason = tr("Permite abortar el despegue salvando la cápsula si algo sale mal.")
 
 	if not affordable:
-		badge = "NO VIABLE"
+		badge = tr("NO VIABLE")
 		tone = Lamp.WARNING
-		reason = "Supera tu presupuesto libre (%s). Prueba calidad Chatarra o quita piezas." % Ui.money(_remaining())
+		reason = tr("Supera tu presupuesto libre (%s). Prueba calidad Chatarra o quita piezas.") % Ui.money(_remaining())
 
 	return {
 		"badge": badge,

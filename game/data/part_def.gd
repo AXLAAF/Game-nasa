@@ -5,8 +5,12 @@ extends Resource
 ## kind: engine, tank, capsule, decoupler, heatshield, parachute, legs, radiator,
 ## insulation, solar, rtg, battery, antenna, computer, sensor, shielding, rcs, escape
 @export var id: StringName = &""
-@export var display_name: String = ""
-@export_multiline var description: String = ""
+@export var display_name: String = "":
+	get:
+		return tr(display_name)
+@export_multiline var description: String = "":
+	get:
+		return tr(description)
 @export var kind: StringName = &"tank"
 @export var radial: bool = false
 @export var cost: int = 100
