@@ -1021,8 +1021,9 @@ func _draw_body(body: BodyDef, pos: Vector2, px: float) -> void:
 	elif body.hazards.has(&"heat") and body.atmosphere <= 0.0:
 		var hr_lava := r * 1.5
 		draw_texture_rect(mist, Rect2(pos - Vector2(hr_lava, hr_lava), Vector2(hr_lava * 2.0, hr_lava * 2.0)), false, Color(1.5, 0.55, 0.16, 0.22))
-	if body.id == &"saturno":
-		draw_set_transform(pos, 0.18, Vector2(2.15, 0.4))
+	# De cerca los anillos los pinta el shader de Planet; este arco solo acompana al punto lejano.
+	if body.id == &"saturno" and body.radius * 2.0 * zoom < PLANET_MIN_PX:
+		draw_set_transform(pos, -0.26, Vector2(2.15, 0.4))
 		draw_arc(Vector2.ZERO, body.radius * 1.55, 0.0, TAU, 64, Color(0.93, 0.84, 0.62, 0.55), maxf(2.4 * px, 1.2))
 		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	if body.radius * 2.0 * zoom < PLANET_MIN_PX:

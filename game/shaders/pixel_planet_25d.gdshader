@@ -11,6 +11,8 @@ uniform vec4 col_b : source_color = vec4(0.22, 0.74, 0.97, 1.0);
 uniform vec4 col_c : source_color = vec4(0.96, 0.92, 0.85, 1.0);
 uniform vec4 col_atmo : source_color = vec4(0.22, 0.74, 0.97, 0.45);
 uniform vec4 col_night : source_color = vec4(0.031, 0.047, 0.086, 1.0);
+uniform float ring = 0.0; // 1.0 dibuja anillos; el rectangulo debe cubrir 2.27 radios (halo_scale)
+uniform vec4 col_ring : source_color = vec4(0.93, 0.84, 0.62, 1.0);
 
 float hash21(vec2 p) {
 	p = fract(p * vec2(123.34, 456.21) + seed);
@@ -81,7 +83,7 @@ void fragment() {
 		} else {
 			float dist = sqrt(r2);
 			float dither = bayer4(px);
-			float rim = smoothstep(halo_scale - 0.03, 0.96, dist);
+			float rim = smoothstep(min(halo_scale, 1.28) - 0.03, 0.96, dist);
 			float quant = rim > 0.001 ? step(dither * 0.56, rim) : 0.0;
 			float sun_side = smoothstep(-0.35, 0.72, dot(normalize(d + vec2(0.0001)), normalize(light_dir)));
 			vec3 halo_col = col_atmo.rgb * mix(0.8, 1.85, sun_side);
@@ -180,5 +182,26 @@ void fragment() {
 		}
 
 		COLOR = vec4(lit, 1.0);
+	}
+
+	// Anillos: elipse inclinada 15 grados; la mitad lejana queda oculta tras el disco.
+	// [DIS] radios en radios planetarios, aproximados a los anillos C, B y A de Saturno.
+	if (ring > 0.5) {
+		vec2 q = vec2(d.x * 0.966 - d.y * 0.259, d.x * 0.259 + d.y * 0.966);
+		float rr = length(vec2(q.x, q.y / 0.3));
+		float shade = 0.0;
+		if (pixels / halo_scale < 18.0) {
+			// Con pocos texeles las bandas no caben: un solo anillo macizo.
+			shade = rr > 1.3 && rr < 2.27 ? 1.0 : 0.0;
+		} else if (rr > 1.53 && rr < 1.95) {
+			shade = 1.0;
+		} else if (rr > 2.03 && rr < 2.27) {
+			shade = 0.74;
+		} else if (rr > 1.24 && rr <= 1.53 && bayer4(px) < 0.5) {
+			shade = 0.5;
+		}
+		if (shade > 0.0 && (r2 > 1.0 || q.y > 0.0)) {
+			COLOR = vec4(col_ring.rgb * shade, 1.0);
+		}
 	}
 }

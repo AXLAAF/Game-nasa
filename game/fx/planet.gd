@@ -7,6 +7,9 @@ extends ColorRect
 const SHADER: Shader = preload("res://game/shaders/pixel_planet_25d.gdshader")
 const TEXEL := 3.0 ## pixeles de pantalla por texel del planeta
 const HALO_SCALE := 1.28 ## margen extra del rectangulo para dibujar el halo atmosferico sin recortes
+const RING_SCALE := 2.4 ## margen con anillos: su borde exterior llega a 2,27 radios en el shader
+
+var _halo := HALO_SCALE
 
 
 static func make(body: BodyDef, diameter: float) -> Planet:
@@ -24,7 +27,10 @@ static func make(body: BodyDef, diameter: float) -> Planet:
 	mat.set_shader_parameter("col_c", palette[2])
 	mat.set_shader_parameter("col_atmo", palette[3])
 	mat.set_shader_parameter("col_night", palette[4])
-	mat.set_shader_parameter("halo_scale", HALO_SCALE)
+	if body.id == &"saturno":
+		p._halo = RING_SCALE
+		mat.set_shader_parameter("ring", 1.0)
+	mat.set_shader_parameter("halo_scale", p._halo)
 	p.material = mat
 	p.fit(diameter, diameter)
 	return p
@@ -72,8 +78,8 @@ static func _look(body: BodyDef) -> Array:
 
 ## diameter en unidades del padre; on_screen en pixeles reales, para fijar el grano del pixel art.
 func fit(diameter: float, on_screen: float) -> void:
-	size = Vector2(diameter, diameter) * HALO_SCALE
-	(material as ShaderMaterial).set_shader_parameter("pixels", clampf(roundf(on_screen * HALO_SCALE / TEXEL), 8.0, 128.0))
+	size = Vector2(diameter, diameter) * _halo
+	(material as ShaderMaterial).set_shader_parameter("pixels", clampf(roundf(on_screen * _halo / TEXEL), 8.0, 128.0 * _halo / HALO_SCALE))
 
 
 func light_from(direction: Vector2) -> void:

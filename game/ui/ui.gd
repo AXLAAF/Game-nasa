@@ -34,6 +34,7 @@ const SIZE_HERO := 36
 static var _theme: Theme
 static var _legend: FontVariation
 static var _mono: FontVariation
+static var _space_mono: FontVariation
 
 
 static func sans() -> Font:
@@ -42,6 +43,23 @@ static func sans() -> Font:
 
 static func bold() -> Font:
 	return load("res://assets/fonts/B612-Bold.ttf")
+
+
+static func title_font() -> Font:
+	return load("res://assets/fonts/Pixelta.ttf")
+
+
+## Alternativas de docs/art/fonts para rotulos tecnicos; el tema sigue en B612.
+static func exo_bold() -> Font:
+	return load("res://assets/fonts/Exo2-Bold.ttf")
+
+
+## Monospace alternativa para telemetria. FontVariation por el mismo motivo que mono().
+static func space_mono() -> Font:
+	if _space_mono == null:
+		_space_mono = FontVariation.new()
+		_space_mono.base_font = load("res://assets/fonts/SpaceMono-Regular.ttf")
+	return _space_mono
 
 
 ## Solo para cifras en ventanas de lectura.

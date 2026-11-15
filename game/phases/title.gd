@@ -17,8 +17,15 @@ func _ready() -> void:
 	col.offset_left = 96
 	col.offset_right = 96
 	col.grow_vertical = Control.GROW_DIRECTION_BOTH
+	var logo := TextureRect.new()
+	logo.texture = load("res://assets/logo_orbita_128.png")
+	logo.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.add_child(logo)
 	var title := Ui.label(col, "Margin Zero", Ui.SIZE_HERO * 2, Ui.IVORY)
-	title.add_theme_font_override("font", Ui.bold())
+	title.add_theme_font_override("font", Ui.title_font())
+	Ui.legend(col, "Deuda orbital")
 	var spacer := Control.new()
 	spacer.custom_minimum_size.y = 18
 	col.add_child(spacer)
@@ -89,7 +96,7 @@ func _credits() -> void:
 		"Margin Zero",
 		"Hecho para NASA Space Apps Challenge, reto Space Mission Design Game.",
 		"Datos abiertos: NASA Planetary Fact Sheet (NSSDCA), JPL Small-Body Database, NASA DONKI y NASA Deep Space Network.",
-		"Tipografía B612 y B612 Mono, SIL Open Font License.",
+		"Tipografía B612, B612 Mono (SIL Open Font License) y Pixelta.",
 		"Hecho con Godot Engine, licencia MIT.",
 	]:
 		var label := Ui.label(modal.col, text, Ui.SIZE_TEXT, Ui.IVORY)

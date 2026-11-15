@@ -115,6 +115,13 @@ static func nozzles(parts: Array, active: Array) -> PackedVector2Array:
 const TEXEL := 2.0
 const OUTLINE := Color("0d1014")
 const FIRE: Texture2D = preload("res://assets/fx/fire_sheet.png")
+# Paleta de tinta de tools/interior_kit_svg.py: los estados coinciden con docs/art/cohete_variantes.svg.
+const INK := Color("1a1410")
+const RUST := Color("c8552b")
+const RUST_D := Color("8a3719")
+const MUSTARD := Color("e8b23a")
+const BONE := Color("efe3c8")
+const STEEL := Color("6f7a80")
 
 
 static func _snap(r: Rect2) -> Rect2:
@@ -240,6 +247,12 @@ static func _block(ci: CanvasItem, r: Rect2, c: Color) -> void:
 	ci.draw_rect(Rect2(r.position.x, r.position.y, TEXEL, r.size.y - TEXEL), c.lightened(0.25))
 
 
+## Destello en cruz con el texel central en corner y brazos de arm por lado.
+static func _spark(ci: CanvasItem, corner: Vector2, arm: float) -> void:
+	ci.draw_rect(Rect2(corner.x - arm, corner.y, arm * 2.0 + TEXEL, TEXEL), BONE)
+	ci.draw_rect(Rect2(corner.x, corner.y - arm, TEXEL, arm * 2.0 + TEXEL), BONE)
+
+
 static func _draw_part(ci: CanvasItem, part: ShipPart, raw: Rect2, flipped: bool, t: float) -> void:
 	var r := _snap(raw)
 	var c := _tone(part)
@@ -301,10 +314,16 @@ static func _draw_part(ci: CanvasItem, part: ShipPart, raw: Rect2, flipped: bool
 			ci.draw_rect(_snap(Rect2(r.position.x - TEXEL, r.position.y, TEXEL, TEXEL * 2.0)), dark)
 			ci.draw_rect(_snap(Rect2(r.end.x, r.end.y - TEXEL * 2.0, TEXEL, TEXEL * 2.0)), dark)
 	if part.revealed and part.hidden_quality == ShipPart.Quality.SCRAP:
-		ci.draw_rect(_sub(r, 0.55, 0.2, 0.8, 0.38), Color(0.5, 0.25, 0.1, 0.6))
-		ci.draw_rect(_sub(r, 0.15, 0.62, 0.35, 0.77), Color(0.5, 0.25, 0.1, 0.55))
+		# Chatarra: mancha de oxido y dos parches remachados (acero y oxido) con contorno de tinta.
+		ci.draw_rect(_sub(r, 0.18, 0.66, 0.4, 0.8), Color(RUST_D, 0.55))
+		for patch: Array in [[_sub(r, 0.55, 0.18, 0.83, 0.38), STEEL], [_sub(r, 0.12, 0.58, 0.32, 0.73), RUST]]:
+			ci.draw_rect(patch[0].grow(TEXEL), INK)
+			_block(ci, patch[0], patch[1])
 	if part.revealed and part.hidden_quality == ShipPart.Quality.LEGENDARY:
-		ci.draw_rect(r.grow(TEXEL), Color(1.6, 1.3, 0.4, 0.5 + 0.3 * sin(t * 4.0)), false, TEXEL)
+		# Legendaria: marco mostaza (HDR, con pulso) y destellos hueso en dos esquinas.
+		ci.draw_rect(r.grow(TEXEL), Color(MUSTARD * 1.75, 0.5 + 0.3 * sin(t * 4.0)), false, TEXEL)
+		_spark(ci, Vector2(r.end.x + TEXEL, r.position.y - TEXEL * 2.0), TEXEL * 2.0)
+		_spark(ci, Vector2(r.position.x - TEXEL * 2.0, r.end.y + TEXEL), TEXEL)
 	if not part.revealed:
 		ci.draw_rect(r, Color(Ui.MYSTERY, 0.3 + 0.15 * sin(t * 5.0)))
 		ci.draw_string(Ui.bold(), r.get_center() + Vector2(-4, 5), "?", HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Ui.IVORY)
@@ -312,7 +331,13 @@ static func _draw_part(ci: CanvasItem, part: ShipPart, raw: Rect2, flipped: bool
 	if h == ShipPart.Health.WORN:
 		ci.draw_rect(_sub(r, 0.15, 0.35, 0.45, 0.35), Color(0.12, 0.08, 0.05, 0.8))
 		ci.draw_rect(_sub(r, 0.45, 0.42, 0.8, 0.42), Color(0.12, 0.08, 0.05, 0.8))
+		ci.draw_rect(_sub(r, 0.58, 0.2, 0.8, 0.36), Color(RUST_D, 0.55))
 	elif h == ShipPart.Health.FAULTY:
+		# Grieta de tinta de parts_ink; el fuego hace de aviso en lugar de la estrella mostaza.
+		var crack := PackedVector2Array()
+		for f: Vector2 in [Vector2(0.2, 0.1), Vector2(0.4, 0.35), Vector2(0.3, 0.5), Vector2(0.55, 0.8)]:
+			crack.append(r.position + r.size * f)
+		ci.draw_polyline(crack, INK, TEXEL)
 		var frame := int(t * 8.0) % 4
 		ci.draw_texture_rect_region(FIRE, Rect2(r.get_center().x - 8.0, r.position.y - 10.0, 16.0, 16.0), Rect2(frame * 24.0, 0, 24, 24))
 	if part.broken:
