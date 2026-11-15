@@ -540,7 +540,7 @@ func _fit() -> void:
 	var avail := Vector2(PANEL_W - 16.0, view_h - 64.0 - 64.0 - 78.0)
 	if avail.y < 40.0:
 		return
-	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 96.0)
+	var box := ShipRenderer.bounds(Run.ship.parts).grow(HULL_OUT + 36.0)
 	var fit := minf(avail.x / maxf(box.size.x, 1.0), avail.y / maxf(box.size.y, 1.0)) * 0.92
 	_rooms.scale = Vector2(fit, fit)
 	var area_center := Vector2(8.0, 66.0) + avail * 0.5

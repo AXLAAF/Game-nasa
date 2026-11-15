@@ -214,6 +214,8 @@ static func fold_toggle(control: Control, show: bool, duration: float = 0.24) ->
 		control.scale = Vector2.ONE
 		control.rotation = 0.0
 		return
+	if not show and not control.visible:
+		return
 	var tween := control.create_tween()
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.set_parallel(true)
@@ -227,8 +229,6 @@ static func fold_toggle(control: Control, show: bool, duration: float = 0.24) ->
 		tween.tween_property(control, "scale", Vector2.ONE, duration).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		tween.tween_property(control, "rotation", 0.0, duration).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
 	else:
-		if not control.visible:
-			return
 		tween.tween_property(control, "modulate:a", 0.0, duration * 0.75).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
 		tween.tween_property(control, "scale", Vector2(0.95, 0.72), duration * 0.8).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_IN)
 		tween.chain().tween_callback(Callable(Kinetic, &"_finish_hide").bind(control.get_instance_id()))
