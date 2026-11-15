@@ -1,47 +1,59 @@
-# Diseno de interfaz: cabina de segunda mano
+# Diseno de interfaz: tablero Margin Zero
 
-Direccion visual del juego jugable actual (`game/`, "Contratista Orbital"). Reemplaza en este
-juego a la paleta y tipografia de `BRANDING-MARGIN-ZERO.md` y `DISEÑO-UI-NAVES-25D.md`, que
-siguen describiendo el remake.
+Direccion visual del juego jugable (`game/`). Usa la paleta de identidad de
+`BRANDING-MARGIN-ZERO.md` y de los documentos VectorCraft de `docs/art/` (logo de la orbita,
+`planetas_fondos`, hoja de robots) y las tipografias de `docs/art/fonts/`.
 
 ## Idea
 
 La pantalla es una ventana y un tablero. El mundo en pixel art se ve por la ventana. La interfaz
-es el tablero fisico de una nave usada: chapa esmaltada, ventanas de lectura oscuras, teclas de
-baquelita y lamparas de aviso.
+es el tablero de una nave embargada: bastidores azul noche, tinta crema, una sola tecla ambar por
+pantalla, cian para el dato real y terracota para la deuda y el fallo.
 
 ## Color
 
-Los tokens viven en `game/ui/ui.gd`. No se escriben colores sueltos en la interfaz.
+Los tokens viven en `game/ui/ui.gd`. No se escriben colores sueltos en la interfaz. Los nombres
+vienen del tablero de cabina anterior; el papel de cada uno no cambio.
 
-| Token | Hex | Uso |
-|---|---|---|
-| `ENAMEL` | `#3E8F8A` | Chapa del tablero y bisel de los paneles. Solo leyendas cortas en `BAKELITE`. |
-| `ENAMEL_SHADE` | `#2C6B67` | Bisel inferior. |
-| `BAKELITE` | `#16181A` | Ventanas de lectura, fondo de paneles y cartas. |
-| `BAKELITE_RAISED` | `#24272A` | Teclas y filas elevadas. |
-| `IVORY` | `#EFE6CF` | Texto, cifras, seleccion, dinero. |
-| `IVORY_DIM` | `#A9A493` | Texto secundario. |
-| `INFO` | `#8FD6CE` | Dato nominal o informativo. |
-| `LAMP_GO` | `#58C96B` | En orden. |
-| `LAMP_CAUTION` | `#FFB000` | Precaucion. |
-| `LAMP_WARNING` | `#F46452` | Fallo. |
-| `MYSTERY` | `#B48CF2` | Piezas misteriosas y radiacion. |
-
-El texto largo va siempre sobre fondo oscuro. Sobre esmalte el marfil no llega a 4.5:1, por eso
-ahi solo se usa `BAKELITE`.
+| Token | Hex | Marca | Uso |
+|---|---|---|---|
+| `BG` | `#080C16` | `void_deep` | Fondo y huecos de lectura. |
+| `BAKELITE` | `#0F1726` | `surface_chassis` | Paneles y cartas. |
+| `BAKELITE_RAISED`, `ENAMEL` | `#172236` | `surface_raised` | Teclas, filas elevadas, consola y placas. |
+| `BAKELITE_EDGE` | `#1E2D47` | `surface_active_band` | Bordes, tecla bajo el cursor, lampara apagada. |
+| `ENAMEL_SHADE` | `#0B0E17` | `outline_pixel` | Contornos y tecla hundida. |
+| `IVORY` | `#F4EBD9` | `ink_cream` | Texto, cifras, seleccion, dinero. |
+| `IVORY_DIM` | `#8B9BB4` | `ink_muted` | Texto secundario y leyendas. |
+| `INFO`, `ENAMEL_LIGHT` | `#38BDF8` | `accent_cyan` | Dato real, telemetria nominal, filo de consola y placas. |
+| `ACCENT`, `LAMP_CAUTION` | `#F09C14` | `accent_amber` | Tecla principal (rellena, con labio) y lampara de precaucion (ficha plana con leyenda). |
+| `LAMP_GO` | `#22C55E` | `status_ok` | En orden. |
+| `TERRACOTTA` | `#C83E2B` | `accent_terracotta` | Marca de deuda. Solo rellenos y bordes: como texto sobre el panel no llega a 4.5:1. |
+| `LAMP_WARNING` | `#E8604A` | terracota encendido | Fallo, como texto o lampara (5.2:1 sobre el panel). |
+| `MYSTERY` | `#B48CF2` | | Piezas misteriosas y radiacion. |
 
 Lamparas: apagada no dice nada, verde en orden, ambar precaucion, rojo fallo. Una lampara lleva
-siempre su leyenda; el color nunca es la unica senal.
+siempre su leyenda; el color nunca es la unica senal. Su ancho sale de la leyenda: no se recorta.
 
 ## Tipografia
 
-B612 y B612 Mono (SIL OFL, `assets/fonts/`), la familia que Airbus diseno para pantallas de cabina.
+Exo 2 y Space Mono (SIL OFL, `assets/fonts/`). Pixelta solo para el rotulo "Margin Zero".
 
-- `Ui.sans()` texto y botones, `Ui.bold()` titulos.
-- `Ui.mono()` solo cifras de telemetria en ventanas de lectura.
+- `Ui.sans()` Exo 2 Regular para texto y botones, `Ui.bold()` Exo 2 SemiBold para titulos.
+- `Ui.mono()` Space Mono, solo cifras (telemetria, dinero) en ventanas de lectura.
 - `Ui.legend_font()` leyendas grabadas.
+- `Ui.title_font()` Pixelta, el rotulo de marca en el titulo y en la cabecera del hangar.
 - Escala: 13 leyenda, 15 texto, 18 subtitulo, 24 lectura, 36 lectura principal. Nada por debajo de 13.
+
+## Maquetacion
+
+- Las pantallas de menu se montan con contenedores, no con posiciones a mano. La columna de
+  contenido tiene un ancho maximo y se centra; en ventanas anchas crecen los margenes.
+- La esquina superior izquierda es del engranaje de ajustes (`Pause.GEAR_RECT`): ninguna pantalla
+  pone nada debajo.
+- `tests/layout_lint.gd` recorre los controles visibles y falla si algo queda fuera de la ventana,
+  con el texto cortado o pisando a otra pieza. `tests/smoke_runner.gd` lo pasa en cada fase;
+  `SMOKE_SIZE` y `SMOKE_CREW` eligen ventana y jugadores. Un solape buscado (modal, carta,
+  tutorial) se declara con el meta `layout_overlay`.
 
 ## Texto
 
@@ -54,11 +66,11 @@ B612 y B612 Mono (SIL OFL, `assets/fonts/`), la familia que Airbus diseno para p
 
 | Pieza | Donde | Para que |
 |---|---|---|
-| `Ui.panel` | ventana oscura con bisel de esmalte | contenedor por defecto |
-| `Ui.plate` | cabecera esmaltada | titulo de un panel |
+| `Ui.panel` | bastidor oscuro de borde fino | contenedor por defecto |
+| `Ui.plate` | banda elevada con filo cian | titulo de un panel |
 | `Ui.readout` | leyenda + hueco con cifra en mono | una cifra clave |
 | `Ui.console` | franja inferior de `Ui.CONSOLE_H` | instrumentos de las fases de vuelo |
-| `Ui.primary` | tecla marfil | la accion principal |
+| `Ui.primary` | tecla ambar | la accion principal |
 | `Ui.mark_selected` | borde marfil | opcion elegida en un selector |
 | `Lamp` | `game/ui/lamp.gd` | estado con leyenda |
 | `Annunciator` | `game/ui/annunciator.gd` | una lampara por pieza de la nave; `C` despliega el detalle |

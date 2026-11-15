@@ -238,6 +238,7 @@ func _ready() -> void:
 		get_tree().paused = true
 	_scanned = bool(data.get("scanned", false))
 	_root = Ui.root(self, 50)
+	_root.set_meta(&"layout_overlay", true)
 	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
 	_dim = ColorRect.new()
 	_dim.color = Color(0, 0, 0, 0.0 if (coop or not Kinetic.is_reduced()) else 0.65)

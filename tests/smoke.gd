@@ -1,15 +1,36 @@
 extends RefCounted
 
+const LINT: Script = preload("res://tests/layout_lint.gd")
+
 var tree: SceneTree
+var crew := 1
+var findings: Dictionary = {} ## linea del lint -> primera parada donde aparecio
 
 
 func run(scene_tree: SceneTree) -> void:
 	tree = scene_tree
 	Profile.reset()
+	Profile.reduced_motion = true # las animaciones desplazan los rectangulos que mide el lint
+	Profile.crew = crew
 	tree.root.add_child(load("res://game/main.tscn").instantiate())
 	await _until(&"title")
+	SettingsPanel.show_panel()
+	await _lint("title+ajustes")
+	Modal.close_all()
+	_phase()._credits()
+	await _lint("title+creditos")
+	Modal.close_all()
+	_phase()._new_game()
+	await _lint("title+nueva partida")
+	Modal.close_all()
 	_phase()._start()
+	Profile.reduced_motion = true # _start reinicia el perfil
+	Profile.crew = crew
 	await _until(&"hangar")
+	Tutorial.replay()
+	await _lint("hangar+manual")
+	if Tutorial.busy():
+		Tutorial._open._finish(true)
 	_phase()._accept(Profile.board(Run.rng)[0])
 	await _until(&"assembly")
 	for id: StringName in [&"motor_trueno", &"tanque_ancho", &"desacoplador", &"motor_susurro", &"tanque_largo", &"escudo_termico", &"capsula", &"paracaidas", &"patas", &"panel_solar"]:
@@ -20,6 +41,7 @@ func run(scene_tree: SceneTree) -> void:
 	_phase()._on_launch()
 	await _until(&"launch")
 	await _wait(7.0)
+	await _lint("launch+vuelo")
 	_close_cards()
 	_phase()._reach_orbit()
 	await _wait(2.5)
@@ -28,6 +50,7 @@ func run(scene_tree: SceneTree) -> void:
 	var space := _phase()
 	await _wait(1.0)
 	space._repair_card()
+	await _lint("space+carta")
 	_close_cards()
 	Run.salvage.append(Run.random_part(ShipPart.Quality.MYSTERY))
 	space._salvage_card()
@@ -74,6 +97,8 @@ func run(scene_tree: SceneTree) -> void:
 	await _until(&"debrief")
 	await _wait(6.0)
 	print("perdida: creditos ", Profile.credits, " lecciones ", Profile.lessons, " inventario ", Profile.inventory.size())
+	Router.go(&"training")
+	await _until(&"training")
 	Profile.reset()
 
 
@@ -96,6 +121,15 @@ func _until(phase: StringName) -> void:
 	print("fase: ", Router.current)
 	if Router.current != phase:
 		push_error("SMOKE: se esperaba la fase %s" % phase)
+		return
+	await _lint(String(phase))
+
+
+func _lint(where: String) -> void:
+	await _wait(0.4)
+	for line: String in LINT.check(tree):
+		if not findings.has(line):
+			findings[line] = where
 
 
 func _wait(seconds: float) -> void:

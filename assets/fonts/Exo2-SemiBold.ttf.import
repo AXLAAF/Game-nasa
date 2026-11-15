@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://3y1rthd40iar"
-path="res://.godot/imported/B612Mono-Regular.ttf-f687e841870975422d94e69aa078d100.fontdata"
+uid="uid://dcdym8u0a020q"
+path="res://.godot/imported/Exo2-SemiBold.ttf-724deb5b4195eece74f5a2505289da82.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/B612Mono-Regular.ttf"
-dest_files=["res://.godot/imported/B612Mono-Regular.ttf-f687e841870975422d94e69aa078d100.fontdata"]
+source_file="res://assets/fonts/Exo2-SemiBold.ttf"
+dest_files=["res://.godot/imported/Exo2-SemiBold.ttf-724deb5b4195eece74f5a2505289da82.fontdata"]
 
 [params]
 

@@ -93,7 +93,7 @@ func _build_hud() -> void:
 	Ui.compact(Ui.button(actions, "Abortar (retroceso)", _abort))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(44, 12, 380, 200))
+	Ui.place(ticker, Ui.TICKER_RECT)
 	root.add_child(ticker)
 	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
 	_dial = Control.new()
@@ -106,14 +106,13 @@ func _build_hud() -> void:
 
 func _place_dial() -> void:
 	if Run.crew >= 2:
-		var vp := get_viewport().get_visible_rect().size
-		var cx := (vp.x - ShipInterior.panel_width()) * 0.5
-		var cy := vp.y * 0.5
-		_dial.set_anchors_preset(Control.PRESET_TOP_LEFT)
-		_dial.offset_left = cx - 90.0
-		_dial.offset_top = cy - 90.0
-		_dial.offset_right = cx + 90.0
-		_dial.offset_bottom = cy + 90.0
+		# Centro del vuelo que el panel interior no tapa; anclado, para seguir a la ventana al redimensionar.
+		var shift := ShipInterior.panel_width() * 0.5
+		_dial.set_anchors_preset(Control.PRESET_CENTER)
+		_dial.offset_left = -90.0 - shift
+		_dial.offset_top = -90.0
+		_dial.offset_right = 90.0 - shift
+		_dial.offset_bottom = 90.0
 	else:
 		_dial.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 		_dial.offset_left = -200.0

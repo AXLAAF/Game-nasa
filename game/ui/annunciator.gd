@@ -71,5 +71,6 @@ func _rebuild(parts: Array) -> void:
 	_lamps.clear()
 	for part: ShipPart in parts:
 		var lamp := Lamp.new(part.def.display_name)
+		lamp.custom_minimum_size.x = 132
 		_grid.add_child(lamp)
 		_lamps.append(lamp)

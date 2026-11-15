@@ -39,7 +39,8 @@ func _initialize() -> void:
 		return
 	var io_failed: int = _run_mcp_suite(io_suite)
 	var training_failed := _run_mcp_suite(load("res://tests/test_training.gd"))
-	quit(1 if failed + broken + music_failed + menu_failed + coop_failed + io_failed + training_failed > 0 else 0)
+	var layout_failed: int = load("res://tests/layout_lint_tests.gd").new().run(self)
+	quit(1 if failed + broken + music_failed + menu_failed + coop_failed + io_failed + training_failed + layout_failed > 0 else 0)
 
 
 func _run_mcp_suite(suite_script: Script) -> int:

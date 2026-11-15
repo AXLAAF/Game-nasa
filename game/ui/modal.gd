@@ -30,6 +30,7 @@ func _init(title: String) -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var root := Control.new()
 	root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	root.set_meta(&"layout_overlay", true) # tests/layout_lint.gd: tapar la pantalla es su trabajo
 	root.theme = Ui.theme()
 	root.mouse_filter = Control.MOUSE_FILTER_STOP
 	add_child(root)

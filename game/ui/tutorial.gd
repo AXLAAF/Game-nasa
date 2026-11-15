@@ -90,6 +90,7 @@ func _ready() -> void:
 		get_tree().paused = true
 	_root = Control.new()
 	_root.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_root.set_meta(&"layout_overlay", true)
 	_root.mouse_filter = Control.MOUSE_FILTER_STOP
 	_root.theme = Ui.theme()
 	add_child(_root)

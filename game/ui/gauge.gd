@@ -12,7 +12,7 @@ var text: String = ""
 var color: Color = Ui.INFO
 var band: Vector2 = Vector2(-1, -1)
 var danger: bool = false
-var on_enamel: bool = false ## sobre chapa: leyenda y cifra en baquelita
+var on_enamel: bool = false ## sobre la consola: leyenda en crema
 
 
 func _init(gauge_title: String = "", gauge_color: Color = Ui.INFO) -> void:
@@ -37,10 +37,9 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var bar := Rect2(0, 19, size.x, size.y - 21)
-	var ink := Ui.BAKELITE if on_enamel else Ui.IVORY
-	draw_string(Ui.legend_font(), Vector2(0, 13), title, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.BAKELITE if on_enamel else Ui.IVORY_DIM)
-	draw_string(Ui.mono(), Vector2(0, 13), ("! " if danger else "") + text, HORIZONTAL_ALIGNMENT_RIGHT, size.x, Ui.SIZE_LEGEND, ink)
-	draw_rect(bar, Color("0b0c0d"))
+	draw_string(Ui.legend_font(), Vector2(0, 13), title, HORIZONTAL_ALIGNMENT_LEFT, -1, Ui.SIZE_LEGEND, Ui.IVORY if on_enamel else Ui.IVORY_DIM)
+	draw_string(Ui.mono(), Vector2(0, 13), ("! " if danger else "") + text, HORIZONTAL_ALIGNMENT_RIGHT, size.x, Ui.SIZE_LEGEND, Ui.IVORY)
+	draw_rect(bar, Ui.BG)
 	draw_rect(bar, Ui.BAKELITE_EDGE, false, 1.0)
 	var c := color
 	if danger and (Profile.reduced_motion or int(Time.get_ticks_msec() / 180.0) % 2 == 0):

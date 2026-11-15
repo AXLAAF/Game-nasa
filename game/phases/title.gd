@@ -96,7 +96,7 @@ func _credits() -> void:
 		"Margin Zero",
 		"Hecho para NASA Space Apps Challenge, reto Space Mission Design Game.",
 		"Datos abiertos: NASA Planetary Fact Sheet (NSSDCA), JPL Small-Body Database, NASA DONKI y NASA Deep Space Network.",
-		"Tipografía B612, B612 Mono (SIL Open Font License) y Pixelta.",
+		"Tipografía Exo 2 y Space Mono (SIL Open Font License) y Pixelta.",
 		"Hecho con Godot Engine, licencia MIT.",
 	]:
 		var label := Ui.label(modal.col, text, Ui.SIZE_TEXT, Ui.IVORY)

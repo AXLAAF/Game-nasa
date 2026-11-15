@@ -2,6 +2,9 @@ extends Node
 
 ## Pausa con Esc y tecla de ajustes fija arriba a la izquierda, en todas las fases tras el titulo.
 
+## Esquina reservada al engranaje: las pantallas no ponen nada debajo.
+const GEAR_RECT := Rect2(8, 8, 28, 28)
+
 var _gear: Button
 var _froze: bool = false
 
@@ -10,8 +13,8 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	var root := Ui.root(self, 85)
 	_gear = Ui.button(root, "", open_settings)
-	_gear.custom_minimum_size = Vector2(28, 28)
-	_gear.position = Vector2(8, 8)
+	_gear.custom_minimum_size = GEAR_RECT.size
+	_gear.position = GEAR_RECT.position
 	_gear.focus_mode = Control.FOCUS_NONE
 	_gear.tooltip_text = "Ajustes"
 	_gear.visible = false

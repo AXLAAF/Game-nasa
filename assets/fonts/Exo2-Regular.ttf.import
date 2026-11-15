@@ -2,13 +2,13 @@
 
 importer="font_data_dynamic"
 type="FontFile"
-uid="uid://36yx5ygt3nn0"
-path="res://.godot/imported/Exo2-Bold.ttf-8bbfb3df8fb1cf4462157b8dfd0988e8.fontdata"
+uid="uid://5fefcu01axt3"
+path="res://.godot/imported/Exo2-Regular.ttf-65917513ea737ac3716c804ff23a6ba8.fontdata"
 
 [deps]
 
-source_file="res://assets/fonts/Exo2-Bold.ttf"
-dest_files=["res://.godot/imported/Exo2-Bold.ttf-8bbfb3df8fb1cf4462157b8dfd0988e8.fontdata"]
+source_file="res://assets/fonts/Exo2-Regular.ttf"
+dest_files=["res://.godot/imported/Exo2-Regular.ttf-65917513ea737ac3716c804ff23a6ba8.fontdata"]
 
 [params]
 

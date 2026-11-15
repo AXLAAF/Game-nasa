@@ -47,6 +47,8 @@ func _build_ui() -> void:
 	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	for edge: String in ["left", "right", "top", "bottom"]:
 		margin.add_theme_constant_override("margin_" + edge, 24)
+	for edge: String in ["left", "right"]: # la cabecera empieza a la derecha del engranaje
+		margin.add_theme_constant_override("margin_" + edge, int(Pause.GEAR_RECT.end.x) + 12)
 	root.add_child(margin)
 	var page := Ui.vbox(margin, 12)
 	var header := Ui.hbox(page, 16)

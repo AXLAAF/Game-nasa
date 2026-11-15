@@ -15,11 +15,10 @@ var _shown: Color = Color.TRANSPARENT
 func _init(legend: String = "", lamp_state: int = OFF) -> void:
 	text = legend.to_upper()
 	state = lamp_state
-	custom_minimum_size = Vector2(132, 26)
+	# Sin recorte: el ancho minimo sale de la leyenda, para que nunca quede en puntos suspensivos.
+	custom_minimum_size = Vector2(0, 26)
 	horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	clip_text = true
-	text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	add_theme_font_override("font", Ui.legend_font())
 	add_theme_font_size_override("font_size", Ui.SIZE_LEGEND)
 
@@ -43,5 +42,7 @@ func _process(_delta: float) -> void:
 	var style := Ui.box(color, color.darkened(0.35), 0, 3)
 	style.border_width_bottom = 2
 	style.set_content_margin_all(3)
+	style.content_margin_left = 8
+	style.content_margin_right = 8
 	add_theme_stylebox_override("normal", style)
 	add_theme_color_override("font_color", Ui.BAKELITE if lit else Ui.IVORY_DIM)

@@ -241,7 +241,7 @@ func _build_left(root: Control) -> void:
 	zone.set_anchors_preset(Control.PRESET_LEFT_WIDE)
 	zone.offset_left = 10
 	zone.offset_right = 340
-	zone.offset_top = 10
+	zone.offset_top = Pause.GEAR_RECT.end.y + 8.0 # el catalogo empieza debajo del engranaje
 	zone.offset_bottom = -10
 	root.add_child(zone)
 	var col := Ui.vbox(zone, 8)
@@ -757,6 +757,7 @@ func _build_hover_card(root: Control) -> void:
 	_hover_card.visible = false
 	_hover_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_hover_card.custom_minimum_size = Vector2(310, 0)
+	_hover_card.set_meta(&"layout_overlay", true)
 	_hover_card.add_theme_stylebox_override("panel", Ui.bezel(Ui.INFO))
 	root.add_child(_hover_card)
 	var col := Ui.vbox(_hover_card, 6)

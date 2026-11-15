@@ -193,13 +193,14 @@ func _build_hud() -> void:
 	_rescue_button = Ui.compact(Ui.button(buttons, "Pedir rescate", _stranded_card))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(44, 12, 380, 200))
+	Ui.place(ticker, Ui.TICKER_RECT)
 	root.add_child(ticker)
-	_prompt = Ui.banner(root, Ui.SIZE_READOUT, 0)
+	_prompt = Ui.banner(root, Ui.SIZE_READOUT, 0, false)
 	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
 	_prompt.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	_prompt.offset_top = -Ui.CONSOLE_H - 70
 	_prompt.offset_bottom = -Ui.CONSOLE_H - 70
+	_prompt.offset_right = -ShipInterior.panel_width() # centrado en el vuelo que el panel interior no tapa
 	Ui.keys(root, "WASD moverse (inercia, sin gravedad)   Mayús sobrecarga   Ctrl fino   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom" if Profile.arcade else "A/D girar   W empuje   Mayús sobrecarga   Ctrl fino   T/G pro/retro   1-6 tiempo   Tab objetivo   F escanear   L entrar   rueda zoom")
 
 

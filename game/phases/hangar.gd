@@ -3,8 +3,11 @@ extends Node2D
 ## Hangar: tablero de contratos, seguro, lecciones e inventario entre partidas.
 
 const REROLL_COST := 100
+const CONTENT_W := 1320.0 ## ancho maximo de la columna de contenido; lo que sobra va a los margenes
+const SIDE_MIN := 48.0 ## margen lateral minimo: deja libre la esquina del engranaje de Pause
 
 var _rng := RandomNumberGenerator.new()
+var _page: MarginContainer
 var _board: VBoxContainer
 var _credit_label: Label
 var _runs_label: Label
@@ -18,9 +21,6 @@ var _p2_hint: Label
 var _join_button: Button
 var _first_focus: Control
 var _reset_armed: bool = false
-var _time: float = 0.0
-var _home: Planet
-var _moon: Planet
 
 
 func _ready() -> void:
@@ -29,41 +29,78 @@ func _ready() -> void:
 	var stars := Starfield.new()
 	add_child(stars)
 	stars.set_sky(Color(0.016, 0.024, 0.06), 1.0)
-	_build_backdrop()
 	var root := Ui.root(self)
-	var maker := Ui.panel(root)
-	maker.add_theme_stylebox_override("panel", Ui.enamel())
-	maker.set_anchors_preset(Control.PRESET_TOP_WIDE)
-	maker.offset_left = 40
-	maker.offset_right = -40
-	maker.offset_top = 24
-	maker.offset_bottom = 134
-	var maker_row := Ui.hbox(maker, 24)
-	var brand := Ui.vbox(maker_row, 0)
-	var title := Ui.label(brand, "Contratista Orbital", Ui.SIZE_HERO, Ui.BAKELITE)
-	title.add_theme_font_override("font", Ui.bold())
-	Ui.label(brand, "Arma barato. Vuela lejos. Apuesta todo.", Ui.SIZE_TEXT, Ui.BAKELITE)
-	var maker_spacer := Control.new()
-	maker_spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	maker_row.add_child(maker_spacer)
-	_credit_label = Ui.readout(maker_row, "Créditos", "", 120.0)
-	_runs_label = Ui.readout(maker_row, "Partidas", "", 100.0)
-	_deliveries_label = Ui.readout(maker_row, "Entregas", "", 100.0)
-	_best_label = Ui.readout(maker_row, "Mejor pago", "", 120.0)
-	_players_label = Ui.readout(maker_row, "Jugadores", "", 110.0)
-	var left := Ui.panel(root)
-	left.set_anchors_preset(Control.PRESET_LEFT_WIDE)
-	left.offset_left = 40
-	left.offset_top = 170
-	left.offset_right = 370
-	left.offset_bottom = -20
-	var col := Ui.vbox(left, 8)
-	Ui.legend(col, "Jugadores")
+	_page = MarginContainer.new()
+	_page.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_page.add_theme_constant_override("margin_top", 14)
+	_page.add_theme_constant_override("margin_bottom", 20)
+	root.add_child(_page)
+	get_viewport().size_changed.connect(_fit)
+	_fit()
+	var page := Ui.vbox(_page, 14)
+	var header := _build_header(page)
+	var body := Ui.hbox(page, 14)
+	body.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var crew := _build_crew(body)
+	var board := _build_board(body)
+	_refresh()
+	_focus_menu()
+	# Sin deslizamiento: estas piezas viven en contenedores y Kinetic solo desliza nodos anclados.
+	Kinetic.enter_deferred(header, 0.0, {"scale": Vector2(0.98, 0.92), "tilt": 0.0, "duration": 0.30})
+	Kinetic.enter_deferred(crew, 0.05, {"scale": Vector2(0.96, 0.94), "tilt": -0.01, "duration": 0.32})
+	Kinetic.enter_deferred(board, 0.09, {"scale": Vector2(0.97, 0.95), "tilt": 0.008, "beam": true, "duration": 0.34})
+	Synth.play(&"chime", -6.0)
+
+
+## Columna de contenido centrada: en ventanas anchas crecen los margenes, no los paneles.
+func _fit() -> void:
+	var side := int(maxf(SIDE_MIN, (get_viewport_rect().size.x - CONTENT_W) * 0.5))
+	_page.add_theme_constant_override("margin_left", side)
+	_page.add_theme_constant_override("margin_right", side)
+
+
+## Marca a la izquierda, lecturas del perfil a la derecha, todo centrado en vertical.
+func _build_header(page: Node) -> Control:
+	var band := Ui.panel(page)
+	var style := Ui.box(Ui.BAKELITE, Ui.BAKELITE_EDGE, 1, 6)
+	style.content_margin_left = 16
+	style.content_margin_right = 16
+	style.content_margin_top = 8
+	style.content_margin_bottom = 10
+	band.add_theme_stylebox_override("panel", style)
+	var row := Ui.hbox(band, 14)
+	var logo := TextureRect.new()
+	logo.texture = load("res://assets/logo_orbita_64.png")
+	logo.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	logo.stretch_mode = TextureRect.STRETCH_KEEP_CENTERED
+	logo.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(logo)
+	var brand := Ui.vbox(row, 0)
+	brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	brand.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var title := Ui.label(brand, "Margin Zero", Ui.SIZE_HERO, Ui.IVORY)
+	title.add_theme_font_override("font", Ui.title_font())
+	Ui.legend(brand, "Deuda orbital")
+	var stats := Ui.hbox(row, 16)
+	stats.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_credit_label = Ui.readout(stats, "Créditos", "", 130.0)
+	_runs_label = Ui.readout(stats, "Partidas", "", 90.0)
+	_deliveries_label = Ui.readout(stats, "Entregas", "", 90.0)
+	_best_label = Ui.readout(stats, "Mejor pago", "", 130.0)
+	_players_label = Ui.readout(stats, "Jugadores", "", 90.0)
+	return band
+
+
+## Columna izquierda: tripulacion, seguro, lecciones y, al pie, el perfil.
+func _build_crew(body: Node) -> Control:
+	var panel := Ui.panel(body)
+	panel.custom_minimum_size.x = 336
+	var col := Ui.vbox(panel, 8)
+	Ui.legend(col, "Tripulación")
 	_build_player_slots(col)
 	Ui.legend(col, "Seguro de la nave")
 	_insurance_box = Ui.hbox(col, 4)
-	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
-	Ui.button(col, "Práctica: armar la nave", func() -> void: Router.go(&"training"))
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
@@ -72,14 +109,12 @@ func _ready() -> void:
 	lessons.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	Ui.legend(lessons, "Lecciones")
 	if Profile.lessons.is_empty():
-		var none := Ui.label(lessons, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
-		none.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		none.custom_minimum_size = Vector2(300, 0)
+		_wrapped(lessons, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
 	for id: String in Profile.lessons:
-		var l := Ui.label(lessons, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size = Vector2(300, 0)
+		_wrapped(lessons, str(Profile.LESSONS[id]), Ui.SIZE_TEXT, Ui.IVORY)
 	Ui.label(col, "Inventario: %d piezas guardadas" % Profile.inventory.size(), Ui.SIZE_TEXT, Ui.IVORY)
+	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
+	Ui.button(col, "Práctica: armar la nave", func() -> void: Router.go(&"training"))
 	var reset := Ui.button(col, "Reiniciar perfil", func() -> void: pass)
 	reset.pressed.connect(func() -> void:
 		if _reset_armed:
@@ -87,57 +122,55 @@ func _ready() -> void:
 			Router.go(&"hangar")
 		else:
 			_reset_armed = true
-			reset.text = "¿Seguro? Pulsa otra vez para borrar todo")
-	var right := Ui.panel(root)
-	right.set_anchors_preset(Control.PRESET_FULL_RECT)
-	right.offset_left = 400
-	right.offset_top = 170
-	right.offset_right = -40
-	right.offset_bottom = -20
-	right.clip_contents = true
-	var board_col := Ui.vbox(right, 10)
-	board_col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			reset.text = "Pulsa otra vez para borrar todo")
+	return panel
+
+
+## Tablero de contratos: ocupa el resto del ancho y reparte su alto entre las fichas.
+func _build_board(body: Node) -> Control:
+	var panel := Ui.panel(body)
+	panel.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var board_col := Ui.vbox(panel, 10)
 	var head := Ui.hbox(board_col)
-	Ui.plate(head, "Contratos")
-	var spacer := Control.new()
-	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(spacer)
-	var reroll := Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
-	reroll.size_flags_horizontal = Control.SIZE_SHRINK_END
+	var heading := Ui.label(head, "Contratos", Ui.SIZE_HEAD, Ui.IVORY)
+	heading.add_theme_font_override("font", Ui.bold())
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
 	var board_scroll := ScrollContainer.new()
-	board_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	board_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	board_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	board_col.add_child(board_scroll)
 	_board = Ui.vbox(board_scroll, 10)
 	_board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_refresh()
-	_update_players_ui()
-	_focus_menu()
-	Kinetic.enter_deferred(maker, 0.0, {"slide": true, "slide_offset": Vector2(-24.0, -14.0), "scale": Vector2(0.95, 0.90), "tilt": -0.015, "beam": true, "duration": 0.34})
-	Kinetic.enter_deferred(left, 0.05, {"slide": true, "slide_offset": Vector2(-28.0, 16.0), "scale": Vector2(0.94, 0.90), "tilt": -0.022, "duration": 0.34})
-	Kinetic.enter_deferred(right, 0.09, {"slide": true, "slide_offset": Vector2(-22.0, 20.0), "scale": Vector2(0.95, 0.91), "tilt": 0.016, "beam": true, "duration": 0.36})
-	Synth.play(&"chime", -6.0)
+	_board.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	return panel
+
+
+## Texto que se ajusta al ancho que le de su contenedor, sin anchos fijos.
+func _wrapped(parent: Node, text: String, size: int, color: Color) -> Label:
+	var l := Ui.label(parent, text, size, color)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return l
 
 
 func _build_player_slots(col: Node) -> void:
-	var p1 := Ui.hbox(col, 8)
-	Ui.label(p1, "P1 Comandante", Ui.SIZE_TEXT, Ui.IVORY)
-	_p1_lamp = Lamp.new("Conectado", Lamp.GO)
-	_p1_lamp.custom_minimum_size = Vector2(110, 26)
-	_p1_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	p1.add_child(_p1_lamp)
-	var p2 := Ui.hbox(col, 8)
-	Ui.label(p2, "P2 Tripulante", Ui.SIZE_TEXT, Ui.IVORY)
-	_p2_lamp = Lamp.new("Ausente", Lamp.OFF)
-	_p2_lamp.custom_minimum_size = Vector2(110, 26)
-	_p2_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	p2.add_child(_p2_lamp)
-	_p2_hint = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.INFO)
-	_p2_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_p2_hint.custom_minimum_size = Vector2(300, 0)
+	_p1_lamp = _player_row(col, "P1 Comandante")
+	_p2_lamp = _player_row(col, "P2 Tripulante")
+	_p2_hint = _wrapped(col, "", Ui.SIZE_LEGEND, Ui.INFO)
 	_join_button = Ui.button(col, "Unirse (jugador 2)", _toggle_join_button)
 	_join_button.tooltip_text = "El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado."
+
+
+## Nombre a la izquierda y lampara de estado alineada a la derecha.
+func _player_row(col: Node, text: String) -> Lamp:
+	var row := Ui.hbox(col, 8)
+	Ui.label(row, text, Ui.SIZE_TEXT, Ui.IVORY).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var lamp := Lamp.new("Ausente", Lamp.OFF)
+	lamp.custom_minimum_size = Vector2(118, 26)
+	lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	row.add_child(lamp)
+	return lamp
 
 
 func _refresh() -> void:
@@ -149,6 +182,7 @@ func _refresh() -> void:
 		child.queue_free()
 	for i: int in Profile.INSURANCE_NAMES.size():
 		var b := Ui.button(_insurance_box, Profile.INSURANCE_NAMES[i], _set_insurance.bind(i))
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.tooltip_text = "Prima %d %% del valor de la nave, cubre %d %% si la pierdes." % [int(Profile.INSURANCE_PREMIUM[i] * 100.0 * (0.5 if Profile.has_lesson("seguro") else 1.0)), int(Profile.INSURANCE_COVER[i] * 100.0)]
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
@@ -181,50 +215,70 @@ func _update_players_ui() -> void:
 		_join_button.text = "Unirse (jugador 2)"
 
 
+## Ficha de contrato: filo de estado, destino, texto y, a la derecha, el dinero y la tecla.
 func _contract_card(contract: Contract) -> PanelContainer:
 	var body := contract.body()
+	var risky := contract.hidden_hazard != &""
 	var card := PanelContainer.new()
+	card.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var rest_style := Ui.box(Ui.BAKELITE_RAISED, Ui.BAKELITE_EDGE, 1, 4)
-	var hover_style := Ui.box(Color(0.20, 0.21, 0.24), Ui.INFO, 1, 4)
+	var hover_style := Ui.box(Ui.BAKELITE_EDGE, Ui.INFO, 1, 4)
+	for style: StyleBoxFlat in [rest_style, hover_style]:
+		style.content_margin_left = 0
+		style.content_margin_right = 14
+		style.content_margin_top = 10
+		style.content_margin_bottom = 10
 	card.add_theme_stylebox_override("panel", rest_style)
 	Kinetic.sync_pivot(card)
 	card.mouse_entered.connect(func() -> void:
 		card.add_theme_stylebox_override("panel", hover_style)
-		Kinetic.pop(card, Vector2(1.015, 1.015), 0.16))
+		Kinetic.pop(card, Vector2(1.01, 1.01), 0.16))
 	card.mouse_exited.connect(func() -> void:
 		card.add_theme_stylebox_override("panel", rest_style))
 	_board.add_child(card)
-	var row := Ui.hbox(card, 12)
+	var row := Ui.hbox(card, 14)
+	var edge := ColorRect.new()
+	edge.color = Ui.LAMP_CAUTION if risky else Ui.INFO
+	edge.custom_minimum_size.x = 4
+	edge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(edge)
 	row.add_child(_planet_icon(body))
-	var info := Ui.vbox(row, 2)
+	var info := Ui.vbox(row, 4)
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	var title := Ui.label(info, contract.title, 18, Ui.IVORY)
-	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	_wrapped(info, contract.title, 20, Ui.IVORY).add_theme_font_override("font", Ui.bold())
 	if body != null:
-		var blurb := Ui.label(info, body.description, 13, Ui.IVORY_DIM)
-		blurb.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		blurb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var dv := Ui.label(info, "Delta-v estimado %d m/s, plazo %d días" % [int(contract.dv_estimate), int(contract.deadline)], Ui.SIZE_LEGEND, Ui.INFO)
-		dv.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		dv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	if contract.hidden_hazard != &"":
+		_wrapped(info, body.description, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+		var facts := Ui.hbox(info, 18)
+		_fact(facts, "Delta-v", "%d m/s" % int(contract.dv_estimate))
+		_fact(facts, "Plazo", "%d días" % int(contract.deadline))
+	if risky:
 		var rumor := Lamp.new("Rumores de peligro", Lamp.CAUTION)
 		rumor.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 		info.add_child(rumor)
 	var money := Ui.vbox(row, 2)
-	money.size_flags_horizontal = Control.SIZE_SHRINK_END
 	money.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	Ui.label(money, Ui.money(contract.payout), 24, Ui.IVORY)
-	Ui.label(money, "Adelanto %s" % Ui.money(contract.advance), 13, Ui.IVORY_DIM)
-	Ui.label(money, "Presupuesto %s" % Ui.money(Profile.budget(contract)), 13, Ui.LAMP_GO)
-	var accept := Ui.primary(Ui.button(row, "Aceptar contrato", _accept.bind(contract)))
-	accept.custom_minimum_size = Vector2(168, 44)
-	accept.size_flags_horizontal = Control.SIZE_SHRINK_END
-	accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	money.custom_minimum_size.x = 184
+	var payout := Ui.label(money, Ui.money(contract.payout), 28, Ui.IVORY)
+	payout.add_theme_font_override("font", Ui.mono())
+	payout.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	for line: Array in [["Adelanto %s" % Ui.money(contract.advance), Ui.IVORY_DIM], ["Presupuesto %s" % Ui.money(Profile.budget(contract)), Ui.LAMP_GO]]:
+		Ui.label(money, line[0], Ui.SIZE_LEGEND, line[1]).horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	var gap := Control.new()
+	gap.custom_minimum_size.y = 6
+	money.add_child(gap)
+	var accept := Ui.primary(Ui.button(money, "Aceptar contrato", _accept.bind(contract)))
+	accept.custom_minimum_size.y = 44
 	if _first_focus == null:
 		_first_focus = accept
 	return card
+
+
+## Dato del contrato: leyenda apagada y cifra en cian (dato real).
+func _fact(parent: Node, legend_text: String, value: String) -> void:
+	var pair := Ui.hbox(parent, 6)
+	Ui.label(pair, legend_text, Ui.SIZE_LEGEND, Ui.IVORY_DIM)
+	Ui.label(pair, value, Ui.SIZE_LEGEND, Ui.INFO).add_theme_font_override("font", Ui.mono())
 
 
 func _focus_menu() -> void:
@@ -237,10 +291,10 @@ func _focus_menu() -> void:
 func _planet_icon(body: BodyDef) -> Control:
 	if body == null:
 		var blank := Control.new()
-		blank.custom_minimum_size = Vector2(56, 56)
+		blank.custom_minimum_size = Vector2(72, 72)
 		return blank
-	var icon := Planet.make(body, 46.0)
-	icon.custom_minimum_size = Vector2(58, 58)
+	var icon := Planet.make(body, 56.0)
+	icon.custom_minimum_size = Vector2(72, 72)
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return icon
 
@@ -286,40 +340,8 @@ func _accept(contract: Contract) -> void:
 	Router.go(&"assembly")
 
 
-func _process(delta: float) -> void:
-	_time += delta
+func _process(_delta: float) -> void:
 	if Controls.join_just() and Run.crew < 2:
 		_set_crew(2)
 	elif Controls.leave_just() and Run.crew >= 2:
 		_set_crew(1)
-	queue_redraw()
-
-
-## Casa al fondo de la ventana, con su luna pasando por delante y por detras.
-func _build_backdrop() -> void:
-	var home := Catalog.home()
-	var moon_def := Catalog.body(&"luna")
-	if home == null or moon_def == null:
-		return
-	_home = Planet.make(home, 560.0)
-	add_child(_home)
-	_moon = Planet.make(moon_def, 48.0)
-	add_child(_moon)
-
-
-func _draw() -> void:
-	if _home == null:
-		return
-	var view := get_viewport_rect().size
-	var center := Vector2(view.x * 0.86, view.y + _home.size.y * 0.34)
-	_home.position = center - _home.size * 0.5
-	var a := _time * 0.25
-	var moon := center + Vector2(cos(a), sin(a) * 0.35) * 420.0
-	_moon.position = moon - _moon.size * 0.5
-	_moon.visible = sin(a) < 0.0 or absf(moon.x - center.x) > 280.0
-	for k: int in 4:
-		var ta := -a * 2.3 + float(k + 1) * 0.08
-		var trail := center + Vector2(cos(ta), sin(ta) * 0.3) * 320.0
-		draw_circle(trail, 2.2 - float(k) * 0.35, Color(1.4, 1.9, 2.6, 0.45 - float(k) * 0.1))
-	var ship := center + Vector2(cos(-a * 2.3), sin(-a * 2.3) * 0.3) * 320.0
-	draw_circle(ship, 3.0, Color(3.0, 2.4, 1.6))

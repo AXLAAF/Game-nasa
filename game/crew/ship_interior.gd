@@ -60,7 +60,7 @@ func _ready() -> void:
 	_panel.set_anchors_preset(Control.PRESET_RIGHT_WIDE)
 	_panel.offset_left = -PANEL_W
 	_panel.offset_top = 64.0
-	_panel.offset_bottom = -64.0
+	_panel.offset_bottom = -(Ui.CONSOLE_H + 8.0) # termina encima de la consola de vuelo, no sobre sus teclas
 	_panel.clip_contents = true
 	add_child(_panel)
 	_shift_lamps()

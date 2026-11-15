@@ -1,28 +1,32 @@
 class_name Ui
 extends RefCounted
 
-## Tablero de cabina de segunda mano: chapa esmaltada, ventanas de lectura oscuras,
-## teclas de baquelita y lamparas. Reglas en docs/DISENO-CABINA.md.
-## El texto largo vive en ventanas oscuras; sobre el esmalte solo leyendas en BAKELITE.
+## Tablero de la identidad Margin Zero: bastidores azul noche, tinta crema, ambar para la accion,
+## cian para el dato y terracota para la deuda. Reglas en docs/DISENO-CABINA.md.
+## Los nombres de los tokens vienen del tablero de cabina anterior; el papel de cada uno no cambia.
 
-const ENAMEL := Color("3e8f8a")
-const ENAMEL_LIGHT := Color("6fb5af")
-const ENAMEL_SHADE := Color("2c6b67")
-const BAKELITE := Color("16181a")
-const BAKELITE_RAISED := Color("24272a")
-const BAKELITE_EDGE := Color("3a3f44")
-const IVORY := Color("efe6cf")
-const IVORY_DIM := Color("a9a493")
-const INFO := Color("8fd6ce")
-const LAMP_GO := Color("58c96b")
-const LAMP_CAUTION := Color("ffb000")
-const LAMP_WARNING := Color("f46452")
-const LAMP_OFF := Color("2a2d30")
+const ENAMEL := Color("172236") ## consola y placas (surface_raised)
+const ENAMEL_LIGHT := Color("38bdf8") ## filo de la consola y relleno de deslizadores
+const ENAMEL_SHADE := Color("0b0e17") ## contorno y huecos hundidos (outline_pixel)
+const BAKELITE := Color("0f1726") ## panel (surface_chassis)
+const BAKELITE_RAISED := Color("172236") ## tecla y fila elevada (surface_raised)
+const BAKELITE_EDGE := Color("1e2d47") ## borde y banda de seleccion
+const IVORY := Color("f4ebd9") ## texto (ink_cream)
+const IVORY_DIM := Color("8b9bb4") ## texto secundario (ink_muted)
+const INFO := Color("38bdf8") ## dato real y telemetria nominal (accent_cyan)
+const ACCENT := Color("f09c14") ## tecla principal (accent_amber)
+const TERRACOTTA := Color("c83e2b") ## marca de deuda: solo rellenos y bordes, no llega a 4.5:1 como texto
+const LAMP_GO := Color("22c55e")
+const LAMP_CAUTION := Color("f09c14")
+const LAMP_WARNING := Color("e8604a") ## terracota encendido: pasa 4.5:1 como texto sobre el panel
+const LAMP_OFF := Color("1e2d47")
 const MYSTERY := Color("b48cf2")
-const BG := Color("070a10")
+const BG := Color("080c16")
 const RARITY: Array[Color] = [IVORY, MYSTERY, LAMP_CAUTION]
 const RARITY_NAMES: Array[String] = ["Común", "Rara", "Legendaria"]
 
+## Caja de los avisos de vuelo (Ticker), a la derecha del engranaje de Pause.
+const TICKER_RECT := Rect2(44, 12, 380, 200)
 ## Alto de la consola inferior de vuelo; Juice desplaza la camara la mitad.
 const CONSOLE_H := 132.0
 const SIZE_LEGEND := 13
@@ -34,32 +38,18 @@ const SIZE_HERO := 36
 static var _theme: Theme
 static var _legend: FontVariation
 static var _mono: FontVariation
-static var _space_mono: FontVariation
 
 
 static func sans() -> Font:
-	return load("res://assets/fonts/B612-Regular.ttf")
+	return load("res://assets/fonts/Exo2-Regular.ttf")
 
 
 static func bold() -> Font:
-	return load("res://assets/fonts/B612-Bold.ttf")
+	return load("res://assets/fonts/Exo2-SemiBold.ttf")
 
 
 static func title_font() -> Font:
 	return load("res://assets/fonts/Pixelta.ttf")
-
-
-## Alternativas de docs/art/fonts para rotulos tecnicos; el tema sigue en B612.
-static func exo_bold() -> Font:
-	return load("res://assets/fonts/Exo2-Bold.ttf")
-
-
-## Monospace alternativa para telemetria. FontVariation por el mismo motivo que mono().
-static func space_mono() -> Font:
-	if _space_mono == null:
-		_space_mono = FontVariation.new()
-		_space_mono.base_font = load("res://assets/fonts/SpaceMono-Regular.ttf")
-	return _space_mono
 
 
 ## Solo para cifras en ventanas de lectura.
@@ -67,7 +57,7 @@ static func space_mono() -> Font:
 static func mono() -> Font:
 	if _mono == null:
 		_mono = FontVariation.new()
-		_mono.base_font = load("res://assets/fonts/B612Mono-Regular.ttf")
+		_mono.base_font = load("res://assets/fonts/SpaceMono-Regular.ttf")
 	return _mono
 
 
@@ -93,28 +83,28 @@ static func box(bg: Color, border: Color, width: int = 1, radius: int = 4) -> St
 	return style
 
 
-## Ventana oscura con bisel de esmalte: el panel por defecto.
-static func bezel(accent: Color = ENAMEL) -> StyleBoxFlat:
-	var style := box(BAKELITE, accent, 4, 6)
-	style.border_width_bottom = 7
-	style.set_content_margin_all(12)
+## Bastidor oscuro de borde fino: el panel por defecto. accent lo recalca (tarjetas flotantes).
+static func bezel(accent: Color = BAKELITE_EDGE) -> StyleBoxFlat:
+	var style := box(BAKELITE, accent, 1, 6)
+	style.border_width_top = 3
+	style.set_content_margin_all(14)
 	style.shadow_color = Color(0, 0, 0, 0.45)
 	style.shadow_size = 6
 	style.shadow_offset = Vector2(0, 3)
 	return style
 
 
-## Chapa esmaltada lisa (consola, placas). Solo admite leyendas en BAKELITE.
+## Banda elevada (consola, placas) con filo cian a la izquierda.
 static func enamel() -> StyleBoxFlat:
-	var style := box(ENAMEL, ENAMEL_SHADE, 0, 3)
-	style.border_width_bottom = 4
+	var style := box(ENAMEL, ENAMEL_LIGHT, 0, 3)
+	style.border_width_left = 3
 	style.set_content_margin_all(10)
 	return style
 
 
 ## Hueco de lectura hundido en la chapa.
 static func well_box() -> StyleBoxFlat:
-	var style := box(BAKELITE, Color("0b0c0d"), 0, 3)
+	var style := box(BG, ENAMEL_SHADE, 0, 3)
 	style.border_width_top = 3
 	style.content_margin_top = 5
 	return style
@@ -137,9 +127,9 @@ static func theme() -> Theme:
 	_theme.default_font = sans()
 	_theme.default_font_size = SIZE_TEXT
 	_theme.set_stylebox("normal", "Button", _key(BAKELITE_RAISED, BAKELITE_EDGE))
-	_theme.set_stylebox("hover", "Button", _key(Color("30353a"), IVORY_DIM))
-	_theme.set_stylebox("pressed", "Button", _key(Color("101113"), IVORY_DIM, true))
-	_theme.set_stylebox("disabled", "Button", _key(Color("1b1d1f"), Color("26292c")))
+	_theme.set_stylebox("hover", "Button", _key(BAKELITE_EDGE, IVORY_DIM))
+	_theme.set_stylebox("pressed", "Button", _key(ENAMEL_SHADE, IVORY_DIM, true))
+	_theme.set_stylebox("disabled", "Button", _key(BAKELITE, BAKELITE_RAISED))
 	var focus := box(Color.TRANSPARENT, IVORY, 2, 6)
 	focus.draw_center = false
 	focus.set_expand_margin_all(3)
@@ -148,19 +138,24 @@ static func theme() -> Theme:
 	_theme.set_color("font_hover_color", "Button", IVORY)
 	_theme.set_color("font_pressed_color", "Button", IVORY)
 	_theme.set_color("font_focus_color", "Button", IVORY)
-	_theme.set_color("font_disabled_color", "Button", Color("8a887d"))
+	_theme.set_color("font_disabled_color", "Button", Color(IVORY_DIM, 0.6))
 	_theme.set_stylebox("panel", "PanelContainer", bezel())
 	_theme.set_stylebox("panel", "Panel", bezel())
 	_theme.set_color("font_color", "Label", IVORY)
 	_theme.set_color("default_color", "RichTextLabel", IVORY)
 	_theme.set_stylebox("panel", "TooltipPanel", box(BAKELITE, IVORY_DIM))
+	_theme.set_stylebox("panel", "ItemList", well_box())
+	_theme.set_stylebox("selected", "ItemList", box(BAKELITE_EDGE, INFO, 0, 3))
+	_theme.set_stylebox("selected_focus", "ItemList", box(BAKELITE_EDGE, INFO, 0, 3))
+	_theme.set_color("font_color", "ItemList", IVORY_DIM)
+	_theme.set_color("font_selected_color", "ItemList", IVORY)
 	_theme.set_color("font_color", "TooltipLabel", IVORY)
 	var grabber := box(BAKELITE_EDGE, BAKELITE_EDGE, 0, 3)
 	grabber.set_content_margin_all(3)
 	_theme.set_stylebox("grabber", "VScrollBar", grabber)
 	_theme.set_stylebox("grabber_highlight", "VScrollBar", box(IVORY_DIM, IVORY_DIM, 0, 3))
 	_theme.set_stylebox("grabber_pressed", "VScrollBar", box(IVORY, IVORY, 0, 3))
-	_theme.set_stylebox("scroll", "VScrollBar", box(Color("0b0c0d"), BAKELITE, 0, 3))
+	_theme.set_stylebox("scroll", "VScrollBar", box(ENAMEL_SHADE, BAKELITE, 0, 3))
 	var track := box(BAKELITE_EDGE, BAKELITE_EDGE, 0, 3)
 	track.content_margin_top = 3
 	track.content_margin_bottom = 3
@@ -176,13 +171,13 @@ static func theme() -> Theme:
 	return _theme
 
 
-## Tecla principal de la pantalla: marfil sobre baquelita. Una por pantalla.
+## Tecla principal de la pantalla: ambar con texto oscuro.
 static func primary(b: Button) -> Button:
-	b.add_theme_stylebox_override("normal", _key(IVORY, IVORY_DIM))
-	b.add_theme_stylebox_override("hover", _key(Color("fff6dc"), IVORY_DIM))
-	b.add_theme_stylebox_override("pressed", _key(IVORY_DIM, IVORY_DIM, true))
+	b.add_theme_stylebox_override("normal", _key(ACCENT, ACCENT.darkened(0.3)))
+	b.add_theme_stylebox_override("hover", _key(ACCENT.lightened(0.2), ACCENT.darkened(0.3)))
+	b.add_theme_stylebox_override("pressed", _key(ACCENT.darkened(0.2), ACCENT.darkened(0.3), true))
 	for state: String in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color"]:
-		b.add_theme_color_override(state, BAKELITE)
+		b.add_theme_color_override(state, BG)
 	b.add_theme_font_override("font", bold())
 	return b
 
@@ -190,9 +185,9 @@ static func primary(b: Button) -> Button:
 ## Tecla baja para la consola de vuelo: caben tres filas en CONSOLE_H.
 static func compact(b: Button) -> Button:
 	b.add_theme_stylebox_override("normal", _key(BAKELITE_RAISED, BAKELITE_EDGE, false, 3))
-	b.add_theme_stylebox_override("hover", _key(Color("30353a"), IVORY_DIM, false, 3))
-	b.add_theme_stylebox_override("pressed", _key(Color("101113"), IVORY_DIM, true, 3))
-	b.add_theme_stylebox_override("disabled", _key(Color("1b1d1f"), Color("26292c"), false, 3))
+	b.add_theme_stylebox_override("hover", _key(BAKELITE_EDGE, IVORY_DIM, false, 3))
+	b.add_theme_stylebox_override("pressed", _key(ENAMEL_SHADE, IVORY_DIM, true, 3))
+	b.add_theme_stylebox_override("disabled", _key(BAKELITE, BAKELITE_RAISED, false, 3))
 	b.add_theme_font_size_override("font_size", SIZE_LEGEND)
 	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return b
@@ -243,12 +238,27 @@ static func keys(root: Control, text: String) -> Label:
 
 
 ## Rotulo grande centrado arriba (cuenta atras, avisos de fase).
-static func banner(root: Control, size: int, y: float) -> Label:
+## between_corners: ocupa solo el hueco entre los avisos (Ticker, a la izquierda) y la matriz de
+## lamparas (a la derecha) y parte el texto en lineas, para no escribir encima de ninguno.
+static func banner(root: Control, size: int, y: float, between_corners: bool = true) -> Label:
 	var l := label(root, "", size, IVORY)
 	l.add_theme_font_override("font", bold())
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	l.offset_top = y
+	if between_corners:
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.offset_left = TICKER_RECT.end.x + 16.0
+		var board := Annunciator.current
+		if board != null and is_instance_valid(board):
+			var fit := func() -> void:
+				l.offset_right = board.position.x - 16.0 - root.size.x
+				# Con dos jugadores el hueco es estrecho: letra menor para no bajar hasta el vuelo.
+				var room := root.size.x + l.offset_right - l.offset_left
+				l.add_theme_font_size_override("font_size", size if room >= 480.0 else mini(size, SIZE_HEAD))
+			board.item_rect_changed.connect(fit)
+			root.resized.connect(fit)
+			fit.call_deferred()
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	l.add_theme_color_override("font_outline_color", Color.BLACK)
 	l.add_theme_constant_override("outline_size", 8)
@@ -282,9 +292,9 @@ static func mark_selected(b: Button, on: bool) -> Button:
 	return b
 
 
-## Leyenda grabada en mayusculas. on_enamel = sobre chapa (negro); si no, dentro de ventana.
+## Leyenda grabada en mayusculas. on_enamel = sobre banda elevada (crema); si no, dentro de panel.
 static func legend(parent: Node, text: String, on_enamel: bool = false) -> Label:
-	var l := label(parent, text.to_upper(), SIZE_LEGEND, BAKELITE if on_enamel else IVORY_DIM)
+	var l := label(parent, text.to_upper(), SIZE_LEGEND, IVORY if on_enamel else IVORY_DIM)
 	l.add_theme_font_override("font", legend_font())
 	return l
 
@@ -329,9 +339,8 @@ static func readout(parent: Node, legend_text: String, unit: String = "", min_wi
 static func console(root: Control) -> HBoxContainer:
 	var p := PanelContainer.new()
 	var style := enamel()
-	style.border_width_bottom = 0
-	style.border_width_top = 3
-	style.border_color = ENAMEL_LIGHT
+	style.border_width_left = 0
+	style.border_width_top = 2
 	style.set_corner_radius_all(0)
 	style.content_margin_left = 16
 	style.content_margin_right = 16
