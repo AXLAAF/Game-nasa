@@ -1,0 +1,180 @@
+{
+  "label": "[DIS]",
+  "seed": 714,
+  "body_radius": 30.0,
+  "atmosphere": 1.0,
+  "play_speed": 3.0,
+  "min_twr": 1.2,
+  "min_dv": 3000.0,
+  "maxq": 28000.0,
+  "q_throttle": 0.6,
+  "turn_rate": 30.0,
+  "throttle_rate": 0.8,
+  "corridor_tolerance": 8.0,
+  "steering_height": 1000.0,
+  "fuel_epsilon": 0.001,
+  "low_fuel_fraction": 0.1,
+  "upper_throttle": 1.0,
+  "orbit_height_fraction": 0.8,
+  "orbit_speed_fraction": 0.97,
+  "orbit_min_vy": -60.0,
+  "deorbit_speed_fraction": 0.75,
+  "entry_min": -16.0,
+  "entry_max": -6.0,
+  "entry_default": -3.0,
+  "drogue_speed": 450.0,
+  "main_speed": 120.0,
+  "main_height": 6000.0,
+  "drogue_area_mult": 0.3,
+  "main_area_mult": 3.0,
+  "safe_landing_speed": 12.0,
+  "shield_use": 0.12,
+  "power_time_scale": 0.02,
+  "countdown": 4.0,
+  "recipe": [
+    {
+      "id": "motor_trueno",
+      "title": "Motor de primera etapa",
+      "why": "El motor va abajo. Trueno levanta el peso del cohete, pero consume más combustible."
+    },
+    {
+      "id": "tanque_ancho",
+      "title": "Tanque de primera etapa",
+      "why": "Colócalo sobre Trueno. Cada motor consume solo los tanques de su etapa."
+    },
+    {
+      "id": "desacoplador",
+      "title": "Límite entre etapas",
+      "why": "Va sobre el primer tanque. Al activarlo se descarta todo lo que queda debajo, incluido el desacoplador."
+    },
+    {
+      "id": "motor_susurro",
+      "title": "Motor de segunda etapa",
+      "why": "Susurro va encima del desacoplador. Es eficiente en el vacío; solo no levanta esta nave desde el suelo."
+    },
+    {
+      "id": "tanque_largo",
+      "title": "Tanque de segunda etapa",
+      "why": "Este tanque alimenta Susurro. El combustible de abajo no sirve después de separar."
+    },
+    {
+      "id": "escudo_termico",
+      "title": "Protección para regresar",
+      "why": "El escudo protege la cabina durante la entrada. Añade masa, pero su material absorbe calor al consumirse."
+    },
+    {
+      "id": "capsula",
+      "title": "Cabina de mando",
+      "why": "La cabina debe quedar en la etapa que conservas. No la pongas debajo del desacoplador."
+    },
+    {
+      "id": "paracaidas",
+      "title": "Freno para aterrizar",
+      "why": "Va sobre la cabina. Se abre en dos pasos y solo cuando la velocidad permite hacerlo."
+    },
+    {
+      "id": "panel_solar",
+      "title": "Generación eléctrica",
+      "why": "Los paneles mantienen la electrónica encendida con luz solar. Añaden masa y no generan en la sombra."
+    },
+    {
+      "id": "bateria",
+      "title": "Reserva eléctrica",
+      "why": "La batería guarda energía. No la genera: necesita el panel para recargarse."
+    }
+  ],
+  "catalog": [
+    "motor_trueno",
+    "tanque_ancho",
+    "desacoplador",
+    "motor_susurro",
+    "tanque_largo",
+    "escudo_termico",
+    "capsula",
+    "paracaidas",
+    "panel_solar",
+    "bateria",
+    "antena"
+  ],
+  "lessons": {
+    "assembly": {
+      "title": "Construye de abajo hacia arriba",
+      "text": "Selecciona la pieza resaltada. La posición se numera desde la base. Puedes retirar o mover piezas; la guía vuelve al primer requisito pendiente."
+    },
+    "countdown": {
+      "title": "Ignición en T-0",
+      "text": "Activa Ignición cuando el reloj marque cero. La práctica espera en T-0: una pulsación temprana explica el error sin consumir combustible."
+    },
+    "ascent": {
+      "title": "Sigue el corredor",
+      "text": "Ajusta potencia y orientación. La asistencia sigue el corredor cuando sueltas el giro. Vigila presión y combustible de la etapa activa."
+    },
+    "steering": {
+      "title": "Aprende a orientar",
+      "text": "Vuelo congelado. Gira hasta alinear el indicador con el objetivo. Después la asistencia mantendrá el corredor cuando sueltes el control."
+    },
+    "maxq": {
+      "title": "Reduce la carga del aire",
+      "text": "Vuelo congelado. Baja la potencia hasta 60 % [DIS]. A mucha velocidad en aire denso aumenta la presión sobre la nave. Bajar potencia reduce esa carga."
+    },
+    "stage_ready": {
+      "title": "Ahora sí: separa la primera etapa",
+      "text": "Vuelo congelado. La etapa activa está vacía; la superior conserva motor y combustible. Activa Separar. Soltar antes habría desperdiciado combustible útil."
+    },
+    "jammed": {
+      "title": "Desacoplador atascado",
+      "text": "Avería programada de práctica. El cierre no se liberó. Usa Reparar; después vuelve a activar Separar. El vuelo permanece congelado."
+    },
+    "stage_repaired": {
+      "title": "Reintenta la separación",
+      "text": "El cierre está reparado. Activa Separar una sola vez para descartar el motor y tanque vacíos de abajo."
+    },
+    "upper_power": {
+      "title": "Comprueba la nueva etapa",
+      "text": "La masa descartada ya no pesa. Sube la potencia hasta 100 % [DIS] para comprobar que Susurro produce empuje con su propio tanque."
+    },
+    "orbit": {
+      "title": "Órbita y regreso",
+      "text": "Llegaste a órbita. La velocidad horizontal sostiene el vuelo. Inicia Regreso para aprender a frenar en sentido contrario al movimiento."
+    },
+    "retrograde": {
+      "title": "Apunta contra el movimiento",
+      "text": "Gira hasta el objetivo retrógrado de -90 grados [DIS]. Apuntar a favor del movimiento aceleraría la nave."
+    },
+    "deorbit": {
+      "title": "Frena para regresar",
+      "text": "Sube la potencia. El encendido retrógrado reduce la velocidad orbital y consume la reserva de la etapa superior."
+    },
+    "entry": {
+      "title": "Elige el corredor de entrada",
+      "text": "Ajusta el ángulo dentro de la franja verde y activa Entrar. Muy plano puede hacerte salir de la atmósfera; demasiado empinado concentra calor y carga. El tramo de costa se resume [DIS]."
+    },
+    "descent": {
+      "title": "Deja trabajar al escudo",
+      "text": "El aire frena la nave y calienta el escudo. Observa su reserva. Espera la ventana segura antes de desplegar el freno del paracaídas."
+    },
+    "drogue_ready": {
+      "title": "Abre el freno del paracaídas",
+      "text": "Vuelo congelado en una ventana segura. Activa Paracaídas para desplegar el freno pequeño. El principal todavía requiere menos velocidad y altura."
+    },
+    "main_ready": {
+      "title": "Abre el paracaídas principal",
+      "text": "Vuelo congelado. Activa Paracaídas otra vez: el principal aumenta el área y reduce la velocidad de caída."
+    },
+    "complete": {
+      "title": "Práctica completada",
+      "text": "Construiste dos etapas, redujiste la carga del aire, reparaste el cierre, separaste sin desperdiciar combustible y regresaste con escudo y paracaídas. Puedes volver al hangar o repetir."
+    },
+    "failed": {
+      "title": "Revisa y reintenta",
+      "text": "Usa Reintentar para recuperar el último punto de control. La práctica no cambia créditos, deuda, contratos ni inventario."
+    },
+    "power_restore": {
+      "title": "Recupera potencia para subir",
+      "text": "La presión actual está por debajo del límite de carga. Vuelve a subir la potencia al 100 % [DIS] para sostener el ascenso. Reducirla durante demasiado tiempo desperdicia combustible luchando contra la gravedad."
+    }
+  },
+  "maxq_warning": 10000.0,
+  "entry_rate": 6.0,
+  "restore_throttle": 1.0
+}

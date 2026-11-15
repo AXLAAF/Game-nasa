@@ -58,6 +58,7 @@ func _ready() -> void:
 	Ui.legend(col, "Seguro de la nave")
 	_insurance_box = Ui.hbox(col, 4)
 	Ui.button(col, "Manual de vuelo", func() -> void: Tutorial.replay())
+	Ui.button(col, "Práctica: mi primer cohete", func() -> void: Router.go(&"training"))
 	Ui.legend(col, "Lecciones")
 	if Profile.lessons.is_empty():
 		var none := Ui.label(col, "Ninguna todavía. Se aprenden perdiendo naves.", Ui.SIZE_TEXT, Ui.IVORY_DIM)
