@@ -71,6 +71,7 @@ func _ready() -> void:
 	_build_hud()
 	_pad_drop = Run.ship.height_px() * 0.5
 	Run.ship.auto_stage()
+	ShipInterior.spawn(self) ## segundo jugador, si la partida lo pide
 
 
 func _build_hud() -> void:
@@ -95,17 +96,30 @@ func _build_hud() -> void:
 	Ui.place(ticker, Rect2(12, 12, 380, 200))
 	root.add_child(ticker)
 	_banner = Ui.banner(root, Ui.SIZE_HERO, 80)
-	# El dial del corredor va abajo a la derecha, fuera de la vertical del cohete.
 	_dial = Control.new()
-	_dial.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
-	_dial.offset_left = -200
-	_dial.offset_right = -20
-	_dial.offset_top = -Ui.CONSOLE_H - 210
-	_dial.offset_bottom = -Ui.CONSOLE_H - 30
 	_dial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_dial.draw.connect(_draw_dial)
 	root.add_child(_dial)
 	Ui.keys(root, "W/S acelerador   A/D cabeceo   1-4 tiempo   Espacio ignición o etapa   C estado   Retroceso abortar")
+	_place_dial()
+
+
+func _place_dial() -> void:
+	if Run.crew >= 2:
+		var vp := get_viewport().get_visible_rect().size
+		var cx := (vp.x - ShipInterior.panel_width()) * 0.5
+		var cy := vp.y * 0.5
+		_dial.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		_dial.offset_left = cx - 90.0
+		_dial.offset_top = cy - 90.0
+		_dial.offset_right = cx + 90.0
+		_dial.offset_bottom = cy + 90.0
+	else:
+		_dial.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+		_dial.offset_left = -200.0
+		_dial.offset_right = -20.0
+		_dial.offset_top = -Ui.CONSOLE_H - 210.0
+		_dial.offset_bottom = -Ui.CONSOLE_H - 30.0
 
 
 func _rebuild_exhausts() -> void:
@@ -120,23 +134,21 @@ func _rebuild_exhausts() -> void:
 		_exhausts.append(p)
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not event.is_pressed() or event.is_echo():
-		return
-	var key := (event as InputEventKey).physical_keycode
-	if key == KEY_SPACE:
+func _unhandled_input(_event: InputEvent) -> void:
+	if Controls.cmd_just(&"cmd_confirm"):
 		if state == State.COUNTDOWN:
 			_ignite()
 		elif state == State.ASCENT:
 			_try_stage()
-	elif key == KEY_BACKSPACE and state == State.ASCENT:
+	if Controls.cmd_just(&"cmd_abort") and state == State.ASCENT:
 		_abort()
-	elif key == KEY_C:
+	if Controls.cmd_just(&"cmd_status"):
 		Ui.toggle_status(self)
-	elif key >= KEY_1 and key <= KEY_4:
-		warp_i = key - KEY_1
+	var next := Controls.warp_choice(LAUNCH_WARPS.size(), warp_i)
+	if next != warp_i:
+		warp_i = next
 		Events.toast.emit("Tiempo %s" % ("x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])), Ui.INFO)
-	elif key == KEY_R and state == State.ASCENT and not lifted and stuck_time > 2.5:
+	if Controls.cmd_just(&"cmd_repair") and state == State.ASCENT and not lifted and stuck_time > 2.5:
 		_scrub()
 
 
@@ -265,13 +277,16 @@ func _process(delta: float) -> void:
 func _fly(delta: float) -> void:
 	var dt := minf(delta, 0.05) * SIM_SPEED * LAUNCH_WARPS[warp_i]
 	flight_time += delta
-	if Input.is_physical_key_pressed(KEY_W): throttle = minf(throttle + delta * 0.8, 1.0)
-	if Input.is_physical_key_pressed(KEY_S): throttle = maxf(throttle - delta * 0.8, 0.0)
-	if Input.is_physical_key_pressed(KEY_Z): throttle = 1.0
-	if Input.is_physical_key_pressed(KEY_X): throttle = 0.0
-	var turn := 0.0
-	if Input.is_physical_key_pressed(KEY_A): turn -= 1.0
-	if Input.is_physical_key_pressed(KEY_D): turn += 1.0
+	var axis := Controls.throttle_axis()
+	if axis > 0.0:
+		throttle = minf(throttle + delta * 0.8 * axis, 1.0)
+	elif axis < 0.0:
+		throttle = maxf(throttle + delta * 0.8 * axis, 0.0)
+	if Controls.cmd_held(&"cmd_throttle_full"):
+		throttle = 1.0
+	if Controls.cmd_held(&"cmd_throttle_zero"):
+		throttle = 0.0
+	var turn := Controls.steer()
 	if Profile.assist and turn == 0.0 and lifted:
 		pitch = move_toward(pitch, target_pitch(), PITCH_RATE * 0.55 * delta)
 	pitch += turn * PITCH_RATE * Run.channel(&"mobility") * delta + _asymmetry() * delta
@@ -510,6 +525,7 @@ func _draw() -> void:
 
 
 func _update_hud() -> void:
+	_place_dial()
 	var ship := Run.ship
 	var ap := h + (vy * vy / (2.0 * maxf(RocketMath.effective_gravity(body, vx), 0.5)) if vy > 0.0 else 0.0)
 	var warp_txt := "x%.1f" % LAUNCH_WARPS[warp_i] if LAUNCH_WARPS[warp_i] < 1.0 else "x%d" % int(LAUNCH_WARPS[warp_i])

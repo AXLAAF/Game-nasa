@@ -29,7 +29,7 @@ Con 2 jugadores: piloto+navegante y ingeniero+comandante.
 
 1. **Información repartida.** El navegante ve trayectoria y «falta»; el piloto ve la nave y la flecha. Tienen que hablar.
 2. **Canales como puestos.** Si se rompe la computadora, el mapa del navegante baja (`Run.channel`). Una pieza rota es un problema de equipo.
-3. **Una sola avería a la vez.** El ingeniero trabaja sin congelar al piloto.
+3. **Averías sin congelar al piloto.** Con un jugador solo hay una crítica abierta. Con dos, otra puede abrirse tras la tregua de 20 s aunque la primera siga rota: el comandante recibe un aviso y puede tirar la más antigua con V a peores odds; el tripulante ve la marca y la repara en el corte.
 4. **Cartas sin pausa global.** La carta va al comandante (nave en x0.5) o hay voto con timer; si se acaba, decide el comandante.
 5. **Warp por consenso.** El navegante propone; el piloto confirma soltando el motor (ya no se acelera con motor encendido).
 6. **Fracaso compartido.** Rebote, paracaídas roto y debrief son historia del grupo.

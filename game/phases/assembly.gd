@@ -326,9 +326,10 @@ func _build_right(root: Control) -> void:
 		Router.go(&"hangar"))
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if event.is_pressed() and (event as InputEventKey).physical_keycode in [KEY_DELETE, KEY_BACKSPACE] and _selected >= 0:
+func _unhandled_input(_event: InputEvent) -> void:
+	if Controls.cmd_just(&"cmd_abort") and _selected >= 0:
 		remove_part(_selected)
+		get_viewport().set_input_as_handled()
 
 
 func selected_index() -> int:

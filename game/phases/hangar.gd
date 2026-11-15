@@ -10,7 +10,13 @@ var _credit_label: Label
 var _runs_label: Label
 var _deliveries_label: Label
 var _best_label: Label
+var _players_label: Label
 var _insurance_box: HBoxContainer
+var _p1_lamp: Lamp
+var _p2_lamp: Lamp
+var _p2_hint: Label
+var _join_button: Button
+var _first_focus: Control
 var _reset_armed: bool = false
 var _time: float = 0.0
 var _home: Planet
@@ -19,6 +25,7 @@ var _moon: Planet
 
 func _ready() -> void:
 	_rng.randomize()
+	Run.crew = clampi(Profile.crew, 1, 2)
 	var stars := Starfield.new()
 	add_child(stars)
 	stars.set_sky(Color(0.01, 0.015, 0.04), 1.0)
@@ -43,9 +50,12 @@ func _ready() -> void:
 	_runs_label = Ui.readout(maker_row, "Partidas", "", 100.0)
 	_deliveries_label = Ui.readout(maker_row, "Entregas", "", 100.0)
 	_best_label = Ui.readout(maker_row, "Mejor pago", "", 120.0)
+	_players_label = Ui.readout(maker_row, "Jugadores", "", 110.0)
 	var left := Ui.panel(root)
 	Ui.place(left, Rect2(40, 170, 330, 0))
 	var col := Ui.vbox(left, 8)
+	Ui.legend(col, "Jugadores")
+	_build_player_slots(col)
 	Ui.legend(col, "Seguro de la nave")
 	_insurance_box = Ui.hbox(col, 4)
 	Ui.legend(col, "Ajustes")
@@ -84,7 +94,29 @@ func _ready() -> void:
 	Ui.button(head, "Pedir contratos nuevos (%s)" % Ui.money(REROLL_COST), _reroll)
 	_board = Ui.vbox(board_col, 10)
 	_refresh()
+	_update_players_ui()
+	_focus_menu()
 	Synth.play(&"chime", -6.0)
+
+
+func _build_player_slots(col: Node) -> void:
+	var p1 := Ui.hbox(col, 8)
+	Ui.label(p1, "P1 Comandante", Ui.SIZE_TEXT, Ui.IVORY)
+	_p1_lamp = Lamp.new("Conectado", Lamp.GO)
+	_p1_lamp.custom_minimum_size = Vector2(110, 26)
+	_p1_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	p1.add_child(_p1_lamp)
+	var p2 := Ui.hbox(col, 8)
+	Ui.label(p2, "P2 Tripulante", Ui.SIZE_TEXT, Ui.IVORY)
+	_p2_lamp = Lamp.new("Ausente", Lamp.OFF)
+	_p2_lamp.custom_minimum_size = Vector2(110, 26)
+	_p2_lamp.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	p2.add_child(_p2_lamp)
+	_p2_hint = Ui.label(col, "", Ui.SIZE_LEGEND, Ui.INFO)
+	_p2_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_p2_hint.custom_minimum_size = Vector2(300, 0)
+	_join_button = Ui.button(col, "Unirse (jugador 2)", _toggle_join_button)
+	_join_button.tooltip_text = "El segundo jugador pulsa A en el mando o J en el teclado. P1 pilota con el teclado."
 
 
 func _refresh() -> void:
@@ -100,8 +132,30 @@ func _refresh() -> void:
 		Ui.mark_selected(b, i == Profile.insurance)
 	for child: Node in _board.get_children():
 		child.queue_free()
+	_first_focus = null
 	for contract: Contract in Profile.board(_rng):
 		_contract_card(contract)
+	_update_players_ui()
+
+
+func _update_players_ui() -> void:
+	var duo := Run.crew >= 2
+	_players_label.text = str(Run.crew)
+	_players_label.add_theme_color_override("font_color", Ui.LAMP_GO if duo else Ui.IVORY)
+	_p1_lamp.text = "Conectado".to_upper()
+	_p1_lamp.state = Lamp.GO
+	if duo:
+		_p2_lamp.text = "Conectado".to_upper()
+		_p2_lamp.state = Lamp.GO
+		_p2_hint.text = "Tripulante listo. En vuelo usa flechas o el mando. P1 pilota con el teclado. Pulsa B / K para salir."
+		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_GO)
+		_join_button.text = "Desconectar jugador 2"
+	else:
+		_p2_lamp.text = "Esperando".to_upper()
+		_p2_lamp.state = Lamp.CAUTION
+		_p2_hint.text = "Pulsa A en el mando o J para unirte. P1 pilota con el teclado, como en un jugador."
+		_p2_hint.add_theme_color_override("font_color", Ui.LAMP_CAUTION)
+		_join_button.text = "Unirse (jugador 2)"
 
 
 func _contract_card(contract: Contract) -> void:
@@ -126,6 +180,15 @@ func _contract_card(contract: Contract) -> void:
 	var accept := Ui.primary(Ui.button(row, "Aceptar contrato", _accept.bind(contract)))
 	accept.custom_minimum_size = Vector2(170, 44)
 	accept.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if _first_focus == null:
+		_first_focus = accept
+
+
+func _focus_menu() -> void:
+	if _first_focus != null and is_instance_valid(_first_focus):
+		_first_focus.grab_focus()
+	elif _join_button != null:
+		_join_button.grab_focus()
 
 
 ## Interruptor: tecla con su lampara de estado al lado.
@@ -162,6 +225,7 @@ func _set_insurance(level: int) -> void:
 	Profile.insurance = level
 	Profile.save_profile()
 	_refresh()
+	_focus_menu()
 
 
 func _toggle_assist() -> void:
@@ -172,6 +236,23 @@ func _toggle_assist() -> void:
 	Router.go(&"hangar")
 
 
+func _toggle_join_button() -> void:
+	_set_crew(1 if Run.crew >= 2 else 2)
+
+
+func _set_crew(count: int) -> void:
+	var next := clampi(count, 1, 2)
+	if next == Run.crew:
+		return
+	Run.crew = next
+	Profile.crew = next
+	Profile.save_profile()
+	Synth.play(&"chime" if next >= 2 else &"beep")
+	Events.toast.emit("2 jugadores conectados" if next >= 2 else "1 jugador conectado", Ui.LAMP_GO if next >= 2 else Ui.IVORY_DIM)
+	Juice.flash(Ui.LAMP_GO if next >= 2 else Ui.IVORY, 0.25)
+	_update_players_ui()
+
+
 func _reroll() -> void:
 	if Profile.credits < REROLL_COST:
 		Synth.play(&"deny")
@@ -180,6 +261,7 @@ func _reroll() -> void:
 	Profile.clear_board()
 	Synth.play(&"coin")
 	_refresh()
+	_focus_menu()
 
 
 func _accept(contract: Contract) -> void:
@@ -190,6 +272,10 @@ func _accept(contract: Contract) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta
+	if Controls.join_just() and Run.crew < 2:
+		_set_crew(2)
+	elif Controls.leave_just() and Run.crew >= 2:
+		_set_crew(1)
 	queue_redraw()
 
 

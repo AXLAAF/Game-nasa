@@ -19,7 +19,55 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var music_failed: int = await music_suite.new().run()
-	quit(1 if failed + broken + music_failed > 0 else 0)
+	var coop_suite: Script = load("res://tests/coop_tests.gd")
+	if coop_suite == null:
+		push_error("FAIL: los tests de cooperativo no compilan")
+		quit(1)
+		return
+	var coop_failed: int = await coop_suite.new().run()
+	var io_suite: Script = load("res://tests/test_coop_io.gd")
+	if io_suite == null:
+		push_error("FAIL: los tests de caja negra/blanca no compilan")
+		quit(1)
+		return
+	var io_failed: int = _run_mcp_suite(io_suite)
+	quit(1 if failed + broken + music_failed + coop_failed + io_failed > 0 else 0)
+
+
+func _run_mcp_suite(suite_script: Script) -> int:
+	var suite: McpTestSuite = suite_script.new()
+	var methods: Array = []
+	for info: Dictionary in suite.get_method_list():
+		var name: String = str(info.name)
+		if name.begins_with("test_"):
+			methods.append(name)
+	methods.sort()
+	suite.suite_setup({})
+	if suite._suite_failed:
+		push_error("FAIL setup: %s" % suite._suite_failed_message)
+		return 1
+	var failed := 0
+	var passed := 0
+	for name: String in methods:
+		suite._reset()
+		suite.setup()
+		var returned: Variant = suite.call(name)
+		if returned is Object and str(returned.get_class()) == "GDScriptFunctionState":
+			failed += 1
+			push_error("FAIL %s: el test no puede suspenderse" % name)
+		elif suite._failed:
+			failed += 1
+			push_error("FAIL %s: %s" % [name, suite._message])
+		elif suite._skipped:
+			print("SKIP %s: %s" % [name, suite._skip_reason])
+		else:
+			passed += 1
+		suite.teardown()
+		suite._free_tracked()
+	suite.suite_teardown()
+	suite._free_tracked()
+	print("CoopIO: %d passed, %d failed" % [passed, failed])
+	return failed
 
 
 func _compile(path: String) -> int:

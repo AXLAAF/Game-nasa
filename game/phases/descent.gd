@@ -89,6 +89,7 @@ func _ready() -> void:
 			corridor += Vector2.ONE * Run.rng.randf_range(-2.0, 2.0)
 		gamma = edge - width * 0.5
 		_say("Corredor de entrada", Ui.INFO)
+	ShipInterior.spawn(self)
 
 
 func _hidden_hazard() -> void:
@@ -194,33 +195,28 @@ func agl() -> float:
 
 # ---------------------------------------------------------------- input
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not event.is_pressed() or event.is_echo():
-		return
-	match (event as InputEventKey).physical_keycode:
-		KEY_SPACE:
-			if state == State.APPROACH:
-				_commit()
-			elif state == State.FLIGHT or state == State.ENTRY:
-				_stage()
-		KEY_P:
-			if state == State.ENTRY or state == State.FLIGHT:
-				_deploy_chute()
-		KEY_E:
-			if state == State.ENTRY or state == State.FLIGHT:
-				_eject()
-		KEY_C:
-			Ui.toggle_status(self)
-		KEY_T:
-			hold_retro = not hold_retro
-		KEY_1, KEY_2, KEY_3, KEY_4:
-			var next := (event as InputEventKey).physical_keycode - KEY_1
-			if next >= 2 and (heat > 0.05 or agl() < 3000.0):
-				Events.toast.emit("Demasiado bajo o caliente para acelerar", Ui.LAMP_CAUTION)
-				warp_i = 1
-			else:
-				warp_i = next
-				Events.toast.emit("Tiempo %s" % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.INFO)
+func _unhandled_input(_event: InputEvent) -> void:
+	if Controls.cmd_just(&"cmd_confirm"):
+		if state == State.APPROACH:
+			_commit()
+		elif state == State.FLIGHT or state == State.ENTRY:
+			_stage()
+	if Controls.cmd_just(&"cmd_parachute") and (state == State.ENTRY or state == State.FLIGHT):
+		_deploy_chute()
+	if Controls.cmd_just(&"cmd_eject") and (state == State.ENTRY or state == State.FLIGHT):
+		_eject()
+	if Controls.cmd_just(&"cmd_status"):
+		Ui.toggle_status(self)
+	if Controls.cmd_just(&"cmd_hold_pro") or Controls.cmd_just(&"cmd_hold_retro"):
+		hold_retro = not hold_retro
+	var next := Controls.warp_choice(DESCENT_WARPS.size(), warp_i)
+	if next != warp_i:
+		if next >= 2 and (heat > 0.05 or agl() < 3000.0):
+			Events.toast.emit("Demasiado bajo o caliente para acelerar", Ui.LAMP_CAUTION)
+			warp_i = 1
+		else:
+			warp_i = next
+			Events.toast.emit("Tiempo %s" % ("x%.1f" % DESCENT_WARPS[warp_i] if DESCENT_WARPS[warp_i] < 1.0 else "x%d" % int(DESCENT_WARPS[warp_i])), Ui.INFO)
 
 
 func _commit() -> void:
@@ -302,8 +298,11 @@ func _process(delta: float) -> void:
 		_explode()
 	match state:
 		State.APPROACH:
-			if Input.is_physical_key_pressed(KEY_W): gamma = minf(gamma + delta * 3.0, -0.5)
-			if Input.is_physical_key_pressed(KEY_S): gamma = maxf(gamma - delta * 3.0, -15.0)
+			var axis := Controls.throttle_axis()
+			if axis > 0.0:
+				gamma = minf(gamma + delta * 3.0 * axis, -0.5)
+			elif axis < 0.0:
+				gamma = maxf(gamma + delta * 3.0 * axis, -15.0)
 		State.ENTRY, State.FLIGHT:
 			_fly(delta)
 	if _over_timer > 0.0:
@@ -325,9 +324,7 @@ func _fly(delta: float) -> void:
 	var mobility := Run.channel(&"mobility")
 	if state == State.ENTRY:
 		lift = 0.0
-		if Input.is_physical_key_pressed(KEY_W): lift = 1.0
-		if Input.is_physical_key_pressed(KEY_S): lift = -1.0
-		lift *= mobility
+		lift = Controls.throttle_axis() * mobility
 		throttle = 0.0
 		pitch = rad_to_deg(atan2(-vx, -vy))
 		if Vector2(vx, vy).length() < v_orb * 0.45 or agl() < 7000.0:
@@ -335,13 +332,15 @@ func _fly(delta: float) -> void:
 			_say("Control manual", Ui.INFO)
 	else:
 		lift = 0.0
-		if Input.is_physical_key_pressed(KEY_W): throttle = minf(throttle + delta * 1.2, 1.0)
-		if Input.is_physical_key_pressed(KEY_S): throttle = maxf(throttle - delta * 1.2, 0.0)
-		if Input.is_physical_key_pressed(KEY_Z): throttle = 1.0
-		if Input.is_physical_key_pressed(KEY_X): throttle = 0.0
-		var turn := 0.0
-		if Input.is_physical_key_pressed(KEY_A): turn -= 1.0
-		if Input.is_physical_key_pressed(KEY_D): turn += 1.0
+		if Controls.throttle_axis() > 0.0:
+			throttle = minf(throttle + delta * 1.2 * Controls.throttle_axis(), 1.0)
+		elif Controls.throttle_axis() < 0.0:
+			throttle = maxf(throttle + delta * 1.2 * Controls.throttle_axis(), 0.0)
+		if Controls.cmd_held(&"cmd_throttle_full"):
+			throttle = 1.0
+		if Controls.cmd_held(&"cmd_throttle_zero"):
+			throttle = 0.0
+		var turn := Controls.steer()
 		if turn != 0.0:
 			hold_retro = false
 			pitch = clampf(pitch + turn * 50.0 * mobility * delta, -100.0, 100.0)
@@ -603,6 +602,7 @@ func _update_view(delta: float) -> void:
 	var ground := agl()
 	var target_scale := clampf(320.0 / maxf(ground, 40.0), 0.004, 6.0)
 	_scale = lerpf(_scale, target_scale, minf(delta * 3.0, 1.0))
+	_cam.position = ShipInterior.view_shift(1.0)
 	var density := clampf(RocketMath.density(body, h) / 1.225 * 4.0, 0.0, 1.0) if body.atmosphere > 0.0 else 0.0
 	var sky := Color(0.01, 0.015, 0.04).lerp(Color(body.atmo_color.r, body.atmo_color.g, body.atmo_color.b), density * 0.8)
 	_stars.set_sky(sky, 1.0 - density)

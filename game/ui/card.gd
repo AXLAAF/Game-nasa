@@ -1,12 +1,16 @@
 class_name Card
 extends CanvasLayer
 
-## Carta de decision: averias, encuentros y apuestas. Pausa el juego, muestra las
-## probabilidades (con niebla si no escaneaste) y resuelve con una ruleta.
+## Carta de decision: averias, encuentros y apuestas.
+## En 1 jugador la avería pausa. En 2, el vuelo sigue: aviso, marca y tirada con V.
 ## data: title, text, tone (malfunction/encounter/bet/info), choices, part, rarity, scanned.
+
+const QUICK_ODDS := 0.55 ## decisión rápida del comandante: más fracaso
 
 static var _queue: Array = []
 static var _open: Card
+static var _faults: Array[Dictionary] = []
+static var _watch: FaultWatch
 
 var data: Dictionary = {}
 var on_done: Callable
@@ -20,6 +24,7 @@ var _needle: float = 0.0
 var _odds: float = 1.0
 var _bar: Control
 var _last_side: int = -1
+var _locked: bool = false
 
 
 static func show_card(card_data: Dictionary, callback: Callable = Callable()) -> void:
@@ -40,13 +45,169 @@ static func busy() -> bool:
 
 static func clear_queue() -> void:
 	_queue.clear()
+	_faults.clear()
 	if _open != null and is_instance_valid(_open):
 		_open.queue_free()
 	_open = null
+	_drop_watch()
+
+
+static func open_faults() -> Array[ShipPart]:
+	var out: Array[ShipPart] = []
+	for row: Dictionary in _faults:
+		var part: ShipPart = row.get("part") as ShipPart
+		if part != null:
+			out.append(part)
+	return out
+
+
+## El jugador 2 ya reparó la pieza. El callback de la fase recibe ese resultado.
+static func release_fault(part: ShipPart, success: bool) -> void:
+	var pending: Array[Callable] = []
+	for i: int in range(_faults.size() - 1, -1, -1):
+		var row: Dictionary = _faults[i]
+		if row.get("part") != part:
+			continue
+		var callback: Callable = row.get("callback", Callable())
+		_faults.remove_at(i)
+		if callback.is_valid():
+			pending.append(callback)
+	_sync_watch()
+	for callback: Callable in pending:
+		callback.call(success)
+
+
+## Tira la avería más antigua. roll < 0 usa Run.rng. No pausa el árbol.
+static func roll_fault(roll: float = -1.0) -> bool:
+	_prune_fixed()
+	if _faults.is_empty():
+		return false
+	var row: Dictionary = _faults.pop_front()
+	var part: ShipPart = row.get("part") as ShipPart
+	var choice: ChoiceDef = row.get("choice") as ChoiceDef
+	var callback: Callable = row.get("callback", Callable())
+	var odds := _fault_odds(row)
+	var sample := Run.rng.randf() if roll < 0.0 else roll
+	var ok := sample < odds
+	if choice != null and not choice.cost.is_empty():
+		Run.apply(choice.cost, part)
+	if ok:
+		if choice != null:
+			Run.apply(choice.win, part)
+		Run.win_streak()
+		if part != null and part.broken:
+			Run.apply({"fix": true}, part)
+	else:
+		if choice != null:
+			Run.apply(choice.lose, part)
+		Run.lose_streak()
+		if part != null and not part.broken:
+			Run.apply({"break": true}, part)
+	Events.toast.emit("Tirada %.0f%% → %s" % [odds * 100.0, "éxito" if ok else "fallo"], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
+	if ok:
+		Synth.play(&"win")
+	else:
+		Synth.play(&"lose")
+	_sync_watch()
+	if callback.is_valid():
+		callback.call(ok)
+	return true
+
+
+static func _service_faults() -> void:
+	_prune_fixed()
+	if _watch != null and is_instance_valid(_watch):
+		_watch.set_text(_banner_text() if not _faults.is_empty() else "")
+	if _faults.is_empty() or busy():
+		return
+	if Controls.cmd_just(&"cmd_snap"):
+		roll_fault()
+
+
+static func _fault_odds(row: Dictionary) -> float:
+	var choice: ChoiceDef = row.get("choice") as ChoiceDef
+	if choice != null and choice.odds < 1.0 and choice.minigame == &"":
+		return clampf(choice.odds * QUICK_ODDS, 0.05, 0.95)
+	return QUICK_ODDS
+
+
+static func _banner_text() -> String:
+	if _faults.is_empty():
+		return ""
+	var row: Dictionary = _faults[0]
+	var part: ShipPart = row.get("part") as ShipPart
+	var name := part.def.display_name if part != null else "Pieza"
+	var odds := _fault_odds(row)
+	var where := "en el casco" if part != null and ShipInterior.is_exterior(part.def.kind) else "en la cabina"
+	if _faults.size() == 1:
+		return "%s averiada, %s. V o Y: tirada al %.0f%%." % [name, where, odds * 100.0]
+	return "%d averías. V tira %s al %.0f%%. El tripulante va a la marca." % [_faults.size(), name, odds * 100.0]
+
+
+static func _prune_fixed() -> void:
+	var pending: Array[Callable] = []
+	for i: int in range(_faults.size() - 1, -1, -1):
+		var row: Dictionary = _faults[i]
+		var part: ShipPart = row.get("part") as ShipPart
+		if part != null and part.broken:
+			continue
+		var callback: Callable = row.get("callback", Callable())
+		_faults.remove_at(i)
+		if callback.is_valid():
+			pending.append(callback)
+	if not pending.is_empty():
+		_sync_watch()
+	for callback: Callable in pending:
+		callback.call(true)
+
+
+static func _sync_watch() -> void:
+	if _faults.is_empty():
+		_drop_watch()
+		return
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	if _watch == null or not is_instance_valid(_watch):
+		_watch = FaultWatch.new()
+		tree.root.add_child(_watch)
+	_watch.set_text(_banner_text())
+
+
+static func _drop_watch() -> void:
+	if _watch != null and is_instance_valid(_watch):
+		_watch.queue_free()
+	_watch = null
+
+
+static func _remember_fault(part: ShipPart, choice: ChoiceDef, callback: Callable) -> void:
+	for row: Dictionary in _faults:
+		if row.get("part") == part:
+			return
+	_faults.append({"part": part, "choice": choice, "callback": callback})
+	_sync_watch()
 
 
 ## Elige una averia del catalogo para la pieza y la muestra.
 static func malfunction(part: ShipPart, callback: Callable = Callable()) -> void:
+	if Run.crew >= 2:
+		Run.apply({"break": true}, part)
+		var options := Catalog.malfunctions_for(part.def.kind)
+		var def: MalfunctionDef = null
+		var choice: ChoiceDef = null
+		if not options.is_empty():
+			def = options[Run.rng.randi_range(0, options.size() - 1)]
+			for candidate: ChoiceDef in def.choices:
+				if candidate.odds < 1.0 and candidate.minigame == &"":
+					choice = candidate
+					break
+		var title := def.title if def != null else "Avería"
+		Events.malfunction.emit(part.def.display_name, title)
+		Synth.play(&"alarm")
+		Juice.hit(0.5)
+		_remember_fault(part, choice, callback)
+		Events.toast.emit(_banner_text(), Ui.LAMP_WARNING)
+		return
 	var options := Catalog.malfunctions_for(part.def.kind)
 	if options.is_empty():
 		Run.apply({"break": true}, part)
@@ -68,22 +229,37 @@ static func malfunction(part: ShipPart, callback: Callable = Callable()) -> void
 func _ready() -> void:
 	layer = 50
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	get_tree().paused = true
+	var coop := Run.crew >= 2
+	if coop:
+		get_tree().paused = false
+		Engine.time_scale = 1.0
+	else:
+		get_tree().paused = true
 	_scanned = bool(data.get("scanned", false))
 	_root = Ui.root(self, 50)
-	_root.mouse_filter = Control.MOUSE_FILTER_STOP
+	_root.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
 	var dim := ColorRect.new()
-	dim.color = Color(0, 0, 0, 0.65)
+	dim.color = Color(0, 0, 0, 0.0 if coop else 0.65)
+	dim.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
 	dim.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_root.add_child(dim)
 	var center := CenterContainer.new()
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE if coop else Control.MOUSE_FILTER_STOP
+	if coop:
+		center.offset_right = -300.0
 	_root.add_child(center)
 	_panel = PanelContainer.new()
 	_panel.custom_minimum_size = Vector2(600, 0)
+	if coop:
+		_panel.mouse_filter = Control.MOUSE_FILTER_STOP
 	center.add_child(_panel)
 	_body = Ui.vbox(_panel, 10)
 	_build()
+	if Run.crew >= 2 and _has_risk(data.get("choices", [])):
+		var tip := Ui.label(_body, "Elige una opción. V o Y la apura con peores probabilidades.", Ui.SIZE_LEGEND, Ui.LAMP_CAUTION)
+		tip.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		tip.custom_minimum_size = Vector2(560, 0)
 	_panel.modulate.a = 0.0
 	_panel.scale = Vector2(0.9, 0.9)
 	_panel.pivot_offset = Vector2(300, 150)
@@ -109,6 +285,8 @@ func _build() -> void:
 		child.queue_free()
 	var header := Ui.hbox(_body)
 	var tag := "Avería" if data.get("tone") == &"malfunction" else ("Apuesta" if data.get("tone") == &"bet" else "Encuentro")
+	if data.get("tone") == &"malfunction" and data.get("part") == null:
+		tag = "Evento"
 	if data.get("tone") == &"encounter":
 		tag = "%s: %s" % [tag, Ui.RARITY_NAMES[clampi(int(data.get("rarity", 0)), 0, 2)]]
 	if data.get("tone") == &"info":
@@ -207,6 +385,41 @@ func _choose(index: int) -> void:
 	_spin(choice)
 
 
+func _process(_delta: float) -> void:
+	if Run.crew < 2 or _bar != null:
+		return
+	if not Controls.cmd_just(&"cmd_snap"):
+		return
+	_quick_decide()
+
+
+func _quick_decide() -> void:
+	if _locked:
+		return
+	var choices: Array = data.get("choices", [])
+	var pick: ChoiceDef = null
+	for i: int in choices.size():
+		var choice: ChoiceDef = choices[i]
+		if choice.odds < 1.0 and choice.minigame == &"":
+			pick = choice
+			break
+	if pick == null:
+		Events.toast.emit("No hay apuesta pendiente", Ui.IVORY_DIM)
+		return
+	_locked = true
+	for row: Node in _choices_box.get_children():
+		for child: Node in row.get_children():
+			if child is Button:
+				child.disabled = true
+	if not pick.cost.is_empty():
+		Run.apply(pick.cost, data.get("part"))
+	var odds := clampf(pick.odds * QUICK_ODDS, 0.05, 0.95)
+	var roll := Run.rng.randf()
+	var ok := roll < odds
+	Events.toast.emit("Decisión rápida %.0f%% → %s" % [odds * 100.0, "éxito" if ok else "fallo"], Ui.LAMP_GO if ok else Ui.LAMP_WARNING)
+	_resolve(pick, ok)
+
+
 func _spin(choice: ChoiceDef) -> void:
 	_bar = Control.new()
 	_bar.custom_minimum_size = Vector2(560, 46)
@@ -280,8 +493,41 @@ func _close(success: bool) -> void:
 	queue_free()
 	if _queue.is_empty():
 		get_tree().paused = false
+		if Run.crew >= 2:
+			Engine.time_scale = 1.0
 	else:
 		var next: Array = _queue.pop_front()
 		show_card(next[0], next[1])
 	if callback.is_valid():
 		callback.call(success)
+
+
+class FaultWatch extends CanvasLayer:
+	var _label: Label
+
+	func _ready() -> void:
+		layer = 40
+		process_mode = Node.PROCESS_MODE_ALWAYS
+		var bg := ColorRect.new()
+		bg.color = Color(0.08, 0.05, 0.04, 0.92)
+		bg.position = Vector2(16, 72)
+		bg.size = Vector2(456, 64)
+		bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(bg)
+		_label = Label.new()
+		_label.position = Vector2(24, 80)
+		_label.size = Vector2(440, 48)
+		_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_label.add_theme_font_override("font", Ui.sans())
+		_label.add_theme_font_size_override("font_size", Ui.SIZE_TEXT)
+		_label.add_theme_color_override("font_color", Ui.LAMP_WARNING)
+		add_child(_label)
+
+	func _process(_delta: float) -> void:
+		Card._service_faults()
+
+	func set_text(text: String) -> void:
+		if _label == null:
+			return
+		_label.text = text

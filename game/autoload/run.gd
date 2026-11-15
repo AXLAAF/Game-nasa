@@ -36,6 +36,7 @@ var space_state: Dictionary = {}
 var pois: Array = []
 var log_lines: PackedStringArray = PackedStringArray()
 var respite: float = 0.0 ## segundos reales sin otro fallo critico
+var crew: int = 1
 
 
 func begin(chosen: Contract) -> void:
@@ -70,6 +71,7 @@ func begin(chosen: Contract) -> void:
 	pois.clear()
 	log_lines.clear()
 	respite = 0.0
+	crew = Profile.crew
 
 
 func _process(delta: float) -> void:
@@ -174,10 +176,11 @@ func roll_stress(stress: float, kinds: Array = [], pool: Array = []) -> Array[Sh
 
 
 ## True si esta pieza puede ser el fallo critico de este momento.
+## Con un jugador solo hay una rota. Con dos, la tregua separa las tiradas y otra puede seguir abierta.
 func admit(part: ShipPart) -> bool:
 	if part == null or part.broken:
 		return false
-	if respite > 0.0 or _has_broken():
+	if respite > 0.0 or (crew < 2 and _has_broken()):
 		part.wear = minf(part.wear + 0.06, 1.0)
 		return false
 	respite = 20.0

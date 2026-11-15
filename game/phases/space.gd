@@ -76,6 +76,7 @@ func _ready() -> void:
 	_stars.set_sky(Color(0.005, 0.008, 0.02), 1.0)
 	_build_hud()
 	Synth.play(&"chime")
+	ShipInterior.spawn(self) ## segundo jugador, si la partida lo pide
 
 
 func _place_ship() -> void:
@@ -181,24 +182,27 @@ func _unhandled_input(event: InputEvent) -> void:
 		elif mb.button_index == MOUSE_BUTTON_LEFT:
 			_pick_target(get_global_mouse_position())
 		return
-	if not (event is InputEventKey) or not event.is_pressed() or event.is_echo():
-		return
-	match (event as InputEventKey).physical_keycode:
-		KEY_1: _set_warp(0)
-		KEY_2: _set_warp(1)
-		KEY_3: _set_warp(2)
-		KEY_4: _set_warp(3)
-		KEY_5: _set_warp(4)
-		KEY_6: _set_warp(5)
-		KEY_TAB: _cycle_target()
-		KEY_T: hold = 0 if hold == 1 else 1
-		KEY_G: hold = 0 if hold == -1 else -1
-		KEY_N: _toggle_nav()
-		KEY_R: _repair_card()
-		KEY_C: Ui.toggle_status(self)
-		KEY_I: _salvage_card()
-		KEY_F: _scan_target()
-		KEY_L: _start_descent()
+	if Controls.cmd_just(&"cmd_cycle"):
+		_cycle_target()
+	if Controls.cmd_just(&"cmd_hold_pro"):
+		hold = 0 if hold == 1 else 1
+	if Controls.cmd_just(&"cmd_hold_retro"):
+		hold = 0 if hold == -1 else -1
+	if Controls.cmd_just(&"cmd_nav"):
+		_toggle_nav()
+	if Controls.cmd_just(&"cmd_repair"):
+		_repair_card()
+	if Controls.cmd_just(&"cmd_status"):
+		Ui.toggle_status(self)
+	if Controls.cmd_just(&"cmd_salvage"):
+		_salvage_card()
+	if Controls.cmd_just(&"cmd_scan"):
+		_scan_target()
+	if Controls.cmd_just(&"cmd_land"):
+		_start_descent()
+	var next := Controls.warp_choice(Run.TIME_SCALES.size(), warp_i)
+	if next != warp_i:
+		_set_warp(next)
 
 
 func _toggle_nav() -> void:
@@ -317,7 +321,7 @@ func _process(delta: float) -> void:
 		_pred_timer = 0.15
 		_predict()
 	_update_hud()
-	_cam.position = st.pos
+	_cam.position = st.pos + ShipInterior.view_shift(zoom)
 	_cam.zoom = Vector2(zoom, zoom)
 	_stars.set_view((st.pos as Vector2) * 0.02)
 	_place_planets()
@@ -342,9 +346,7 @@ func _place_planets() -> void:
 
 func _steer(delta: float) -> void:
 	_nav = _nav_guidance()
-	var turn := 0.0
-	if Input.is_physical_key_pressed(KEY_A): turn -= 1.0
-	if Input.is_physical_key_pressed(KEY_D): turn += 1.0
+	var turn := Controls.steer()
 	var mobility := Run.channel(&"mobility")
 	if turn != 0.0:
 		hold = 0
@@ -387,9 +389,10 @@ func _nav_text() -> String:
 func _thrust(delta: float, dt: float) -> Vector2:
 	var ship := Run.ship
 	var throttle := 0.0
-	if Input.is_physical_key_pressed(KEY_W):
-		throttle = 0.15 if Input.is_physical_key_pressed(KEY_CTRL) else 1.0
-	var over := throttle > 0.0 and Input.is_physical_key_pressed(KEY_SHIFT)
+	var axis := Controls.throttle_axis()
+	if axis > 0.0:
+		throttle = (0.15 if Controls.cmd_held(&"cmd_fine") else 1.0) * axis
+	var over := throttle > 0.0 and Controls.cmd_held(&"cmd_overdrive")
 	if over:
 		overdrive = minf(overdrive + delta * 0.3, 1.0)
 	else:
@@ -671,6 +674,9 @@ func _choice(label: String, odds: float, win: Dictionary, lose: Dictionary = {},
 
 func _repair_card() -> void:
 	if Card.busy():
+		return
+	if Run.crew >= 2:
+		Events.toast.emit("El tripulante repara en la nave. Tirada penalizada: V / Y", Ui.LAMP_CAUTION)
 		return
 	var part: ShipPart = null
 	for p: ShipPart in Run.ship.parts:
