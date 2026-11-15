@@ -1,0 +1,135 @@
+{
+  "status": "audio_in_progress",
+  "source_commit": "fb078cf960af9531d7b6273b8cb37e8155fa58fe",
+  "width": 1920,
+  "height": 1080,
+  "fps": 30,
+  "frames": 891,
+  "duration": 29.7,
+  "sample_rate": 48000,
+  "target_lufs": -14,
+  "max_true_peak_dbtp": -1,
+  "bpm": 120,
+  "key": "D minor",
+  "flow_id": "BAEAHiPFoIgGWuwnglk6",
+  "voice_id": "20BLHNU68Kmgsrc8Ixqj",
+  "voice_name": "Alexander Black- Professional Narrator",
+  "model_id": "eleven_v4",
+  "voice_cues": [
+    {
+      "file": "vo_01.mp3",
+      "start": 0.15,
+      "end": 2.85,
+      "text": "We are Team Skaar, from Mérida, Mexico."
+    },
+    {
+      "file": "vo_02.mp3",
+      "start": 3.1,
+      "end": 7.75,
+      "text": "Our challenge: Space Mission Design Game. Students rarely see how a real mission is designed."
+    },
+    {
+      "file": "vo_03.mp3",
+      "start": 8.12,
+      "end": 11.8,
+      "text": "So we built Margin Zero: mission design with zero margin for error."
+    },
+    {
+      "file": "vo_04.mp3",
+      "start": 12.1,
+      "end": 14.85,
+      "text": "Pick a contract. Build a rocket on a tight budget."
+    },
+    {
+      "file": "vo_05.mp3",
+      "start": 15.08,
+      "end": 16.9,
+      "text": "Launch, and fly it yourself."
+    },
+    {
+      "file": "vo_06.mp3",
+      "start": 17.1,
+      "end": 20.85,
+      "text": "Space fights back, modeled on NASA and JPL open data."
+    },
+    {
+      "file": "vo_07.mp3",
+      "start": 23.08,
+      "end": 24.9,
+      "text": "Every flight ends with a debrief of what went wrong."
+    },
+    {
+      "file": "vo_08.mp3",
+      "start": 25.1,
+      "end": 29.1,
+      "text": "Training the next generation of mission designers."
+    }
+  ],
+  "silence": [
+    7.85,
+    8.0
+  ],
+  "no_voice": [
+    21,
+    23
+  ],
+  "music_sections": [
+    [
+      0,
+      7.85,
+      "Cold open tension"
+    ],
+    [
+      8,
+      12,
+      "Hero drop"
+    ],
+    [
+      12,
+      21,
+      "Rhythmic drive"
+    ],
+    [
+      21,
+      23,
+      "Climax"
+    ],
+    [
+      23,
+      25,
+      "Debrief tension"
+    ],
+    [
+      25,
+      29.7,
+      "Final button"
+    ]
+  ],
+  "sfx": [
+    {
+      "name": "riser",
+      "start": 5.5,
+      "end": 7.85
+    },
+    {
+      "name": "sub_drop_D",
+      "start": 8,
+      "end": 9.0
+    },
+    {
+      "name": "ignition_launch",
+      "start": 15,
+      "end": 17
+    },
+    {
+      "name": "solar_warning",
+      "start": 17,
+      "end": 18.5
+    },
+    {
+      "name": "reentry_climax",
+      "start": 21,
+      "end": 23
+    }
+  ]
+}

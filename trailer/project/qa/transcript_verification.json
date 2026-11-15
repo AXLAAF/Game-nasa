@@ -1,0 +1,5 @@
+{
+  "expected": "We are Team Skaar, from Mérida, Mexico. Our challenge: Space Mission Design Game. Students rarely see how a real mission is designed. So we built Margin Zero: mission design with zero margin for error. Pick a contract. Build a rocket on a tight budget. Launch, and fly it yourself. Space fights back, modeled on NASA and JPL open data. Every flight ends with a debrief of what went wrong. Training the next generation of mission designers.",
+  "recognized": "We are Team Skaar from Mérida, Mexico. Our challenge? Space mission design game. Students rarely see how a real mission is designed. So we built Margin Zero, mission design with zero margin for error. Pick a contract, build a rocket on a tight budget, launch and fly it yourself. Space fights back, modeled on NASA and JPL open data. Every flight ends with a debrief of what went wrong, training the next generation of mission designers.",
+  "exact_words_match": true
+}

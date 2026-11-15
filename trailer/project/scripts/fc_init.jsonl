@@ -1,0 +1,3 @@
+{"id": "file.newProject", "params": {"name": "margin_zero_trailer"}}
+{"id": "file.newSequence", "params": {"name": "Margin Zero \u2014 Official Trailer 29.7s", "width": 1920, "height": 1080, "fps": 30, "sampleRate": 48000, "video": 1, "audio": 4, "mix": "Stereo"}}
+{"id": "file.import", "params": {"paths": ["/tmp/mz_trailer/renders/visual_master_v2.mp4", "/tmp/mz_trailer/vo/voice_stem.wav", "/tmp/mz_trailer/music/music_stem.wav", "/tmp/mz_trailer/sfx/sfx_stem.wav", "/tmp/mz_trailer/audio_trailer_master.wav"]}}

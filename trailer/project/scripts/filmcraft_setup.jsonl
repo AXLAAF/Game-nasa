@@ -1,0 +1,25 @@
+{"id": "timeline.place", "params": {"item": 7, "track": "V1", "seconds": 0, "insert": false, "duration": {"frame": 891}, "video": true, "audio": false}}
+{"id": "timeline.setTrack", "params": {"track": "V1", "name": "Visual master \u2014 EffectCraft", "muted": false}}
+{"id": "timeline.setTrack", "params": {"track": "A1", "name": "English voice-over \u2014 pending ElevenLabs", "muted": false}}
+{"id": "timeline.setTrack", "params": {"track": "A2", "name": "Original music 120 BPM \u2014 pending ElevenLabs", "muted": false}}
+{"id": "timeline.setTrack", "params": {"track": "A3", "name": "Cinematic SFX \u2014 pending ElevenLabs", "muted": false}}
+{"id": "timeline.setTrack", "params": {"track": "A4", "name": "Reference master \u2014 muted", "muted": true}}
+{"id": "markers.add", "params": {"target": "program", "time": 38102400000, "name": "vo_01.mp3", "comment": "We are Team Skaar, from M\u00e9rida, Mexico.", "durationFrames": 81}}
+{"id": "markers.add", "params": {"target": "program", "time": 787449600000, "name": "vo_02.mp3", "comment": "Our challenge: Space Mission Design Game. Students rarely see how a real mission is designed.", "durationFrames": 140}}
+{"id": "markers.add", "params": {"target": "program", "time": 2062609920000, "name": "vo_03.mp3", "comment": "So we built Margin Zero: mission design with zero margin for error.", "durationFrames": 110}}
+{"id": "markers.add", "params": {"target": "program", "time": 3073593600000, "name": "vo_04.mp3", "comment": "Pick a contract. Build a rocket on a tight budget.", "durationFrames": 82}}
+{"id": "markers.add", "params": {"target": "program", "time": 3830561280000, "name": "vo_05.mp3", "comment": "Launch, and fly it yourself.", "durationFrames": 55}}
+{"id": "markers.add", "params": {"target": "program", "time": 4343673600000, "name": "vo_06.mp3", "comment": "Space fights back, modeled on NASA and JPL open data.", "durationFrames": 112}}
+{"id": "markers.add", "params": {"target": "program", "time": 5862689280000, "name": "vo_07.mp3", "comment": "Every flight ends with a debrief of what went wrong.", "durationFrames": 55}}
+{"id": "markers.add", "params": {"target": "program", "time": 6375801600000, "name": "vo_08.mp3", "comment": "Training the next generation of mission designers.", "durationFrames": 120}}
+{"id": "markers.add", "params": {"target": "program", "time": 0, "name": "OPENING"}}
+{"id": "markers.add", "params": {"target": "program", "time": 762048000000, "name": "CHALLENGE"}}
+{"id": "markers.add", "params": {"target": "program", "time": 2032128000000, "name": "TITLE / HERO DROP"}}
+{"id": "markers.add", "params": {"target": "program", "time": 3048192000000, "name": "01 CONTRACT"}}
+{"id": "markers.add", "params": {"target": "program", "time": 3429216000000, "name": "02 BUILD"}}
+{"id": "markers.add", "params": {"target": "program", "time": 3810240000000, "name": "03 LAUNCH"}}
+{"id": "markers.add", "params": {"target": "program", "time": 4318272000000, "name": "04 FLY"}}
+{"id": "markers.add", "params": {"target": "program", "time": 5334336000000, "name": "05 LAND / NO VOICE"}}
+{"id": "markers.add", "params": {"target": "program", "time": 5842368000000, "name": "06 DEBRIEF"}}
+{"id": "markers.add", "params": {"target": "program", "time": 6350400000000, "name": "CLOSING"}}
+{"id": "sequence.setWorkArea", "params": {"start": 0, "end": 7544275200000}}

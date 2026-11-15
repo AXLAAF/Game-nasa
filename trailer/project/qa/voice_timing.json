@@ -1,0 +1,66 @@
+[
+  {
+    "clip": "vo_01",
+    "raw_trimmed_seconds": 2.557729,
+    "tempo_factor": 1,
+    "seconds": 2.572729,
+    "start": 0.15,
+    "end": 2.7227289999999997
+  },
+  {
+    "clip": "vo_02",
+    "raw_trimmed_seconds": 5.667167,
+    "tempo_factor": 1.2253334054054055,
+    "seconds": 4.64,
+    "start": 3.1,
+    "end": 7.74
+  },
+  {
+    "clip": "vo_03",
+    "raw_trimmed_seconds": 4.176208,
+    "tempo_factor": 1.1426013679890556,
+    "seconds": 3.67,
+    "start": 8.12,
+    "end": 11.79
+  },
+  {
+    "clip": "vo_04",
+    "raw_trimmed_seconds": 2.765063,
+    "tempo_factor": 1.014702018348624,
+    "seconds": 2.74,
+    "start": 12.1,
+    "end": 14.84
+  },
+  {
+    "clip": "vo_05",
+    "raw_trimmed_seconds": 1.845708,
+    "tempo_factor": 1.0282495821727027,
+    "seconds": 1.81,
+    "start": 15.08,
+    "end": 16.89
+  },
+  {
+    "clip": "vo_06",
+    "raw_trimmed_seconds": 3.96275,
+    "tempo_factor": 1.0638255033557047,
+    "seconds": 3.74,
+    "start": 17.1,
+    "end": 20.840000000000003
+  },
+  {
+    "clip": "vo_07",
+    "raw_trimmed_seconds": 2.547125,
+    "tempo_factor": 1.419011142061281,
+    "seconds": 1.81,
+    "start": 23.08,
+    "end": 24.889999999999997
+  },
+  {
+    "clip": "vo_08",
+    "raw_trimmed_seconds": 2.919396,
+    "tempo_factor": 1,
+    "seconds": 2.934396,
+    "start": 25.1,
+    "end": 28.034396
+  }
+]
