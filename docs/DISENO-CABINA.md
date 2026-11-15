@@ -63,6 +63,7 @@ B612 y B612 Mono (SIL OFL, `assets/fonts/`), la familia que Airbus diseno para p
 | `Lamp` | `game/ui/lamp.gd` | estado con leyenda |
 | `Annunciator` | `game/ui/annunciator.gd` | una lampara por pieza de la nave; `C` despliega el detalle |
 | `Gauge` | `game/ui/gauge.gd` | cinta de medida con marcas cada 10 % |
+| `Modal` | `game/ui/modal.gd` | ventana de menu (pausa, ajustes, creditos, confirmaciones); Esc la cierra y devuelve el foco |
 
 ## Movimiento
 

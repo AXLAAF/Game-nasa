@@ -1,6 +1,7 @@
 extends Node
 
 const PHASES: Dictionary = {
+	&"title": "res://game/phases/title.gd",
 	&"hangar": "res://game/phases/hangar.gd",
 	&"assembly": "res://game/phases/assembly.gd",
 	&"launch": "res://game/phases/launch.gd",
@@ -87,7 +88,8 @@ func _swap(phase_id: StringName) -> void:
 	host.add_child(phase)
 	current = phase_id
 	Events.phase_changed.emit(phase_id)
-	Tutorial.offer(phase_id)
+	if phase_id != &"title":
+		Tutorial.offer(phase_id)
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

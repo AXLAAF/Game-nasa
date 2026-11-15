@@ -14,6 +14,9 @@ func run(scene_tree: SceneTree) -> void:
 			Profile.tutorial_seen.append(String(phase))
 	tree.root.add_child(load("res://game/main.tscn").instantiate())
 	await _wait(1.0)
+	await _shot("0_title")
+	await _go(&"hangar")
+	await _wait(1.0)
 	await _shot("1_hangar")
 	Run.debug_setup()
 	for phase: StringName in [&"assembly", &"launch", &"space"]:
@@ -41,6 +44,15 @@ func run(scene_tree: SceneTree) -> void:
 	Tutorial.replay()
 	await _wait(0.5)
 	await _shot("8_tutorial")
+	Tutorial._open._skip()
+	await _wait(0.5)
+	Pause.open()
+	await _wait(0.6)
+	await _shot("9_pausa")
+	SettingsPanel.show_panel()
+	await _wait(0.6)
+	await _shot("10_ajustes")
+	Modal.close_all()
 	print("SHOTS ", ProjectSettings.globalize_path(_dir))
 
 

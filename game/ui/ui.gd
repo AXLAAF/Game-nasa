@@ -143,6 +143,18 @@ static func theme() -> Theme:
 	_theme.set_stylebox("grabber_highlight", "VScrollBar", box(IVORY_DIM, IVORY_DIM, 0, 3))
 	_theme.set_stylebox("grabber_pressed", "VScrollBar", box(IVORY, IVORY, 0, 3))
 	_theme.set_stylebox("scroll", "VScrollBar", box(Color("0b0c0d"), BAKELITE, 0, 3))
+	var track := box(BAKELITE_EDGE, BAKELITE_EDGE, 0, 3)
+	track.content_margin_top = 3
+	track.content_margin_bottom = 3
+	_theme.set_stylebox("slider", "HSlider", track)
+	var fill := box(ENAMEL_LIGHT, ENAMEL_LIGHT, 0, 3)
+	_theme.set_stylebox("grabber_area", "HSlider", fill)
+	_theme.set_stylebox("grabber_area_highlight", "HSlider", fill)
+	var knob := Image.create(12, 22, false, Image.FORMAT_RGBA8)
+	knob.fill(IVORY)
+	var knob_tex := ImageTexture.create_from_image(knob)
+	for state: String in ["grabber", "grabber_highlight", "grabber_disabled"]:
+		_theme.set_icon(state, "HSlider", knob_tex)
 	return _theme
 
 

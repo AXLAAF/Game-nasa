@@ -19,6 +19,12 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var music_failed: int = await music_suite.new().run()
+	var menu_suite: Script = load("res://tests/menu_tests.gd")
+	if menu_suite == null:
+		push_error("FAIL: los tests de menu no compilan")
+		quit(1)
+		return
+	var menu_failed: int = menu_suite.new().run()
 	var coop_suite: Script = load("res://tests/coop_tests.gd")
 	if coop_suite == null:
 		push_error("FAIL: los tests de cooperativo no compilan")
@@ -31,7 +37,7 @@ func _initialize() -> void:
 		quit(1)
 		return
 	var io_failed: int = _run_mcp_suite(io_suite)
-	quit(1 if failed + broken + music_failed + coop_failed + io_failed > 0 else 0)
+	quit(1 if failed + broken + music_failed + menu_failed + coop_failed + io_failed > 0 else 0)
 
 
 func _run_mcp_suite(suite_script: Script) -> int:

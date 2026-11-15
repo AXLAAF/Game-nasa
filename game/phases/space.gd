@@ -160,7 +160,7 @@ func _build_hud() -> void:
 	_rescue_button = Ui.compact(Ui.button(buttons, "Pedir rescate", _stranded_card))
 	Ui.annunciator(root)
 	var ticker := Ticker.new()
-	Ui.place(ticker, Rect2(12, 12, 380, 200))
+	Ui.place(ticker, Rect2(44, 12, 380, 200))
 	root.add_child(ticker)
 	_prompt = Ui.banner(root, Ui.SIZE_READOUT, 0)
 	_prompt.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
